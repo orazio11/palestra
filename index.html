@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v19</title>
+    <title>App Schede Palestra v20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,10 +104,12 @@
 
         <!-- VISTA DETTAGLIO ESERCIZIO -->
         <div id="exercise-detail-view" class="hidden">
-            <button id="back-to-list-btn" class="mb-4 flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Torna alla Lista
-            </button>
+            <div class="flex items-center gap-4 mb-4 sticky top-4 z-20 bg-gray-900 py-2">
+                <button id="back-to-list-btn" class="p-3 bg-gray-700 rounded-lg text-blue-400 hover:bg-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <select id="exercise-jumper" class="w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"></select>
+            </div>
             <div id="exercise-detail-container"></div>
         </div>
 
@@ -156,6 +158,7 @@
         const listContainer = document.getElementById('exercise-list-container');
         const detailContainer = document.getElementById('exercise-detail-container');
         const backToListBtn = document.getElementById('back-to-list-btn');
+        const exerciseJumper = document.getElementById('exercise-jumper');
 
         // --- STATO APPLICAZIONE ---
         let currentAthlete = "Erika";
@@ -320,8 +323,7 @@
                             currentWeek = weekNum;
                             document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
                             btn.classList.add('active');
-                            // Se siamo in vista dettaglio, ri-renderizza la card
-                            if (detailView.classList.contains('hidden') === false) {
+                            if (!detailView.classList.contains('hidden')) {
                                 const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
                                 renderExerciseDetail(exerciseIndex);
                             }
@@ -361,9 +363,28 @@
             });
         }
 
+        function populateExerciseJumper(currentExerciseIndex) {
+            exerciseJumper.innerHTML = '';
+            const exercises = currentSheetData.slice(exerciseStartRowIndex);
+            exercises.forEach((row, rowIndex) => {
+                const esercizio = row[2] || 'Nuovo Esercizio';
+                if (row.every(cell => cell === '')) return;
+                
+                const option = document.createElement('option');
+                option.value = rowIndex;
+                option.textContent = esercizio;
+                if (rowIndex === currentExerciseIndex) {
+                    option.selected = true;
+                }
+                exerciseJumper.appendChild(option);
+            });
+        }
+
         function renderExerciseDetail(exerciseIndex) {
             detailContainer.innerHTML = '';
             detailContainer.dataset.exerciseIndex = exerciseIndex;
+            
+            populateExerciseJumper(exerciseIndex);
             
             const originalRowIndex = exerciseIndex + exerciseStartRowIndex;
             const row = currentSheetData[originalRowIndex];
@@ -616,6 +637,10 @@
         addRowBtn.addEventListener('click', handleAddNewRow);
         addWeekBtn.addEventListener('click', handleAddWeek);
         backToListBtn.addEventListener('click', showListView);
+        exerciseJumper.addEventListener('change', (e) => {
+            const newIndex = parseInt(e.target.value, 10);
+            renderExerciseDetail(newIndex);
+        });
     </script>
 </body>
 </html>
