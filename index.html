@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v16</title>
+    <title>App Schede Palestra v17</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -359,8 +359,21 @@
                 for (let i = 0; i < 4; i++) {
                     const caricoCol = weekCols.start + (i * 2);
                     const repCol = caricoCol + 1;
+                    
+                    let prevWeekHint = '';
+                    if (weekToShow > 1 && weekColRanges[weekToShow - 1]) {
+                        const prevWeekCols = weekColRanges[weekToShow - 1];
+                        const prevSeriesData = row.slice(prevWeekCols.start, prevWeekCols.end);
+                        const prevLoad = prevSeriesData[i*2] || '-';
+                        const prevReps = prevSeriesData[i*2+1] || '-';
+                        if (prevLoad !== '-' || prevReps !== '-') {
+                            prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
+                        }
+                    }
+
                     weeklySeriesHTML += `
                         <div class="grid grid-cols-3 items-center gap-3">
+                            ${prevWeekHint}
                             <span class="font-bold text-gray-400">Serie ${i + 1}</span>
                             <input type="number" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
                             <input type="number" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
@@ -394,7 +407,7 @@
                         ${createDetailField('Tecnica', tecnica, 3)}
                         ${createDetailField('Note', note, 4)}
                         ${linkFieldHTML}
-                        <div class="grid grid-cols-2 gap-x-4 pt-2 mt-2 border-t border-gray-700">
+                        <div class="space-y-2 pt-2 mt-2 border-t border-gray-700">
                             ${createDetailField('Serie', serie, 8)}
                             ${createDetailField('Ripetizioni', ripetizioni, 9)}
                             ${createDetailField('RIR', rir, 6)}
