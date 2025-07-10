@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v18</title>
+    <title>App Schede Palestra v19</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
         }
         .week-btn {
             transition: all 0.2s ease-in-out;
-            flex-shrink: 0; /* Impedisce ai bottoni di restringersi */
+            flex-shrink: 0;
         }
         .week-btn.active {
             background-color: #2563eb;
@@ -57,13 +57,8 @@
         .edit-mode { display: none; }
         .card-editing .view-mode { display: none; }
         .card-editing .edit-mode { display: block; }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
@@ -74,7 +69,7 @@
         </header>
 
         <!-- Sezione Controlli -->
-        <div class="controls bg-gray-800 p-4 rounded-xl shadow-lg mb-6 flex flex-col gap-4 sticky top-4 z-20">
+        <div id="controls-panel" class="controls bg-gray-800 p-4 rounded-xl shadow-lg mb-6 flex flex-col gap-4 sticky top-4 z-20">
             <div class="flex items-center gap-4">
                 <label for="athlete-selector" class="font-semibold text-gray-300">Atleta:</label>
                 <select id="athlete-selector" class="w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"></select>
@@ -94,18 +89,28 @@
         <div id="status-message" class="text-center mb-4 h-6"></div>
         <div id="loader" class="loader hidden"></div>
 
-        <!-- Contenitore Schede Esercizi -->
-        <div id="exercise-cards-container" class="space-y-6"></div>
-
-        <!-- Pulsanti Azioni -->
-        <div id="action-buttons" class="mt-8 flex justify-center gap-4 hidden">
-            <button id="add-row-btn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition shadow-lg">
-                + Aggiungi Esercizio
-            </button>
-            <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">
-                + Aggiungi Settimana
-            </button>
+        <!-- VISTA LISTA ESERCIZI -->
+        <div id="exercise-list-view">
+            <div id="exercise-list-container" class="space-y-3"></div>
+            <div id="action-buttons" class="mt-8 flex justify-center gap-4 hidden">
+                <button id="add-row-btn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition shadow-lg">
+                    + Aggiungi Esercizio
+                </button>
+                <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">
+                    + Aggiungi Settimana
+                </button>
+            </div>
         </div>
+
+        <!-- VISTA DETTAGLIO ESERCIZIO -->
+        <div id="exercise-detail-view" class="hidden">
+            <button id="back-to-list-btn" class="mb-4 flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Torna alla Lista
+            </button>
+            <div id="exercise-detail-container"></div>
+        </div>
+
     </div>
 
     <!-- Finestra Modale per Password -->
@@ -123,8 +128,6 @@
     <script>
         // ========================================================================
         // --- CONFIGURAZIONE ATLETI ---
-        // Per aggiungere un nuovo atleta, copia una delle righe qui sotto,
-        // incollala e cambia il nome (es. "Marco") e l'URL dello script.
         // ========================================================================
         const athletes = {
             "Erika": {
@@ -133,10 +136,6 @@
             "Alice": {
                 scriptURL: 'https://script.google.com/macros/s/AKfycbz2HNrfgHESlyL3tG8NKYiVZ6sqxqw5UdHcu7bhaAuSBpXdDnflAleDt-EweIhz-7YM/exec'
             }
-            // Esempio per un nuovo atleta:
-            // "Marco": {
-            //     scriptURL: 'URL_DELLO_SCRIPT_DI_MARCO'
-            // }
         };
         // ========================================================================
 
@@ -145,12 +144,18 @@
         const sheetSelector = document.getElementById('sheet-selector');
         const weekSelector = document.getElementById('week-selector');
         const newSheetBtn = document.getElementById('new-sheet-btn');
-        const cardsContainer = document.getElementById('exercise-cards-container');
         const loader = document.getElementById('loader');
         const statusMessage = document.getElementById('status-message');
         const addRowBtn = document.getElementById('add-row-btn');
         const addWeekBtn = document.getElementById('add-week-btn');
         const actionButtons = document.getElementById('action-buttons');
+        const controlsPanel = document.getElementById('controls-panel');
+        // Viste
+        const listView = document.getElementById('exercise-list-view');
+        const detailView = document.getElementById('exercise-detail-view');
+        const listContainer = document.getElementById('exercise-list-container');
+        const detailContainer = document.getElementById('exercise-detail-container');
+        const backToListBtn = document.getElementById('back-to-list-btn');
 
         // --- STATO APPLICAZIONE ---
         let currentAthlete = "Erika";
@@ -244,8 +249,9 @@
 
         async function loadSheetData(sheetName) {
             showLoader(true);
-            cardsContainer.innerHTML = '';
+            listContainer.innerHTML = '';
             actionButtons.classList.add('hidden');
+            showListView();
 
             try {
                 const passCheckResponse = await fetch(`${currentScriptURL}?action=isPasswordRequired&sheetName=${encodeURIComponent(sheetName)}`);
@@ -266,7 +272,7 @@
                     }
                     currentSheetData = result.data;
                     analyzeSheetStructure(currentSheetData);
-                    renderExerciseCards(currentSheetData, currentWeek);
+                    renderExerciseList(currentSheetData);
                     actionButtons.classList.remove('hidden');
                 } else { 
                     delete sheetPasswords[`${currentAthlete}-${sheetName}`];
@@ -314,8 +320,10 @@
                             currentWeek = weekNum;
                             document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
                             btn.classList.add('active');
-                            if (currentSheetData.length > 0) {
-                                renderExerciseCards(currentSheetData, currentWeek);
+                            // Se siamo in vista dettaglio, ri-renderizza la card
+                            if (detailView.classList.contains('hidden') === false) {
+                                const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
+                                renderExerciseDetail(exerciseIndex);
                             }
                         };
                         weekSelector.appendChild(btn);
@@ -324,105 +332,140 @@
             });
         }
 
-        function renderExerciseCards(data, weekToShow) {
-            cardsContainer.innerHTML = '';
+        function renderExerciseList(data) {
+            listContainer.innerHTML = '';
             if (exerciseStartRowIndex === -1) {
-                cardsContainer.innerHTML = `<p class="p-4 text-center text-red-400">Struttura foglio non riconosciuta. Assicurati che ci sia una riga con "CATEGORIA" e "ESERCIZIO".</p>`;
+                listContainer.innerHTML = `<p class="p-4 text-center text-red-400">Struttura foglio non riconosciuta.</p>`;
                 return;
             }
-
-            const weekCols = weekColRanges[weekToShow];
-            if (!weekCols) {
-                cardsContainer.innerHTML = `<p class="p-4 text-center text-gray-500">Dati per la settimana ${weekToShow} non trovati.</p>`;
-                return;
-            }
-
+            
             const exercises = data.slice(exerciseStartRowIndex);
-
             exercises.forEach((row, rowIndex) => {
-                const originalRowIndex = rowIndex + exerciseStartRowIndex;
-                
-                const categoria = row[1] || '';   // B
-                const esercizio = row[2] || '';   // C
-                const tecnica = row[3] || '';     // D
-                const note = row[4] || '';        // E
-                const link = row[5] || '';        // F
-                const rir = row[6] || '';         // G
-                const recupero = row[7] || '';    // H
-                const serie = row[8] || '';       // I
-                const ripetizioni = row[9] || ''; // J
+                const esercizio = row[2] || '';
+                const categoria = row[1] || '';
 
                 if (row.every(cell => cell === '')) return;
 
-                const card = document.createElement('div');
-                card.className = 'exercise-card bg-gray-800 p-5 rounded-lg shadow-md';
+                const item = document.createElement('div');
+                item.className = 'bg-gray-800 p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-700 transition flex justify-between items-center';
+                item.onclick = () => showExerciseDetail(rowIndex);
                 
-                const seriesData = row.slice(weekCols.start, weekCols.end);
-                let weeklySeriesHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const caricoCol = weekCols.start + (i * 2);
-                    const repCol = caricoCol + 1;
-                    
-                    let prevWeekHint = '';
-                    if (weekToShow > 1 && weekColRanges[weekToShow - 1]) {
-                        const prevWeekCols = weekColRanges[weekToShow - 1];
-                        const prevSeriesData = row.slice(prevWeekCols.start, prevWeekCols.end);
-                        const prevLoad = prevSeriesData[i*2] || '-';
-                        const prevReps = prevSeriesData[i*2+1] || '-';
-                        if (prevLoad !== '-' || prevReps !== '-') {
-                            prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
-                        }
-                    }
+                item.innerHTML = `
+                    <div>
+                        <h3 class="text-lg font-bold text-white">${esercizio || 'Nuovo Esercizio'}</h3>
+                        <p class="text-sm text-gray-400">${categoria}</p>
+                    </div>
+                    <svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
 
-                    weeklySeriesHTML += `
-                        <div class="grid grid-cols-3 items-center gap-3">
-                            ${prevWeekHint}
-                            <span class="font-bold text-gray-400">Serie ${i + 1}</span>
-                            <input type="number" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
-                            <input type="number" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
-                        </div>
-                    `;
+        function renderExerciseDetail(exerciseIndex) {
+            detailContainer.innerHTML = '';
+            detailContainer.dataset.exerciseIndex = exerciseIndex;
+            
+            const originalRowIndex = exerciseIndex + exerciseStartRowIndex;
+            const row = currentSheetData[originalRowIndex];
+            const weekToShow = currentWeek;
+            
+            const weekCols = weekColRanges[weekToShow];
+            if (!weekCols) {
+                detailContainer.innerHTML = `<p class="p-4 text-center text-gray-500">Dati per la settimana ${weekToShow} non trovati.</p>`;
+                return;
+            }
+
+            const categoria = row[1] || '';   // B
+            const esercizio = row[2] || '';   // C
+            const tecnica = row[3] || '';     // D
+            const note = row[4] || '';        // E
+            const link = row[5] || '';        // F
+            const rir = row[6] || '';         // G
+            const recupero = row[7] || '';    // H
+            const serie = row[8] || '';       // I
+            const ripetizioni = row[9] || ''; // J
+
+            const card = document.createElement('div');
+            card.className = 'exercise-card bg-gray-800 p-5 rounded-lg shadow-md';
+            
+            const seriesData = row.slice(weekCols.start, weekCols.end);
+            let weeklySeriesHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const caricoCol = weekCols.start + (i * 2);
+                const repCol = caricoCol + 1;
+                
+                let prevWeekHint = '';
+                if (weekToShow > 1 && weekColRanges[weekToShow - 1]) {
+                    const prevWeekCols = weekColRanges[weekToShow - 1];
+                    const prevSeriesData = row.slice(prevWeekCols.start, prevWeekCols.end);
+                    const prevLoad = prevSeriesData[i*2] || '-';
+                    const prevReps = prevSeriesData[i*2+1] || '-';
+                    if (prevLoad !== '-' || prevReps !== '-') {
+                        prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
+                    }
                 }
 
-                const createDetailField = (label, value, colIndex) => `
-                    <div class="grid grid-cols-3 gap-x-4 items-center">
-                        <label class="text-gray-400 font-semibold col-span-1">${label}</label>
-                        <div class="col-span-2">
-                            <p class="view-mode text-gray-200 py-2">${value || '...'}</p>
-                            <input type="text" class="edit-mode editable-input" value="${value}" data-row="${originalRowIndex}" data-col="${colIndex}" oninput="handleCellUpdate(event)">
-                        </div>
-                    </div>`;
-                
-                const linkIcon = link.startsWith('http') ? `<a href="${link}" target="_blank" class="text-blue-400 hover:text-blue-300 absolute right-0 top-0 p-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : '';
-                const linkFieldHTML = `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-gray-400 font-semibold col-span-1">Link</label><div class="col-span-2 relative"><p class="view-mode text-gray-200 py-2 truncate">${link || '...'}</p><input type="text" class="edit-mode editable-input" value="${link}" data-row="${originalRowIndex}" data-col="5" oninput="handleCellUpdate(event)">${linkIcon}</div></div>`;
-
-                card.innerHTML = `
-                    <div class="relative">
-                        <div class="view-mode"><h3 class="text-xl font-bold text-white mb-3">${esercizio || 'Nuovo Esercizio'}</h3></div>
-                        <div class="edit-mode mb-3">${createDetailField('Esercizio', esercizio, 2)}</div>
-                        <button class="absolute top-0 right-0 p-1 text-gray-400 hover:text-white" onclick="toggleEditMode(this)">
-                            <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            <svg class="save-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </button>
+                weeklySeriesHTML += `
+                    <div class="grid grid-cols-3 items-center gap-3">
+                        ${prevWeekHint}
+                        <span class="font-bold text-gray-400">Serie ${i + 1}</span>
+                        <input type="number" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
+                        <input type="number" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
                     </div>
-                    <div class="text-sm space-y-2">
-                        ${createDetailField('Categoria', categoria, 1)}
-                        ${createDetailField('Tecnica', tecnica, 3)}
-                        ${createDetailField('Note', note, 4)}
-                        ${linkFieldHTML}
-                        <div class="space-y-2 pt-2 mt-2 border-t border-gray-700">
-                            ${createDetailField('Serie', serie, 8)}
-                            ${createDetailField('Ripetizioni', ripetizioni, 9)}
-                            ${createDetailField('RIR', rir, 6)}
-                            ${createDetailField('Recupero', recupero, 7)}
-                        </div>
-                    </div>
-                    <hr class="border-gray-700 my-4">
-                    <h4 class="text-lg font-semibold text-gray-200 mb-3">Carichi Settimana ${weekToShow}</h4>
-                    <div class="space-y-3">${weeklySeriesHTML}</div>
                 `;
-                cardsContainer.appendChild(card);
-            });
+            }
+
+            const createDetailField = (label, value, colIndex) => `
+                <div class="grid grid-cols-3 gap-x-4 items-center">
+                    <label class="text-gray-400 font-semibold col-span-1">${label}</label>
+                    <div class="col-span-2">
+                        <p class="view-mode text-gray-200 py-2">${value || '...'}</p>
+                        <input type="text" class="edit-mode editable-input" value="${value}" data-row="${originalRowIndex}" data-col="${colIndex}" oninput="handleCellUpdate(event)">
+                    </div>
+                </div>`;
+            
+            const linkIcon = link.startsWith('http') ? `<a href="${link}" target="_blank" class="text-blue-400 hover:text-blue-300 absolute right-0 top-0 p-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : '';
+            const linkFieldHTML = `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-gray-400 font-semibold col-span-1">Link</label><div class="col-span-2 relative"><p class="view-mode text-gray-200 py-2 truncate">${link || '...'}</p><input type="text" class="edit-mode editable-input" value="${link}" data-row="${originalRowIndex}" data-col="5" oninput="handleCellUpdate(event)">${linkIcon}</div></div>`;
+
+            card.innerHTML = `
+                <div class="relative">
+                    <div class="view-mode"><h3 class="text-xl font-bold text-white mb-3">${esercizio || 'Nuovo Esercizio'}</h3></div>
+                    <div class="edit-mode mb-3">${createDetailField('Esercizio', esercizio, 2)}</div>
+                    <button class="absolute top-0 right-0 p-1 text-gray-400 hover:text-white" onclick="toggleEditMode(this)">
+                        <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <svg class="save-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
+                <div class="text-sm space-y-2">
+                    ${createDetailField('Categoria', categoria, 1)}
+                    ${createDetailField('Tecnica', tecnica, 3)}
+                    ${createDetailField('Note', note, 4)}
+                    ${linkFieldHTML}
+                    <div class="space-y-2 pt-2 mt-2 border-t border-gray-700">
+                        ${createDetailField('Serie', serie, 8)}
+                        ${createDetailField('Ripetizioni', ripetizioni, 9)}
+                        ${createDetailField('RIR', rir, 6)}
+                        ${createDetailField('Recupero', recupero, 7)}
+                    </div>
+                </div>
+                <hr class="border-gray-700 my-4">
+                <h4 class="text-lg font-semibold text-gray-200 mb-3">Carichi Settimana ${weekToShow}</h4>
+                <div class="space-y-3">${weeklySeriesHTML}</div>
+            `;
+            detailContainer.appendChild(card);
+        }
+
+        function showListView() {
+            listView.classList.remove('hidden');
+            detailView.classList.add('hidden');
+            controlsPanel.classList.remove('hidden');
+        }
+
+        function showExerciseDetail(exerciseIndex) {
+            listView.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            controlsPanel.classList.add('hidden');
+            renderExerciseDetail(exerciseIndex);
         }
         
         function toggleEditMode(button) {
@@ -445,8 +488,7 @@
             saveTimeout = setTimeout(() => {
                 showStatus('Salvataggio...', 'info');
                 const payload = { action: 'updateCell', sheetName, row, col, value: newValue };
-                const scrollY = window.scrollY;
-
+                
                 fetch(currentScriptURL, {
                     method: 'POST',
                     body: JSON.stringify(payload),
@@ -457,8 +499,8 @@
                     if (result.status === 'success') {
                         showStatus('Salvato!', 'success');
                         if (parseInt(col, 10) === 2 || parseInt(col, 10) === 5) {
-                             renderExerciseCards(currentSheetData, currentWeek);
-                             window.scrollTo(0, scrollY);
+                             const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
+                             renderExerciseDetail(exerciseIndex);
                         }
                     } else { throw new Error(result.message); }
                 })
@@ -573,6 +615,7 @@
         newSheetBtn.addEventListener('click', handleNewSheet);
         addRowBtn.addEventListener('click', handleAddNewRow);
         addWeekBtn.addEventListener('click', handleAddWeek);
+        backToListBtn.addEventListener('click', showListView);
     </script>
 </body>
 </html>
