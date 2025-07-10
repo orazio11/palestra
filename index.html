@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v17</title>
+    <title>App Schede Palestra v18</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,13 +57,12 @@
         .edit-mode { display: none; }
         .card-editing .view-mode { display: none; }
         .card-editing .edit-mode { display: block; }
-        /* Nasconde la scrollbar ma la lascia funzionante */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
         .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
@@ -86,7 +85,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
             </div>
-            <!-- NUOVA VISUALIZZAZIONE SETTIMANE -->
             <div id="week-selector" class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
                 <!-- I bottoni delle settimane verranno inseriti qui -->
             </div>
@@ -250,23 +248,28 @@
             actionButtons.classList.add('hidden');
 
             try {
-                const passwordKey = `${currentAthlete}-${sheetName}`;
-                let password = sheetPasswords[passwordKey] || '';
-                if (!password) {
-                    password = await promptForPassword(sheetName);
+                const passCheckResponse = await fetch(`${currentScriptURL}?action=isPasswordRequired&sheetName=${encodeURIComponent(sheetName)}`);
+                const passCheckResult = await passCheckResponse.json();
+
+                let password = '';
+                if (passCheckResult.status === 'success' && passCheckResult.data.required) {
+                    const passwordKey = `${currentAthlete}-${sheetName}`;
+                    password = sheetPasswords[passwordKey] || await promptForPassword(sheetName);
                 }
 
                 const response = await fetch(`${currentScriptURL}?action=getSheetData&sheetName=${encodeURIComponent(sheetName)}&password=${encodeURIComponent(password)}`);
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    sheetPasswords[passwordKey] = password;
+                    if (passCheckResult.data.required) {
+                        sheetPasswords[`${currentAthlete}-${sheetName}`] = password;
+                    }
                     currentSheetData = result.data;
                     analyzeSheetStructure(currentSheetData);
                     renderExerciseCards(currentSheetData, currentWeek);
                     actionButtons.classList.remove('hidden');
                 } else { 
-                    delete sheetPasswords[passwordKey];
+                    delete sheetPasswords[`${currentAthlete}-${sheetName}`];
                     throw new Error(result.message); 
                 }
             } catch (error) {
@@ -442,6 +445,7 @@
             saveTimeout = setTimeout(() => {
                 showStatus('Salvataggio...', 'info');
                 const payload = { action: 'updateCell', sheetName, row, col, value: newValue };
+                const scrollY = window.scrollY;
 
                 fetch(currentScriptURL, {
                     method: 'POST',
@@ -454,6 +458,7 @@
                         showStatus('Salvato!', 'success');
                         if (parseInt(col, 10) === 2 || parseInt(col, 10) === 5) {
                              renderExerciseCards(currentSheetData, currentWeek);
+                             window.scrollTo(0, scrollY);
                         }
                     } else { throw new Error(result.message); }
                 })
@@ -559,7 +564,7 @@
         athleteSelector.addEventListener('change', async (e) => {
             currentAthlete = e.target.value;
             currentScriptURL = athletes[currentAthlete].scriptURL;
-            sheetPasswords = {}; // Reset passwords when changing athlete
+            sheetPasswords = {};
             await loadSheets();
             const selectedSheet = sheetSelector.value;
             if(selectedSheet) await loadSheetData(selectedSheet);
