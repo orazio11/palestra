@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v23</title>
+    <title>App Schede Palestra v27</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .editable-input {
             -moz-appearance: textfield;
             background-color: #374151;
@@ -27,48 +26,19 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
         }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .week-btn {
-            transition: all 0.2s ease-in-out;
-            flex-shrink: 0;
-        }
-        .week-btn.active {
-            background-color: #2563eb;
-            color: white;
-        }
-        .loader {
-            border: 5px solid #374151;
-            border-top: 5px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .week-btn { transition: all 0.2s ease-in-out; flex-shrink: 0; }
+        .week-btn.active { background-color: #2563eb; color: white; }
+        .loader { border: 5px solid #374151; border-top: 5px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 40px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .view-mode { display: block; }
         .edit-mode { display: none; }
         .card-editing .view-mode { display: none; }
         .card-editing .edit-mode { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Animazione di lampeggio per il salvataggio */
-        @keyframes flash-green {
-            0% { background-color: #374151; } /* Colore di base */
-            50% { background-color: #10B981; } /* Verde brillante */
-            100% { background-color: #374151; } /* Torna al colore di base */
-        }
-        .flash-saved {
-            animation: flash-green 1s ease-in-out;
-        }
+        @keyframes flash-green { 0% { background-color: #374151; } 50% { background-color: #10B981; } 100% { background-color: #374151; } }
+        .flash-saved { animation: flash-green 1s ease-in-out; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
@@ -90,9 +60,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
             </div>
-            <div id="week-selector" class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
-                <!-- I bottoni delle settimane verranno inseriti qui -->
-            </div>
+            <div id="week-selector" class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar"></div>
         </div>
 
         <!-- Area Messaggi e Loader -->
@@ -102,16 +70,11 @@
         <!-- VISTA LISTA ESERCIZI -->
         <div id="exercise-list-view">
             <div id="exercise-list-container" class="space-y-3"></div>
-            <div id="action-buttons" class="mt-8 flex justify-center gap-4 hidden">
-                <button id="add-row-btn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition shadow-lg">
-                    + Aggiungi Esercizio
-                </button>
-                <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">
-                    + Aggiungi Settimana
-                </button>
-                 <button id="summary-btn" class="bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition shadow-lg">
-                    Riepilogo
-                </button>
+            <div id="action-buttons" class="mt-8 flex flex-wrap justify-center gap-4 hidden">
+                <button id="add-row-btn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition shadow-lg">+ Aggiungi Esercizio</button>
+                <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">+ Aggiungi Settimana</button>
+                 <button id="summary-btn" class="bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition shadow-lg">Riepilogo Storico</button>
+                <button id="category-summary-btn" class="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition shadow-lg">Riepilogo Categorie</button>
             </div>
         </div>
 
@@ -125,31 +88,40 @@
             </div>
             <div id="exercise-detail-container"></div>
         </div>
-
     </div>
 
-    <!-- Finestra Modale per Password -->
+    <!-- Modali -->
     <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-sm m-4">
             <h3 class="text-xl font-bold text-white mb-4" id="password-modal-title">Inserisci Password</h3>
-            <p class="text-sm text-gray-400 mb-4">Questa scheda è protetta. Inserisci la password che trovi nella cella B1 del foglio.</p>
+            <p class="text-sm text-gray-400 mb-4" id="password-modal-text">Questa scheda è protetta.</p>
             <input type="password" id="password-input" class="editable-input w-full mb-4" placeholder="Password...">
-            <button id="password-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
-                Accedi
-            </button>
+            <button id="password-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">Accedi</button>
         </div>
     </div>
-
-    <!-- Finestra Modale per Riepilogo -->
     <div id="summary-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-lg m-4 max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
-                 <h3 class="text-xl font-bold text-white">Riepilogo Storico</h3>
+                 <h3 class="text-xl font-bold text-white" id="summary-modal-title">Riepilogo</h3>
                  <button id="close-summary-btn" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
-            <div id="summary-content" class="overflow-y-auto space-y-4">
-                <!-- Il contenuto del riepilogo verrà inserito qui -->
+            <div id="summary-content" class="overflow-y-auto space-y-4"></div>
+        </div>
+    </div>
+    <div id="timer-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">Timer Recupero</h3>
+            <p id="timer-display" class="text-6xl font-mono text-blue-400 mb-6">00:00</p>
+            <button id="close-timer-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Chiudi</button>
+        </div>
+    </div>
+    <div id="chart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl m-4 max-h-[80vh] flex flex-col">
+             <div class="flex justify-between items-center mb-4">
+                 <h3 class="text-xl font-bold text-white">Grafico Progressione Carico</h3>
+                 <button id="close-chart-btn" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
+            <canvas id="load-chart"></canvas>
         </div>
     </div>
 
@@ -177,6 +149,7 @@
         const addRowBtn = document.getElementById('add-row-btn');
         const addWeekBtn = document.getElementById('add-week-btn');
         const summaryBtn = document.getElementById('summary-btn');
+        const categorySummaryBtn = document.getElementById('category-summary-btn');
         const actionButtons = document.getElementById('action-buttons');
         const controlsPanel = document.getElementById('controls-panel');
         // Viste
@@ -188,8 +161,14 @@
         const exerciseJumper = document.getElementById('exercise-jumper');
         // Modali
         const summaryModal = document.getElementById('summary-modal');
+        const summaryModalTitle = document.getElementById('summary-modal-title');
         const closeSummaryBtn = document.getElementById('close-summary-btn');
         const summaryContent = document.getElementById('summary-content');
+        const timerModal = document.getElementById('timer-modal');
+        const timerDisplay = document.getElementById('timer-display');
+        const closeTimerBtn = document.getElementById('close-timer-btn');
+        const chartModal = document.getElementById('chart-modal');
+        const closeChartBtn = document.getElementById('close-chart-btn');
 
         // --- STATO APPLICAZIONE ---
         let currentAthlete = "Erika";
@@ -201,6 +180,9 @@
         let weekColRanges = {};
         let weekHeaderRowIndex = -1;
         let exerciseStartRowIndex = -1;
+        let timerInterval;
+        let loadChartInstance;
+        let audioCtx;
 
         // --- LOGICA PRINCIPALE ---
         async function init() {
@@ -242,14 +224,16 @@
             }
         }
 
-        function promptForPassword(sheetName) {
+        function promptForPassword(sheetName, text) {
             return new Promise((resolve, reject) => {
                 const modal = document.getElementById('password-modal');
                 const title = document.getElementById('password-modal-title');
+                const modalText = document.getElementById('password-modal-text');
                 const input = document.getElementById('password-input');
                 const submitBtn = document.getElementById('password-submit-btn');
 
                 title.textContent = `Password per "${sheetName}"`;
+                modalText.textContent = text;
                 input.value = '';
                 modal.classList.remove('hidden');
                 input.focus();
@@ -294,7 +278,7 @@
                 let password = '';
                 if (passCheckResult.status === 'success' && passCheckResult.data.required) {
                     const passwordKey = `${currentAthlete}-${sheetName}`;
-                    password = sheetPasswords[passwordKey] || await promptForPassword(sheetName);
+                    password = sheetPasswords[passwordKey] || await promptForPassword(sheetName, 'Questa scheda è protetta. Inserisci la password.');
                 }
 
                 const response = await fetch(`${currentScriptURL}?action=getSheetData&sheetName=${encodeURIComponent(sheetName)}&password=${encodeURIComponent(password)}`);
@@ -410,6 +394,12 @@
                 exerciseJumper.appendChild(option);
             });
         }
+        
+        function getMaxRepsFromRange(rangeStr) {
+            if (!rangeStr || typeof rangeStr !== 'string') return null;
+            const parts = rangeStr.split('-').map(p => parseInt(p.trim(), 10));
+            return Math.max(...parts.filter(p => !isNaN(p)));
+        }
 
         function renderExerciseDetail(exerciseIndex) {
             detailContainer.innerHTML = '';
@@ -436,6 +426,7 @@
             const recupero = row[7] || '';    // H
             const serie = row[8] || '';       // I
             const ripetizioni = row[9] || ''; // J
+            const maxReps = getMaxRepsFromRange(ripetizioni);
 
             const card = document.createElement('div');
             card.className = 'exercise-card bg-gray-800 p-5 rounded-lg shadow-md';
@@ -447,21 +438,36 @@
                 const repCol = caricoCol + 1;
                 
                 let prevWeekHint = '';
+                let progressionHint = '';
+                let prefilledLoad = seriesData[i*2] || '';
+
                 if (weekToShow > 1 && weekColRanges[weekToShow - 1]) {
                     const prevWeekCols = weekColRanges[weekToShow - 1];
                     const prevSeriesData = row.slice(prevWeekCols.start, prevWeekCols.end);
                     const prevLoad = prevSeriesData[i*2] || '-';
                     const prevReps = prevSeriesData[i*2+1] || '-';
+
                     if (prevLoad !== '-' || prevReps !== '-') {
                         prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad} x ${prevReps}</p>`;
+                        
+                        const lastReps = parseInt(prevReps, 10);
+                        if (!isNaN(lastReps) && maxReps && prefilledLoad === '') {
+                             if (lastReps < maxReps) {
+                                prefilledLoad = prevLoad;
+                                progressionHint = `<p class="text-xs text-amber-400 text-right col-span-3 -mt-2 mb-1">Consiglio: Stesso carico, aumenta le reps</p>`;
+                             } else {
+                                progressionHint = `<p class="text-xs text-green-400 text-right col-span-3 -mt-2 mb-1">Consiglio: Aumenta il carico!</p>`;
+                             }
+                        }
                     }
                 }
 
                 weeklySeriesHTML += `
-                    <div class="grid grid-cols-3 items-center gap-3">
+                    <div class="grid grid-cols-3 items-center gap-3 mb-2">
                         ${prevWeekHint}
+                        ${progressionHint}
                         <span class="font-bold text-gray-400">Serie ${i + 1}</span>
-                        <input type="text" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
+                        <input type="text" placeholder="kg" class="editable-input" value="${prefilledLoad}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
                         <input type="text" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
                     </div>
                 `;
@@ -501,11 +507,22 @@
                         ${createDetailField('Serie', serie, 8)}
                         ${createDetailField('Ripetizioni', ripetizioni, 9)}
                         ${createDetailField('RIR', rir, 6)}
-                        ${createDetailField('Recupero', recupero, 7)}
+                        <div class="grid grid-cols-3 gap-x-4 items-center">
+                            <label class="text-gray-400 font-semibold col-span-1">Recupero</label>
+                            <div class="col-span-2 flex items-center gap-2">
+                                <div class="flex-grow"><p class="view-mode text-gray-200 py-2">${recupero || '...'}</p><input type="text" class="edit-mode editable-input" value="${recupero}" data-row="${originalRowIndex}" data-col="7" oninput="handleCellUpdate(event)"></div>
+                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600" onclick="startTimer('${recupero}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <hr class="border-gray-700 my-4">
-                <h4 class="text-lg font-semibold text-gray-200 mb-3">Carichi Settimana ${weekToShow}</h4>
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-lg font-semibold text-gray-200">Carichi Settimana ${weekToShow}</h4>
+                    <button class="text-sm text-blue-400 hover:underline" onclick="showLoadChart(${exerciseIndex})">Mostra Grafico</button>
+                </div>
                 <div class="space-y-3">${weeklySeriesHTML}</div>
             `;
             detailContainer.appendChild(card);
@@ -612,6 +629,7 @@
         }
 
         function showSummary() {
+            summaryModalTitle.textContent = 'Riepilogo Storico';
             summaryContent.innerHTML = '';
             let summaryHTML = '';
 
@@ -662,6 +680,73 @@
             }
             
             summaryModal.classList.remove('hidden');
+        }
+
+        async function showCategorySummary() {
+            showLoader(true);
+            try {
+                const passwordKey = `${currentAthlete}-GLOBAL`;
+                let password = sheetPasswords[passwordKey] || '';
+                if (!password) {
+                    password = await promptForPassword(currentAthlete, `Inserisci la password di ${currentAthlete} per il riepilogo globale.`);
+                }
+                
+                const response = await fetch(`${currentScriptURL}?action=getAllSheetsData&password=${encodeURIComponent(password)}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    sheetPasswords[passwordKey] = password;
+                    const allSheetsData = result.data;
+                    const categoryCounts = {};
+
+                    for (const sheetName in allSheetsData) {
+                        const sheetData = allSheetsData[sheetName];
+                        let startRow = -1;
+                        for (let i = 0; i < sheetData.length; i++) {
+                            if (sheetData[i][1] && sheetData[i][1].toUpperCase() === 'CATEGORIA') {
+                                startRow = i + 1;
+                                break;
+                            }
+                        }
+
+                        if (startRow !== -1) {
+                            const exercises = sheetData.slice(startRow);
+                            exercises.forEach(row => {
+                                const category = row[1];
+                                const sets = parseInt(row[8], 10);
+                                if (category && !isNaN(sets)) {
+                                    categoryCounts[category] = (categoryCounts[category] || 0) + sets;
+                                }
+                            });
+                        }
+                    }
+                    
+                    summaryModalTitle.textContent = 'Riepilogo Volume Categorie';
+                    let summaryHTML = '';
+                    const sortedCategories = Object.keys(categoryCounts).sort();
+
+                    if (sortedCategories.length === 0) {
+                        summaryHTML = '<p class="text-gray-400">Nessuna categoria trovata. Controlla la colonna "CATEGORIA" nei tuoi fogli.</p>';
+                    } else {
+                         summaryHTML = sortedCategories.map(category => `
+                            <div class="flex justify-between items-center bg-gray-700 p-3 rounded-md">
+                                <span class="font-semibold text-white">${category}</span>
+                                <span class="font-bold text-blue-400">${categoryCounts[category]} serie</span>
+                            </div>
+                        `).join('');
+                    }
+                    summaryContent.innerHTML = summaryHTML;
+                    summaryModal.classList.remove('hidden');
+
+                } else {
+                    delete sheetPasswords[passwordKey];
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showStatus(`Errore riepilogo: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+            }
         }
 
         async function handleAddNewRow() {
@@ -754,6 +839,102 @@
                 }, 3000);
             }
         }
+        
+        function startTimer(durationStr) {
+            clearInterval(timerInterval);
+            let duration = parseInt(durationStr, 10);
+            if (isNaN(duration)) {
+                showStatus('Tempo di recupero non valido.', 'error');
+                return;
+            }
+            
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            timerModal.classList.remove('hidden');
+            let timer = duration;
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "Fine!";
+                    playTimerSound();
+                }
+            }, 1000);
+        }
+
+        function playTimerSound() {
+            if (!audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 1);
+        }
+
+        function showLoadChart(exerciseIndex) {
+            const originalRowIndex = exerciseIndex + exerciseStartRowIndex;
+            const row = currentSheetData[originalRowIndex];
+            
+            const labels = [];
+            const data = [];
+
+            Object.keys(weekColRanges).sort((a,b) => a-b).forEach(weekNumStr => {
+                const weekNum = parseInt(weekNumStr, 10);
+                const weekCols = weekColRanges[weekNum];
+                if (!weekCols) return;
+                
+                let maxLoad = 0;
+                for (let i = 0; i < 4; i++) {
+                    const load = parseFloat(row[weekCols.start + (i * 2)]);
+                    if (!isNaN(load) && load > maxLoad) {
+                        maxLoad = load;
+                    }
+                }
+                if (maxLoad > 0) {
+                    labels.push(`Sett. ${weekNum}`);
+                    data.push(maxLoad);
+                }
+            });
+
+            if (loadChartInstance) {
+                loadChartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('load-chart').getContext('2d');
+            loadChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Carico Massimo Sollevato (kg)',
+                        data: data,
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            chartModal.classList.remove('hidden');
+        }
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', init);
@@ -770,7 +951,13 @@
         addRowBtn.addEventListener('click', handleAddNewRow);
         addWeekBtn.addEventListener('click', handleAddWeek);
         summaryBtn.addEventListener('click', showSummary);
+        categorySummaryBtn.addEventListener('click', showCategorySummary);
         closeSummaryBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
+        closeTimerBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerModal.classList.add('hidden');
+        });
+        closeChartBtn.addEventListener('click', () => chartModal.classList.add('hidden'));
         backToListBtn.addEventListener('click', showListView);
         exerciseJumper.addEventListener('change', (e) => {
             const newIndex = parseInt(e.target.value, 10);
