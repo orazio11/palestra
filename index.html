@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v20</title>
+    <title>App Schede Palestra v23</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +59,16 @@
         .card-editing .edit-mode { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animazione di lampeggio per il salvataggio */
+        @keyframes flash-green {
+            0% { background-color: #374151; } /* Colore di base */
+            50% { background-color: #10B981; } /* Verde brillante */
+            100% { background-color: #374151; } /* Torna al colore di base */
+        }
+        .flash-saved {
+            animation: flash-green 1s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
@@ -99,6 +109,9 @@
                 <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">
                     + Aggiungi Settimana
                 </button>
+                 <button id="summary-btn" class="bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition shadow-lg">
+                    Riepilogo
+                </button>
             </div>
         </div>
 
@@ -127,6 +140,19 @@
         </div>
     </div>
 
+    <!-- Finestra Modale per Riepilogo -->
+    <div id="summary-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-lg m-4 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                 <h3 class="text-xl font-bold text-white">Riepilogo Storico</h3>
+                 <button id="close-summary-btn" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div id="summary-content" class="overflow-y-auto space-y-4">
+                <!-- Il contenuto del riepilogo verrà inserito qui -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========================================================================
         // --- CONFIGURAZIONE ATLETI ---
@@ -150,6 +176,7 @@
         const statusMessage = document.getElementById('status-message');
         const addRowBtn = document.getElementById('add-row-btn');
         const addWeekBtn = document.getElementById('add-week-btn');
+        const summaryBtn = document.getElementById('summary-btn');
         const actionButtons = document.getElementById('action-buttons');
         const controlsPanel = document.getElementById('controls-panel');
         // Viste
@@ -159,6 +186,10 @@
         const detailContainer = document.getElementById('exercise-detail-container');
         const backToListBtn = document.getElementById('back-to-list-btn');
         const exerciseJumper = document.getElementById('exercise-jumper');
+        // Modali
+        const summaryModal = document.getElementById('summary-modal');
+        const closeSummaryBtn = document.getElementById('close-summary-btn');
+        const summaryContent = document.getElementById('summary-content');
 
         // --- STATO APPLICAZIONE ---
         let currentAthlete = "Erika";
@@ -422,7 +453,7 @@
                     const prevLoad = prevSeriesData[i*2] || '-';
                     const prevReps = prevSeriesData[i*2+1] || '-';
                     if (prevLoad !== '-' || prevReps !== '-') {
-                        prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
+                        prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad} x ${prevReps}</p>`;
                     }
                 }
 
@@ -430,8 +461,8 @@
                     <div class="grid grid-cols-3 items-center gap-3">
                         ${prevWeekHint}
                         <span class="font-bold text-gray-400">Serie ${i + 1}</span>
-                        <input type="number" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
-                        <input type="number" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
+                        <input type="text" placeholder="kg" class="editable-input" value="${seriesData[i*2] || ''}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
+                        <input type="text" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
                     </div>
                 `;
             }
@@ -452,10 +483,14 @@
                 <div class="relative">
                     <div class="view-mode"><h3 class="text-xl font-bold text-white mb-3">${esercizio || 'Nuovo Esercizio'}</h3></div>
                     <div class="edit-mode mb-3">${createDetailField('Esercizio', esercizio, 2)}</div>
-                    <button class="absolute top-0 right-0 p-1 text-gray-400 hover:text-white" onclick="toggleEditMode(this)">
-                        <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        <svg class="save-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </button>
+                    <div class="absolute top-0 right-0 flex gap-2">
+                        <button class="p-1 text-gray-400 hover:text-white" onclick="handleManualSave(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                        <button class="p-1 text-gray-400 hover:text-white" onclick="toggleEditMode(this)">
+                            <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="text-sm space-y-2">
                     ${createDetailField('Categoria', categoria, 1)}
@@ -492,8 +527,6 @@
         function toggleEditMode(button) {
             const card = button.closest('.exercise-card');
             card.classList.toggle('card-editing');
-            button.querySelector('.edit-icon').classList.toggle('hidden');
-            button.querySelector('.save-icon').classList.toggle('hidden');
         }
 
         function handleCellUpdate(event) {
@@ -519,16 +552,116 @@
                 .then(result => {
                     if (result.status === 'success') {
                         showStatus('Salvato!', 'success');
-                        if (parseInt(col, 10) === 2 || parseInt(col, 10) === 5) {
-                             const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
-                             renderExerciseDetail(exerciseIndex);
-                        }
+                        input.classList.add('flash-saved');
+                        input.addEventListener('animationend', () => {
+                            input.classList.remove('flash-saved');
+                        }, { once: true });
                     } else { throw new Error(result.message); }
                 })
                 .catch(error => {
                     showStatus(`Errore: ${error.message}`, 'error');
                 });
             }, 1000);
+        }
+
+        async function handleManualSave(button) {
+            const card = button.closest('.exercise-card');
+            const inputs = card.querySelectorAll('input[data-row]');
+            const updates = [];
+            
+            inputs.forEach(input => {
+                updates.push({
+                    row: input.dataset.row,
+                    col: input.dataset.col,
+                    value: input.value
+                });
+            });
+
+            if (updates.length === 0) {
+                showStatus('Nessun dato da salvare.', 'info');
+                return;
+            }
+
+            showLoader(true);
+            const sheetName = sheetSelector.value;
+            const payload = { action: 'bulkUpdateCells', sheetName, updates };
+
+            try {
+                const response = await fetch(currentScriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showStatus('Dati salvati con successo!', 'success');
+                    inputs.forEach(input => {
+                        input.classList.add('flash-saved');
+                        input.addEventListener('animationend', () => {
+                            input.classList.remove('flash-saved');
+                        }, { once: true });
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showStatus(`Errore salvataggio: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function showSummary() {
+            summaryContent.innerHTML = '';
+            let summaryHTML = '';
+
+            const exercises = currentSheetData.slice(exerciseStartRowIndex);
+            exercises.forEach(row => {
+                const exerciseName = row[2];
+                if (!exerciseName) return;
+
+                let exerciseLogHTML = `<div class="bg-gray-700 p-4 rounded-md">
+                                        <h4 class="font-bold text-lg text-white mb-2">${exerciseName}</h4>
+                                        <div class="space-y-2">`;
+                
+                let hasData = false;
+                Object.keys(weekColRanges).sort((a, b) => a - b).forEach(weekNumStr => {
+                    const weekNum = parseInt(weekNumStr, 10);
+                    const weekCols = weekColRanges[weekNum];
+                    if (!weekCols) return;
+
+                    let weeklyData = [];
+                    for (let i = 0; i < 4; i++) {
+                        const load = row[weekCols.start + (i * 2)] || '';
+                        const reps = row[weekCols.start + (i * 2) + 1] || '';
+                        if (load || reps) {
+                            weeklyData.push(`${load} x ${reps}`);
+                        }
+                    }
+
+                    if (weeklyData.length > 0) {
+                        hasData = true;
+                        exerciseLogHTML += `<div class="text-sm">
+                                              <p class="font-semibold text-gray-300">Settimana ${weekNum}:</p>
+                                              <p class="text-gray-400 pl-2">${weeklyData.join(' | ')}</p>
+                                           </div>`;
+                    }
+                });
+
+                exerciseLogHTML += `</div></div>`;
+                
+                if (hasData) {
+                    summaryHTML += exerciseLogHTML;
+                }
+            });
+
+            if (summaryHTML === '') {
+                summaryContent.innerHTML = '<p class="text-gray-400">Nessun dato registrato da mostrare nel riepilogo.</p>';
+            } else {
+                summaryContent.innerHTML = summaryHTML;
+            }
+            
+            summaryModal.classList.remove('hidden');
         }
 
         async function handleAddNewRow() {
@@ -636,6 +769,8 @@
         newSheetBtn.addEventListener('click', handleNewSheet);
         addRowBtn.addEventListener('click', handleAddNewRow);
         addWeekBtn.addEventListener('click', handleAddWeek);
+        summaryBtn.addEventListener('click', showSummary);
+        closeSummaryBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
         backToListBtn.addEventListener('click', showListView);
         exerciseJumper.addEventListener('change', (e) => {
             const newIndex = parseInt(e.target.value, 10);
