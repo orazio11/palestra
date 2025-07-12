@@ -493,11 +493,12 @@
             for (let i = 0; i < numSets; i++) {
                 const caricoCol = weekCols.start + (i * 2);
                 const repCol = caricoCol + 1;
+                // FIX: Changed grid to 5 columns for better spacing
                 html += `
-                    <div class="grid grid-cols-3 items-center gap-3">
-                        <span class="font-bold text-slate-400 text-sm">Serie ${i + 1}</span>
-                        ${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}
-                        ${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}
+                    <div class="grid grid-cols-5 items-center gap-2">
+                        <span class="font-bold text-slate-400 text-sm col-span-1">Serie ${i + 1}</span>
+                        <div class="col-span-2">${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}</div>
+                        <div class="col-span-2">${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}</div>
                     </div>`;
             }
             html += '</div>';
@@ -533,10 +534,12 @@
                     const prevLoad = prevSeriesData[i*2] || '-';
                     const prevReps = prevSeriesData[i*2+1] || '-';
                     if (prevLoad !== '-' || prevReps !== '-') {
-                        prevWeekHint = `<p class="text-xs text-slate-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
+                        // FIX: Changed col-span to 5 to match new grid
+                        prevWeekHint = `<p class="text-xs text-slate-500 text-right col-span-5 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
                     }
                 }
-                weeklySeriesHTML += `<div class="grid grid-cols-3 items-center gap-3">${prevWeekHint}<span class="font-bold text-slate-400">Serie ${i + 1}</span>${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}</div>`;
+                // FIX: Changed grid to 5 columns to give more space to inputs on mobile.
+                weeklySeriesHTML += `<div class="grid grid-cols-5 items-center gap-2">${prevWeekHint}<span class="font-bold text-slate-400 col-span-1">Serie ${i + 1}</span><div class="col-span-2">${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}</div><div class="col-span-2">${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}</div></div>`;
             }
 
             const createDetailField = (label, value, colIndex) => `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-slate-400 font-semibold col-span-1">${label}</label><div class="col-span-2"><p class="view-mode text-slate-200 py-2">${value || '...'}</p><div class="edit-mode">${createInputField('text', '...', value, originalRowIndex, colIndex)}</div></div></div>`;
