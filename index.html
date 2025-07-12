@@ -3,51 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra v28</title>
+    <title>App Schede Palestra v28 - Multi Atleta</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .editable-input { -moz-appearance: textfield; background-color: #374151; border: 1px solid #4b5563; color: #d1d5db; border-radius: 0.5rem; padding: 8px 12px; width: 100%; transition: border-color 0.2s, box-shadow 0.2s; }
-        .editable-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .week-btn { transition: all 0.2s ease-in-out; flex-shrink: 0; }
-        .week-btn.active { background-color: #2563eb; color: white; }
-        .loader { border: 5px solid #374151; border-top: 5px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 40px auto; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* slate-950 */
+            color: #e2e8f0; /* slate-200 */
+        }
+        .editable-input {
+            -moz-appearance: textfield;
+            background-color: #0f172a; /* slate-900 */
+            border: 1px solid #1e293b; /* slate-800 */
+            color: #cbd5e1; /* slate-300 */
+            border-radius: 0.5rem;
+            padding: 10px 12px;
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .editable-input:focus {
+            outline: none;
+            border-color: #f59e0b; /* amber-500 */
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .week-btn {
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0;
+            background-color: #1e293b; /* slate-800 */
+            color: #94a3b8; /* slate-400 */
+            border: 1px solid #334155;
+        }
+        .week-btn:hover {
+            background-color: #334155; /* slate-700 */
+        }
+        .week-btn.week-truly-completed {
+            background-color: #0d9488; /* teal-600 */
+            color: #ccfbf1; /* teal-100 */
+            font-weight: 600;
+            border-color: #0f766e;
+        }
+        .week-btn.active {
+            background-color: #f59e0b; /* amber-500 */
+            color: #431407; /* amber-950 */
+            font-weight: 700;
+            border-color: #d97706;
+        }
+        .sheet-option.completed {
+            color: #10b981; /* emerald-500 */
+            font-style: italic;
+        }
+        .loader, .status-spinner {
+            border: 3px solid #1e293b; /* slate-800 */
+            border-top: 3px solid #f59e0b; /* amber-500 */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loader { width: 50px; height: 50px; margin: 40px auto; }
+        .status-spinner { width: 16px; height: 16px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .view-mode { display: block; }
-        .edit-mode { display: none; }
-        .card-editing .view-mode { display: none; }
-        .card-editing .edit-mode { display: block; }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes flash-green { 0% { background-color: #374151; } 50% { background-color: #10B981; } 100% { background-color: #374151; } }
-        .flash-saved { animation: flash-green 1s ease-in-out; }
+        
+        .modal { transition: opacity 0.25s ease; }
+        .modal-content { transition: transform 0.25s ease; }
+        .input-wrapper { position: relative; }
+        .input-status {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+        .number-input-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .number-input-custom .editable-input {
+            text-align: center;
+            font-weight: 600;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        .number-input-custom button {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            width: 38px;
+            height: 38px;
+            border-radius: 0.5rem;
+            font-size: 1.5rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .number-input-custom button:hover {
+            background-color: #334155;
+        }
+        .quick-add-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding: 0 1rem;
+        }
+        .quick-add-panel.open {
+            max-height: 500px; /* Abbastanza grande per contenere i campi */
+            padding: 1rem;
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body class="bg-slate-950">
 
     <div class="container mx-auto p-4 max-w-2xl">
         <header class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Scheda Allenamento</h1>
+            <h1 id="main-title" class="text-3xl sm:text-4xl font-bold text-white">Scheda Allenamento</h1>
         </header>
 
         <!-- Sezione Controlli -->
-        <div id="controls-panel" class="controls bg-gray-800 p-4 rounded-xl shadow-lg mb-6 flex flex-col gap-4 sticky top-4 z-20">
-            <div class="flex items-center gap-4">
-                <label for="athlete-selector" class="font-semibold text-gray-300">Atleta:</label>
-                <select id="athlete-selector" class="w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"></select>
+        <div id="controls-panel" class="controls bg-slate-900/80 backdrop-blur-sm p-4 rounded-xl shadow-lg mb-6 flex flex-col gap-4 sticky top-4 z-20 border border-slate-800">
+            <div>
+                <label for="athlete-selector" class="block text-sm font-medium text-slate-400 mb-1">Atleta:</label>
+                <select id="athlete-selector" class="w-full bg-slate-800 text-white p-3 border border-slate-700 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-500"></select>
             </div>
-            <div class="flex items-center justify-between">
-                <select id="sheet-selector" class="w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"></select>
-                <button id="new-sheet-btn" class="ml-4 flex-shrink-0 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <div>
+                <label for="sheet-selector" class="block text-sm font-medium text-slate-400 mb-1">Scheda:</label>
+                <select id="sheet-selector" class="w-full bg-slate-800 text-white p-3 border border-slate-700 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-500"></select>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+                 <button id="new-sheet-btn" class="w-full text-center bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition shadow-md">
+                    Nuova Scheda
+                </button>
+                <button id="end-sheet-btn" class="w-full text-center bg-teal-600 text-white font-bold p-3 rounded-lg hover:bg-teal-700 transition shadow-md">
+                    Termina Scheda
                 </button>
             </div>
-            <div id="week-selector" class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div id="week-selector" class="flex items-center space-x-2 overflow-x-auto pt-2 pb-1 no-scrollbar">
+                <!-- I bottoni delle settimane verranno inseriti qui -->
+            </div>
         </div>
 
         <!-- Area Messaggi e Loader -->
@@ -57,135 +161,88 @@
         <!-- VISTA LISTA ESERCIZI -->
         <div id="exercise-list-view">
             <div id="exercise-list-container" class="space-y-3"></div>
-            <div id="action-buttons" class="mt-8 flex flex-wrap justify-center gap-4 hidden">
-                <button id="add-row-btn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition shadow-lg">+ Aggiungi Esercizio</button>
-                <button id="add-week-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow-lg">+ Aggiungi Settimana</button>
-                 <button id="summary-btn" class="bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition shadow-lg">Riepilogo Storico</button>
-                <button id="category-summary-btn" class="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition shadow-lg">Riepilogo Categorie</button>
-            </div>
         </div>
 
         <!-- VISTA DETTAGLIO ESERCIZIO -->
         <div id="exercise-detail-view" class="hidden">
-            <div class="flex items-center gap-4 mb-4 sticky top-4 z-20 bg-gray-900 py-2">
-                <button id="back-to-list-btn" class="p-3 bg-gray-700 rounded-lg text-blue-400 hover:bg-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </button>
-                <select id="exercise-jumper" class="w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"></select>
-            </div>
+            <button id="back-to-list-btn" class="mb-4 flex items-center gap-2 text-amber-400 hover:text-amber-300 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Torna alla Lista
+            </button>
             <div id="exercise-detail-container"></div>
         </div>
     </div>
 
-    <!-- Modali -->
-    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-sm m-4">
+    <!-- Finestre Modali -->
+    <div id="password-modal" class="modal fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-slate-800">
             <h3 class="text-xl font-bold text-white mb-4" id="password-modal-title">Inserisci Password</h3>
-            <p class="text-sm text-gray-400 mb-4" id="password-modal-text">Questa scheda è protetta.</p>
+            <p class="text-sm text-slate-400 mb-4">Questa scheda è protetta. Inserisci la password.</p>
             <input type="password" id="password-input" class="editable-input w-full mb-4" placeholder="Password...">
-            <button id="password-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">Accedi</button>
+            <button id="password-submit-btn" class="w-full bg-amber-600 text-white font-bold py-3 rounded-lg hover:bg-amber-700 transition">
+                Accedi
+            </button>
         </div>
     </div>
-    <div id="summary-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-lg m-4 max-h-[80vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                 <h3 class="text-xl font-bold text-white" id="summary-modal-title">Riepilogo</h3>
-                 <button id="close-summary-btn" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+
+    <div id="confirm-modal" class="modal fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-slate-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-slate-800">
+            <h3 class="text-xl font-bold text-white mb-4" id="confirm-modal-title">Conferma Azione</h3>
+            <p class="text-sm text-slate-400 mb-6" id="confirm-modal-message">Sei sicuro?</p>
+            <div class="flex justify-end gap-4">
+                <button id="confirm-cancel-btn" class="bg-slate-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-slate-700 transition">Annulla</button>
+                <button id="confirm-ok-btn" class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition">Conferma</button>
             </div>
-            <div id="summary-content" class="overflow-y-auto space-y-4"></div>
-        </div>
-    </div>
-    <div id="timer-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center">
-            <h3 class="text-2xl font-bold text-white mb-4">Timer Recupero</h3>
-            <p id="timer-display" class="text-6xl font-mono text-blue-400 mb-6">00:00</p>
-            <button id="close-timer-btn" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Chiudi</button>
-        </div>
-    </div>
-    <div id="chart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl m-4 max-h-[80vh] flex flex-col">
-             <div class="flex justify-between items-center mb-4">
-                 <h3 class="text-xl font-bold text-white">Grafico Progressione Carico</h3>
-                 <button id="close-chart-btn" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
-            </div>
-            <canvas id="load-chart"></canvas>
         </div>
     </div>
 
     <script>
         // ========================================================================
-        // --- CONFIGURAZIONE ATLETI ---
-        // Per aggiungere un nuovo atleta, copia una delle righe qui sotto,
-        // incollala e cambia il nome (es. "Marco") e l'URL dello script.
+        // --- CONFIGURAZIONE E COSTANTI ---
         // ========================================================================
         const athletes = {
-            "Erika": {
-                scriptURL: 'https://script.google.com/macros/s/AKfycbxxtdWlvsIo3dviUYy54CHo5xV1x7_IHeOva-EzXw50S1YnQ-McD6zidFwuBP3i6yVr2g/exec'
+            "Orazio": {
+                scriptURL: 'https://script.google.com/macros/s/AKfycbxZGuWdQdFcfMMR87563SKdaW0RzsrZwDywFdDfnRbNlQIKvpJUF2BuKtUtBse_afsF/exec'
             },
             "Alice": {
                 scriptURL: 'https://script.google.com/macros/s/AKfycbz2HNrfgHESlyL3tG8NKYiVZ6sqxqw5UdHcu7bhaAuSBpXdDnflAleDt-EweIhz-7YM/exec'
-            },
-            "Orazio": {
-                scriptURL: 'https://script.google.com/macros/s/AKfycbxZGuWdQdFcfMMR87563SKdaW0RzsrZwDywFdDfnRbNlQIKvpJUF2BuKtUtBse_afsF/exec'
             }
         };
-        // ========================================================================
+        const WEIGHT_INCREMENT = 2.5;
 
         // --- RIFERIMENTI DOM ---
         const athleteSelector = document.getElementById('athlete-selector');
         const sheetSelector = document.getElementById('sheet-selector');
         const weekSelector = document.getElementById('week-selector');
         const newSheetBtn = document.getElementById('new-sheet-btn');
+        const endSheetBtn = document.getElementById('end-sheet-btn');
         const loader = document.getElementById('loader');
         const statusMessage = document.getElementById('status-message');
-        const addRowBtn = document.getElementById('add-row-btn');
-        const addWeekBtn = document.getElementById('add-week-btn');
-        const summaryBtn = document.getElementById('summary-btn');
-        const categorySummaryBtn = document.getElementById('category-summary-btn');
-        const actionButtons = document.getElementById('action-buttons');
         const controlsPanel = document.getElementById('controls-panel');
-        // Viste
         const listView = document.getElementById('exercise-list-view');
         const detailView = document.getElementById('exercise-detail-view');
         const listContainer = document.getElementById('exercise-list-container');
         const detailContainer = document.getElementById('exercise-detail-container');
         const backToListBtn = document.getElementById('back-to-list-btn');
-        const exerciseJumper = document.getElementById('exercise-jumper');
-        // Modali
-        const summaryModal = document.getElementById('summary-modal');
-        const summaryModalTitle = document.getElementById('summary-modal-title');
-        const closeSummaryBtn = document.getElementById('close-summary-btn');
-        const summaryContent = document.getElementById('summary-content');
-        const timerModal = document.getElementById('timer-modal');
-        const timerDisplay = document.getElementById('timer-display');
-        const closeTimerBtn = document.getElementById('close-timer-btn');
-        const chartModal = document.getElementById('chart-modal');
-        const closeChartBtn = document.getElementById('close-chart-btn');
+        const mainTitle = document.getElementById('main-title');
 
         // --- STATO APPLICAZIONE ---
-        let currentAthlete = "Erika";
+        let currentAthlete = Object.keys(athletes)[0];
         let currentScriptURL = athletes[currentAthlete].scriptURL;
         let currentSheetData = [];
-        let currentWeek = 1;
-        let saveTimeout;
+        let currentWeek = 1; 
         let sheetPasswords = {};
         let weekColRanges = {};
         let weekHeaderRowIndex = -1;
         let exerciseStartRowIndex = -1;
-        let timerInterval;
-        let loadChartInstance;
-        let audioCtx;
+        let saveTimeouts = {};
 
-        // --- LOGICA PRINCIPALE ---
+        // --- LOGICA DI INIZIALIZZAZIONE ---
         async function init() {
             setupAthleteSelector();
-            await loadSheets();
-            const selectedSheet = sheetSelector.value;
-            if (selectedSheet) {
-                await loadSheetData(selectedSheet);
-            }
+            await loadAndSelectSheet();
         }
-        
+
         function setupAthleteSelector() {
             Object.keys(athletes).forEach(name => {
                 const option = document.createElement('option');
@@ -193,100 +250,76 @@
                 option.textContent = name;
                 athleteSelector.appendChild(option);
             });
+            athleteSelector.value = currentAthlete;
+            mainTitle.textContent = `Scheda di ${currentAthlete}`;
         }
 
+        async function loadAndSelectSheet() {
+            const allSheets = await loadSheets();
+            if (!allSheets) return;
+            const sheetToLoad = allSheets.find(sheet => !sheet.isComplete);
+            if (sheetToLoad) {
+                sheetSelector.value = sheetToLoad.name;
+                await loadSheetData(sheetToLoad.name);
+            } else if (allSheets.length > 0) {
+                const lastSheet = allSheets[allSheets.length - 1];
+                sheetSelector.value = lastSheet.name;
+                await loadSheetData(lastSheet.name);
+            }
+        }
+
+        // --- GESTIONE DATI (Sheets) ---
         async function loadSheets() {
             showLoader(true);
             sheetSelector.innerHTML = '';
             try {
-                const response = await fetch(`${currentScriptURL}?action=getSheets`);
+                // FIX: Aggiunto cache-busting per assicurare dati freschi
+                const response = await fetch(`${currentScriptURL}?action=getSheets&t=${new Date().getTime()}`);
                 const result = await response.json();
                 if (result.status === 'success') {
-                    result.data.forEach(sheetName => {
+                    result.data.forEach(sheetInfo => {
                         const option = document.createElement('option');
-                        option.value = sheetName;
-                        option.textContent = sheetName;
+                        option.value = sheetInfo.name;
+                        option.textContent = sheetInfo.name;
+                        if (sheetInfo.isComplete) {
+                            option.classList.add('sheet-option', 'completed');
+                        }
                         sheetSelector.appendChild(option);
                     });
+                    return result.data;
                 } else { throw new Error(result.message); }
             } catch (error) {
                 showStatus(`Errore caricamento schede: ${error.message}`, 'error');
+                return null;
             } finally {
                 showLoader(false);
             }
         }
 
-        function promptForPassword(sheetName, text) {
-            return new Promise((resolve, reject) => {
-                const modal = document.getElementById('password-modal');
-                const title = document.getElementById('password-modal-title');
-                const modalText = document.getElementById('password-modal-text');
-                const input = document.getElementById('password-input');
-                const submitBtn = document.getElementById('password-submit-btn');
-
-                title.textContent = `Password per "${sheetName}"`;
-                modalText.textContent = text;
-                input.value = '';
-                modal.classList.remove('hidden');
-                input.focus();
-
-                const handleSubmit = () => {
-                    modal.classList.add('hidden');
-                    cleanup();
-                    resolve(input.value);
-                };
-
-                const handleCancel = (event) => {
-                    if (event.target === modal) {
-                        modal.classList.add('hidden');
-                        cleanup();
-                        reject(new Error("Accesso annullato."));
-                    }
-                };
-                
-                const handleKeyUp = (event) => { if (event.key === 'Enter') handleSubmit(); };
-                const cleanup = () => {
-                    submitBtn.onclick = null;
-                    input.onkeyup = null;
-                    modal.onclick = null;
-                };
-
-                submitBtn.onclick = handleSubmit;
-                input.onkeyup = handleKeyUp;
-                modal.onclick = handleCancel;
-            });
-        }
-
         async function loadSheetData(sheetName) {
             showLoader(true);
             listContainer.innerHTML = '';
-            actionButtons.classList.add('hidden');
             showListView();
-
             try {
-                const passCheckResponse = await fetch(`${currentScriptURL}?action=isPasswordRequired&sheetName=${encodeURIComponent(sheetName)}`);
+                // FIX: Aggiunto cache-busting
+                const passCheckResponse = await fetch(`${currentScriptURL}?action=isPasswordRequired&sheetName=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`);
                 const passCheckResult = await passCheckResponse.json();
-
                 let password = '';
                 if (passCheckResult.status === 'success' && passCheckResult.data.required) {
                     const passwordKey = `${currentAthlete}-${sheetName}`;
-                    password = sheetPasswords[passwordKey] || await promptForPassword(sheetName, 'Questa scheda è protetta. Inserisci la password.');
+                    password = sheetPasswords[passwordKey] || await showPasswordModal(sheetName);
                 }
-
-                const response = await fetch(`${currentScriptURL}?action=getSheetData&sheetName=${encodeURIComponent(sheetName)}&password=${encodeURIComponent(password)}`);
+                // FIX: Aggiunto cache-busting
+                const response = await fetch(`${currentScriptURL}?action=getSheetData&sheetName=${encodeURIComponent(sheetName)}&password=${encodeURIComponent(password)}&t=${new Date().getTime()}`);
                 const result = await response.json();
-                
                 if (result.status === 'success') {
-                    if (passCheckResult.data.required) {
-                        sheetPasswords[`${currentAthlete}-${sheetName}`] = password;
-                    }
+                    if (passCheckResult.data.required) sheetPasswords[`${currentAthlete}-${sheetName}`] = password;
                     currentSheetData = result.data;
                     analyzeSheetStructure(currentSheetData);
                     renderExerciseList(currentSheetData);
-                    actionButtons.classList.remove('hidden');
-                } else { 
+                } else {
                     delete sheetPasswords[`${currentAthlete}-${sheetName}`];
-                    throw new Error(result.message); 
+                    throw new Error(result.message);
                 }
             } catch (error) {
                 showStatus(error.message, 'error');
@@ -295,50 +328,103 @@
                 showLoader(false);
             }
         }
-        
+
         function analyzeSheetStructure(data) {
-            weekSelector.innerHTML = '';
             weekColRanges = {};
             weekHeaderRowIndex = -1;
             exerciseStartRowIndex = -1;
-
-            for (let i = 0; i < Math.min(data.length, 10); i++) {
+            for (let i = 0; i < Math.min(data.length, 15); i++) {
                 const row = data[i] || [];
-                if (weekHeaderRowIndex === -1 && row.some(cell => typeof cell === 'string' && cell.toLowerCase().includes('settimana'))) {
+                if (weekHeaderRowIndex === -1 && row.some(cell => typeof cell === 'string' && String(cell).toLowerCase().includes('settimana'))) {
                     weekHeaderRowIndex = i;
                 }
-                if (exerciseStartRowIndex === -1 && typeof row[1] === 'string' && row[1].toUpperCase() === 'CATEGORIA') {
+                if (exerciseStartRowIndex === -1 && typeof row[1] === 'string' && String(row[1]).toUpperCase() === 'CATEGORIA') {
                     exerciseStartRowIndex = i + 1;
                 }
             }
-
             if (weekHeaderRowIndex === -1) return;
-
             const headerRow = data[weekHeaderRowIndex];
             headerRow.forEach((cell, index) => {
-                if (typeof cell === 'string' && cell.toLowerCase().startsWith('settimana')) {
-                    const weekNumMatch = cell.match(/\d+/);
+                if (typeof cell === 'string' && String(cell).toLowerCase().startsWith('settimana')) {
+                    const weekNumMatch = String(cell).match(/\d+/);
                     if (weekNumMatch) {
                         const weekNum = parseInt(weekNumMatch[0], 10);
                         weekColRanges[weekNum] = { start: index, end: index + 8 };
-                        
-                        const btn = document.createElement('button');
-                        btn.textContent = `Sett. ${weekNum}`;
-                        btn.dataset.week = weekNum;
-                        btn.className = `week-btn px-4 py-2 rounded-md font-semibold text-sm ${weekNum === currentWeek ? 'active' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`;
-                        btn.onclick = () => {
-                            currentWeek = weekNum;
-                            document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            if (!detailView.classList.contains('hidden')) {
-                                const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
-                                renderExerciseDetail(exerciseIndex);
-                            }
-                        };
-                        weekSelector.appendChild(btn);
                     }
                 }
             });
+            
+            currentWeek = determineRealCurrentWeek(data);
+            renderWeekSelector();
+        }
+
+        // --- LOGICA DI RENDERING ---
+        function renderWeekSelector() {
+            weekSelector.innerHTML = '';
+            const sortedWeeks = Object.keys(weekColRanges).map(Number).sort((a, b) => a - b);
+            sortedWeeks.forEach(weekNum => {
+                const btn = document.createElement('button');
+                btn.textContent = `Sett. ${weekNum}`;
+                btn.dataset.week = weekNum;
+                
+                const isComplete = isWeekTrulyComplete(weekNum, currentSheetData);
+                let btnClass = 'week-btn';
+                if (isComplete) {
+                    btnClass = 'week-btn week-truly-completed';
+                }
+                if (weekNum === currentWeek) {
+                    btnClass = 'week-btn active';
+                }
+
+                btn.className = `px-4 py-2 rounded-md font-semibold text-sm ${btnClass}`;
+                btn.onclick = () => {
+                    currentWeek = weekNum;
+                    renderWeekSelector();
+                    renderExerciseList(currentSheetData);
+                    if (!detailView.classList.contains('hidden')) {
+                        const exerciseIndex = parseInt(detailContainer.dataset.exerciseIndex, 10);
+                        renderExerciseDetail(exerciseIndex);
+                    }
+                };
+                weekSelector.appendChild(btn);
+            });
+        }
+        
+        function isWeekTrulyComplete(weekNum, data) {
+            if (!weekColRanges[weekNum] || exerciseStartRowIndex === -1) return false;
+            const exercises = data.slice(exerciseStartRowIndex);
+            const weekCols = weekColRanges[weekNum];
+
+            const hasAnyExercises = exercises.some(row => !row.slice(2, 10).every(c => c === '' || c === null || c === undefined));
+            if (!hasAnyExercises) return false;
+
+            for (const exerciseRow of exercises) {
+                const coreExerciseData = exerciseRow.slice(2, 10);
+                if (coreExerciseData.every(c => c === '' || c === null || c === undefined)) continue;
+
+                const numSets = parseInt(exerciseRow[8], 10);
+                if (isNaN(numSets) || numSets <= 0) {
+                    if(exerciseRow[2]) return false; 
+                    else continue;
+                }
+
+                const seriesData = exerciseRow.slice(weekCols.start, weekCols.start + (numSets * 2));
+                if (seriesData.length < numSets * 2 || seriesData.some(cell => cell === '' || cell === null || cell === undefined)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function determineRealCurrentWeek(data) {
+            if (!weekColRanges || Object.keys(weekColRanges).length === 0 || exerciseStartRowIndex === -1) return 1;
+            const sortedWeeks = Object.keys(weekColRanges).map(Number).sort((a, b) => a - b);
+            for (const weekNum of sortedWeeks) {
+                if (!isWeekTrulyComplete(weekNum, data)) {
+                    return weekNum;
+                }
+            }
+            return sortedWeeks.length > 0 ? sortedWeeks[sortedWeeks.length - 1] : 1;
         }
 
         function renderExerciseList(data) {
@@ -347,614 +433,353 @@
                 listContainer.innerHTML = `<p class="p-4 text-center text-red-400">Struttura foglio non riconosciuta.</p>`;
                 return;
             }
-            
             const exercises = data.slice(exerciseStartRowIndex);
             exercises.forEach((row, rowIndex) => {
-                const esercizio = row[2] || '';
-                const categoria = row[1] || '';
-
                 if (row.every(cell => cell === '')) return;
-
-                const item = document.createElement('div');
-                item.className = 'bg-gray-800 p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-700 transition flex justify-between items-center';
-                item.onclick = () => showExerciseDetail(rowIndex);
-                
-                item.innerHTML = `
-                    <div>
-                        <h3 class="text-lg font-bold text-white">${esercizio || 'Nuovo Esercizio'}</h3>
-                        <p class="text-sm text-gray-400">${categoria}</p>
-                    </div>
-                    <svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                `;
-                listContainer.appendChild(item);
-            });
-        }
-
-        function populateExerciseJumper(currentExerciseIndex) {
-            exerciseJumper.innerHTML = '';
-            const exercises = currentSheetData.slice(exerciseStartRowIndex);
-            exercises.forEach((row, rowIndex) => {
+                const originalRowIndex = rowIndex + exerciseStartRowIndex;
                 const esercizio = row[2] || 'Nuovo Esercizio';
-                if (row.every(cell => cell === '')) return;
+                const categoria = row[1] || '';
+                const serie = row[8] || '-';
+                const ripetizioni = row[9] || '-';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = "bg-slate-900 rounded-lg shadow-md border border-slate-800";
                 
-                const option = document.createElement('option');
-                option.value = rowIndex;
-                option.textContent = esercizio;
-                if (rowIndex === currentExerciseIndex) {
-                    option.selected = true;
-                }
-                exerciseJumper.appendChild(option);
+                const item = document.createElement('div');
+                item.className = 'p-4 flex justify-between items-center';
+                
+                const textPart = document.createElement('div');
+                textPart.className = "flex-grow cursor-pointer";
+                textPart.onclick = () => showExerciseDetail(rowIndex);
+                textPart.innerHTML = `
+                    <h3 class="text-lg font-bold text-white">${esercizio}</h3>
+                    <p class="text-sm text-slate-400">${categoria}</p>
+                    <div class="flex items-center gap-4 mt-2 text-xs text-slate-300">
+                        <span><span class="font-semibold text-slate-500">SERIE:</span> ${serie}</span>
+                        <span><span class="font-semibold text-slate-500">REPS:</span> ${ripetizioni}</span>
+                    </div>`;
+
+                const quickAddButton = document.createElement('button');
+                quickAddButton.className = "p-2 ml-2 rounded-full hover:bg-slate-700 transition flex-shrink-0";
+                quickAddButton.title = "Aggiunta Rapida";
+                quickAddButton.onclick = () => toggleQuickAddPanel(rowIndex);
+                quickAddButton.innerHTML = `<svg class="text-amber-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+
+                item.appendChild(textPart);
+                item.appendChild(quickAddButton);
+                
+                const quickAddPanel = document.createElement('div');
+                quickAddPanel.id = `quick-add-${rowIndex}`;
+                quickAddPanel.className = 'quick-add-panel bg-slate-900/50 border-t border-slate-800';
+                quickAddPanel.innerHTML = createQuickAddHTML(originalRowIndex);
+
+                wrapper.appendChild(item);
+                wrapper.appendChild(quickAddPanel);
+                listContainer.appendChild(wrapper);
             });
         }
         
-        function getMaxRepsFromRange(rangeStr) {
-            if (!rangeStr || typeof rangeStr !== 'string') return null;
-            const parts = rangeStr.split('-').map(p => parseInt(p.trim(), 10));
-            return Math.max(...parts.filter(p => !isNaN(p)));
+        function createQuickAddHTML(originalRowIndex) {
+            const row = currentSheetData[originalRowIndex];
+            const weekCols = weekColRanges[currentWeek];
+            if (!weekCols) return `<p class="text-slate-500 text-sm">Dati settimana non disponibili.</p>`;
+            
+            const numSets = parseInt(row[8], 10);
+            if (isNaN(numSets) || numSets <= 0) {
+                return `<p class="text-slate-500 text-sm">Numero di serie non definito.</p>`;
+            }
+
+            let html = '<div class="space-y-3">';
+            for (let i = 0; i < numSets; i++) {
+                const caricoCol = weekCols.start + (i * 2);
+                const repCol = caricoCol + 1;
+                html += `
+                    <div class="grid grid-cols-3 items-center gap-3">
+                        <span class="font-bold text-slate-400 text-sm">Serie ${i + 1}</span>
+                        ${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}
+                        ${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}
+                    </div>`;
+            }
+            html += '</div>';
+            return html;
         }
 
         function renderExerciseDetail(exerciseIndex) {
             detailContainer.innerHTML = '';
             detailContainer.dataset.exerciseIndex = exerciseIndex;
-            
-            populateExerciseJumper(exerciseIndex);
-            
             const originalRowIndex = exerciseIndex + exerciseStartRowIndex;
             const row = currentSheetData[originalRowIndex];
             const weekToShow = currentWeek;
-            
             const weekCols = weekColRanges[weekToShow];
             if (!weekCols) {
-                detailContainer.innerHTML = `<p class="p-4 text-center text-gray-500">Dati per la settimana ${weekToShow} non trovati.</p>`;
+                detailContainer.innerHTML = `<p class="p-4 text-center text-slate-500">Dati per la settimana ${weekToShow} non trovati.</p>`;
                 return;
             }
-
-            const categoria = row[1] || '';   // B
-            const esercizio = row[2] || '';   // C
-            const tecnica = row[3] || '';     // D
-            const note = row[4] || '';        // E
-            const link = row[5] || '';        // F
-            const rir = row[6] || '';         // G
-            const recupero = row[7] || '';    // H
-            const serie = row[8] || '';       // I
-            const ripetizioni = row[9] || ''; // J
-            const maxReps = getMaxRepsFromRange(ripetizioni);
-
+            const [, categoria, esercizio, tecnica, note, link, rir, recupero, serie, ripetizioni] = row;
             const card = document.createElement('div');
-            card.className = 'exercise-card bg-gray-800 p-5 rounded-lg shadow-md';
+            card.className = 'exercise-card bg-slate-900 p-5 rounded-lg shadow-md border border-slate-800';
             
-            const seriesData = row.slice(weekCols.start, weekCols.end);
+            const createInputField = (type, placeholder, value, row, col) => `<div class="input-wrapper"><input type="${type}" placeholder="${placeholder}" class="editable-input" value="${value || ''}" data-row="${row}" data-col="${col}" data-old-value="${value || ''}" oninput="handleCellInput(event)" onblur="handleCellBlur(event)"><span class="input-status"></span></div>`;
+            
             let weeklySeriesHTML = '';
-            for (let i = 0; i < 4; i++) {
+            const numSets = parseInt(serie, 10) || 4;
+            for (let i = 0; i < numSets; i++) {
                 const caricoCol = weekCols.start + (i * 2);
                 const repCol = caricoCol + 1;
-                
                 let prevWeekHint = '';
-                let progressionHint = '';
-                let prefilledLoad = seriesData[i*2] || '';
-
                 if (weekToShow > 1 && weekColRanges[weekToShow - 1]) {
                     const prevWeekCols = weekColRanges[weekToShow - 1];
                     const prevSeriesData = row.slice(prevWeekCols.start, prevWeekCols.end);
                     const prevLoad = prevSeriesData[i*2] || '-';
                     const prevReps = prevSeriesData[i*2+1] || '-';
-
                     if (prevLoad !== '-' || prevReps !== '-') {
-                        prevWeekHint = `<p class="text-xs text-gray-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad} x ${prevReps}</p>`;
-                        
-                        const lastReps = parseInt(prevReps, 10);
-                        if (!isNaN(lastReps) && maxReps && prefilledLoad === '') {
-                             if (lastReps < maxReps) {
-                                prefilledLoad = prevLoad;
-                                progressionHint = `<p class="text-xs text-amber-400 text-right col-span-3 -mt-2 mb-1">Consiglio: Stesso carico, aumenta le reps</p>`;
-                             } else {
-                                progressionHint = `<p class="text-xs text-green-400 text-right col-span-3 -mt-2 mb-1">Consiglio: Aumenta il carico!</p>`;
-                             }
-                        }
+                        prevWeekHint = `<p class="text-xs text-slate-500 text-right col-span-3 mb-1">Sett. prec: ${prevLoad}kg x ${prevReps}</p>`;
                     }
                 }
-
-                weeklySeriesHTML += `
-                    <div class="grid grid-cols-3 items-center gap-3 mb-2">
-                        ${prevWeekHint}
-                        ${progressionHint}
-                        <span class="font-bold text-gray-400">Serie ${i + 1}</span>
-                        <input type="text" placeholder="kg" class="editable-input" value="${prefilledLoad}" data-row="${originalRowIndex}" data-col="${caricoCol}" oninput="handleCellUpdate(event)">
-                        <input type="text" placeholder="reps" class="editable-input" value="${seriesData[i*2+1] || ''}" data-row="${originalRowIndex}" data-col="${repCol}" oninput="handleCellUpdate(event)">
-                    </div>
-                `;
+                weeklySeriesHTML += `<div class="grid grid-cols-3 items-center gap-3">${prevWeekHint}<span class="font-bold text-slate-400">Serie ${i + 1}</span>${createNumberInputHTML('number', 'kg', row[caricoCol], originalRowIndex, caricoCol, WEIGHT_INCREMENT, repCol)}${createNumberInputHTML('number', 'reps', row[repCol], originalRowIndex, repCol, 1)}</div>`;
             }
 
-            const createDetailField = (label, value, colIndex) => `
-                <div class="grid grid-cols-3 gap-x-4 items-center">
-                    <label class="text-gray-400 font-semibold col-span-1">${label}</label>
-                    <div class="col-span-2">
-                        <p class="view-mode text-gray-200 py-2">${value || '...'}</p>
-                        <input type="text" class="edit-mode editable-input" value="${value}" data-row="${originalRowIndex}" data-col="${colIndex}" oninput="handleCellUpdate(event)">
-                    </div>
-                </div>`;
+            const createDetailField = (label, value, colIndex) => `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-slate-400 font-semibold col-span-1">${label}</label><div class="col-span-2"><p class="view-mode text-slate-200 py-2">${value || '...'}</p><div class="edit-mode">${createInputField('text', '...', value, originalRowIndex, colIndex)}</div></div></div>`;
             
-            const linkIcon = link.startsWith('http') ? `<a href="${link}" target="_blank" class="text-blue-400 hover:text-blue-300 absolute right-0 top-0 p-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : '';
-            const linkFieldHTML = `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-gray-400 font-semibold col-span-1">Link</label><div class="col-span-2 relative"><p class="view-mode text-gray-200 py-2 truncate">${link || '...'}</p><input type="text" class="edit-mode editable-input" value="${link}" data-row="${originalRowIndex}" data-col="5" oninput="handleCellUpdate(event)">${linkIcon}</div></div>`;
+            const linkIcon = (link || '').startsWith('http') ? `<a href="${link}" target="_blank" class="text-amber-400 hover:text-amber-300 absolute right-0 top-0 p-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : '';
+            const linkFieldHTML = `<div class="grid grid-cols-3 gap-x-4 items-center"><label class="text-slate-400 font-semibold col-span-1">Link</label><div class="col-span-2 relative"><p class="view-mode text-slate-200 py-2 truncate">${link || '...'}</p><div class="edit-mode">${createInputField('text', 'http://...', link, originalRowIndex, 5)}</div>${linkIcon}</div></div>`;
 
-            card.innerHTML = `
-                <div class="relative">
-                    <div class="view-mode"><h3 class="text-xl font-bold text-white mb-3">${esercizio || 'Nuovo Esercizio'}</h3></div>
-                    <div class="edit-mode mb-3">${createDetailField('Esercizio', esercizio, 2)}</div>
-                    <div class="absolute top-0 right-0 flex gap-2">
-                        <button class="p-1 text-gray-400 hover:text-white" onclick="handleManualSave(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </button>
-                        <button class="p-1 text-gray-400 hover:text-white" onclick="toggleEditMode(this)">
-                            <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="text-sm space-y-2">
-                    ${createDetailField('Categoria', categoria, 1)}
-                    ${createDetailField('Tecnica', tecnica, 3)}
-                    ${createDetailField('Note', note, 4)}
-                    ${linkFieldHTML}
-                    <div class="space-y-2 pt-2 mt-2 border-t border-gray-700">
-                        ${createDetailField('Serie', serie, 8)}
-                        ${createDetailField('Ripetizioni', ripetizioni, 9)}
-                        ${createDetailField('RIR', rir, 6)}
-                        <div class="grid grid-cols-3 gap-x-4 items-center">
-                            <label class="text-gray-400 font-semibold col-span-1">Recupero</label>
-                            <div class="col-span-2 flex items-center gap-2">
-                                <div class="flex-grow"><p class="view-mode text-gray-200 py-2">${recupero || '...'}</p><input type="text" class="edit-mode editable-input" value="${recupero}" data-row="${originalRowIndex}" data-col="7" oninput="handleCellUpdate(event)"></div>
-                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600" onclick="startTimer('${recupero}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="border-gray-700 my-4">
-                <div class="flex justify-between items-center mb-3">
-                    <h4 class="text-lg font-semibold text-gray-200">Carichi Settimana ${weekToShow}</h4>
-                    <button class="text-sm text-blue-400 hover:underline" onclick="showLoadChart(${exerciseIndex})">Mostra Grafico</button>
-                </div>
-                <div class="space-y-3">${weeklySeriesHTML}</div>
-            `;
+            card.innerHTML = `<div class="relative"><div class="view-mode"><h3 class="text-xl font-bold text-white mb-3">${esercizio || 'Nuovo Esercizio'}</h3></div><div class="edit-mode mb-3">${createDetailField('Esercizio', esercizio, 2)}</div><button class="absolute top-0 right-0 p-1 text-slate-400 hover:text-white" onclick="toggleEditMode(this)"><svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="text-sm space-y-2">${createDetailField('Categoria', categoria, 1)}${createDetailField('Tecnica', tecnica, 3)}${createDetailField('Note', note, 4)}${linkFieldHTML}<div class="space-y-2 pt-2 mt-2 border-t border-slate-800">${createDetailField('Serie', serie, 8)}${createDetailField('Ripetizioni', ripetizioni, 9)}${createDetailField('RIR', rir, 6)}${createDetailField('Recupero', recupero, 7)}</div></div><hr class="border-slate-800 my-4"><h4 class="text-lg font-semibold text-slate-200 mb-3">Carichi Settimana ${weekToShow}</h4><div class="space-y-3">${weeklySeriesHTML}</div>`;
             detailContainer.appendChild(card);
         }
 
-        function showListView() {
-            listView.classList.remove('hidden');
-            detailView.classList.add('hidden');
-            controlsPanel.classList.remove('hidden');
+        function createNumberInputHTML(type, placeholder, value, row, col, step, repCol = null) {
+            const repColAttr = repCol ? `data-rep-col="${repCol}"` : '';
+            const onInputHandler = repCol ? 'handleWeightInput(event)' : 'handleCellInput(event)';
+            return `<div class="number-input-custom">
+                <button onclick="changeValue(this, -${step})">-</button>
+                <div class="input-wrapper flex-grow">
+                    <input type="${type}" placeholder="${placeholder}" class="editable-input" value="${value || ''}" 
+                           data-row="${row}" data-col="${col}" data-old-value="${value || ''}" ${repColAttr}
+                           oninput="${onInputHandler}" onblur="handleCellBlur(event)">
+                    <span class="input-status"></span>
+                </div>
+                <button onclick="changeValue(this, ${step})">+</button>
+            </div>`;
         }
 
-        function showExerciseDetail(exerciseIndex) {
-            listView.classList.add('hidden');
-            detailView.classList.remove('hidden');
-            controlsPanel.classList.add('hidden');
-            renderExerciseDetail(exerciseIndex);
-        }
-        
-        function toggleEditMode(button) {
-            const card = button.closest('.exercise-card');
-            card.classList.toggle('card-editing');
-        }
-
-        function handleCellUpdate(event) {
-            clearTimeout(saveTimeout);
-            const input = event.target;
-            const newValue = input.value;
-            const { row, col } = input.dataset;
-            const sheetName = sheetSelector.value;
-            
-            showStatus('Digitando...', 'info');
-            currentSheetData[row][col] = newValue;
-
-            saveTimeout = setTimeout(() => {
-                showStatus('Salvataggio...', 'info');
-                const payload = { action: 'updateCell', sheetName, row, col, value: newValue };
-                
-                fetch(currentScriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.status === 'success') {
-                        showStatus('Salvato!', 'success');
-                        input.classList.add('flash-saved');
-                        input.addEventListener('animationend', () => {
-                            input.classList.remove('flash-saved');
-                        }, { once: true });
-                    } else { throw new Error(result.message); }
-                })
-                .catch(error => {
-                    showStatus(`Errore: ${error.message}`, 'error');
-                });
-            }, 1000);
-        }
-
-        async function handleManualSave(button) {
-            const card = button.closest('.exercise-card');
-            const inputs = card.querySelectorAll('input[data-row]');
-            const updates = [];
-            
-            inputs.forEach(input => {
-                updates.push({
-                    row: input.dataset.row,
-                    col: input.dataset.col,
-                    value: input.value
-                });
+        // --- GESTIONE INTERAZIONI UTENTE (Event Handlers) ---
+        function toggleQuickAddPanel(rowIndex) {
+            document.querySelectorAll('.quick-add-panel.open').forEach(panel => {
+                if (panel.id !== `quick-add-${rowIndex}`) {
+                    panel.classList.remove('open');
+                }
             });
+            const panel = document.getElementById(`quick-add-${rowIndex}`);
+            panel.classList.toggle('open');
+        }
 
-            if (updates.length === 0) {
-                showStatus('Nessun dato da salvare.', 'info');
-                return;
+        function changeValue(button, delta) {
+            const input = button.parentElement.querySelector('input');
+            let currentValue = parseFloat(input.value) || 0;
+            currentValue += delta;
+            if (currentValue < 0) currentValue = 0;
+            input.value = Math.round(currentValue * 100) / 100;
+            
+            const event = new Event('input', { bubbles: true, cancelable: true });
+            input.dispatchEvent(event);
+            handleCellBlur({ target: input });
+        }
+
+        function handleWeightInput(event) {
+            handleCellInput(event);
+            const weightInput = event.target;
+            const repCol = weightInput.dataset.repCol;
+            if (!repCol) return;
+
+            const repInput = weightInput.closest('.grid').querySelector(`input[data-col='${repCol}']`);
+            if (repInput && repInput.value === '') {
+                const mainRepsCell = currentSheetData[weightInput.dataset.row][9] || '';
+                const minRep = parseInt(String(mainRepsCell).split('-')[0], 10);
+                if (!isNaN(minRep)) {
+                    repInput.value = minRep;
+                    const changeEvent = new Event('input', { bubbles: true, cancelable: true });
+                    repInput.dispatchEvent(changeEvent);
+                    handleCellBlur({target: repInput});
+                }
             }
+        }
 
-            showLoader(true);
+        function handleCellInput(event) {
+            const input = event.target;
+            const { row, col } = input.dataset;
+            const key = `${row}-${col}`;
+            clearTimeout(saveTimeouts[key]);
+            currentSheetData[row][col] = input.value;
+            saveTimeouts[key] = setTimeout(() => saveCellData(input), 1500);
+        }
+
+        function handleCellBlur(event) {
+            const input = event.target;
+            const { row, col } = input.dataset;
+            const key = `${row}-${col}`;
+            clearTimeout(saveTimeouts[key]);
+            saveCellData(input);
+        }
+
+        async function saveCellData(input) {
+            const { row, col, oldValue } = input.dataset;
+            const newValue = input.value;
+            if (oldValue === newValue) return; 
+            
             const sheetName = sheetSelector.value;
-            const payload = { action: 'bulkUpdateCells', sheetName, updates };
+            const statusEl = input.closest('.input-wrapper').querySelector('.input-status');
+            if (!statusEl) return;
 
+            statusEl.innerHTML = `<div class="status-spinner"></div>`;
+            const payload = { action: 'updateCell', sheetName, row, col, value: newValue };
             try {
-                const response = await fetch(currentScriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
+                const response = await fetch(currentScriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showStatus('Dati salvati con successo!', 'success');
-                    inputs.forEach(input => {
-                        input.classList.add('flash-saved');
-                        input.addEventListener('animationend', () => {
-                            input.classList.remove('flash-saved');
-                        }, { once: true });
-                    });
-                } else {
-                    throw new Error(result.message);
-                }
+                    statusEl.innerHTML = `<svg class="text-teal-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    input.dataset.oldValue = newValue;
+                    renderWeekSelector();
+                } else { throw new Error(result.message); }
             } catch (error) {
+                statusEl.innerHTML = `<svg class="text-red-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
                 showStatus(`Errore salvataggio: ${error.message}`, 'error');
             } finally {
-                showLoader(false);
+                setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 2000);
             }
         }
 
-        function showSummary() {
-            summaryModalTitle.textContent = 'Riepilogo Storico';
-            summaryContent.innerHTML = '';
-            let summaryHTML = '';
-
-            const exercises = currentSheetData.slice(exerciseStartRowIndex);
-            exercises.forEach(row => {
-                const exerciseName = row[2];
-                if (!exerciseName) return;
-
-                let exerciseLogHTML = `<div class="bg-gray-700 p-4 rounded-md">
-                                        <h4 class="font-bold text-lg text-white mb-2">${exerciseName}</h4>
-                                        <div class="space-y-2">`;
-                
-                let hasData = false;
-                Object.keys(weekColRanges).sort((a, b) => a - b).forEach(weekNumStr => {
-                    const weekNum = parseInt(weekNumStr, 10);
-                    const weekCols = weekColRanges[weekNum];
-                    if (!weekCols) return;
-
-                    let weeklyData = [];
-                    for (let i = 0; i < 4; i++) {
-                        const load = row[weekCols.start + (i * 2)] || '';
-                        const reps = row[weekCols.start + (i * 2) + 1] || '';
-                        if (load || reps) {
-                            weeklyData.push(`${load} x ${reps}`);
-                        }
-                    }
-
-                    if (weeklyData.length > 0) {
-                        hasData = true;
-                        exerciseLogHTML += `<div class="text-sm">
-                                              <p class="font-semibold text-gray-300">Settimana ${weekNum}:</p>
-                                              <p class="text-gray-400 pl-2">${weeklyData.join(' | ')}</p>
-                                           </div>`;
-                    }
-                });
-
-                exerciseLogHTML += `</div></div>`;
-                
-                if (hasData) {
-                    summaryHTML += exerciseLogHTML;
-                }
-            });
-
-            if (summaryHTML === '') {
-                summaryContent.innerHTML = '<p class="text-gray-400">Nessun dato registrato da mostrare nel riepilogo.</p>';
-            } else {
-                summaryContent.innerHTML = summaryHTML;
-            }
-            
-            summaryModal.classList.remove('hidden');
-        }
-
-        async function showCategorySummary() {
-            showLoader(true);
-            try {
-                const passwordKey = `${currentAthlete}-GLOBAL`;
-                let password = sheetPasswords[passwordKey] || '';
-                if (!password) {
-                    password = await promptForPassword(currentAthlete, `Inserisci la password di ${currentAthlete} per il riepilogo globale.`);
-                }
-                
-                const response = await fetch(`${currentScriptURL}?action=getAllSheetsData&password=${encodeURIComponent(password)}`);
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    sheetPasswords[passwordKey] = password;
-                    const allSheetsData = result.data;
-                    const categoryCounts = {};
-
-                    for (const sheetName in allSheetsData) {
-                        const sheetData = allSheetsData[sheetName];
-                        let startRow = -1;
-                        for (let i = 0; i < sheetData.length; i++) {
-                            if (sheetData[i][1] && sheetData[i][1].toUpperCase() === 'CATEGORIA') {
-                                startRow = i + 1;
-                                break;
-                            }
-                        }
-
-                        if (startRow !== -1) {
-                            const exercises = sheetData.slice(startRow);
-                            exercises.forEach(row => {
-                                const category = row[1];
-                                const sets = parseInt(row[8], 10);
-                                if (category && !isNaN(sets)) {
-                                    categoryCounts[category] = (categoryCounts[category] || 0) + sets;
-                                }
-                            });
-                        }
-                    }
-                    
-                    summaryModalTitle.textContent = 'Riepilogo Volume Categorie';
-                    let summaryHTML = '';
-                    const sortedCategories = Object.keys(categoryCounts).sort();
-
-                    if (sortedCategories.length === 0) {
-                        summaryHTML = '<p class="text-gray-400">Nessuna categoria trovata. Controlla la colonna "CATEGORIA" nei tuoi fogli.</p>';
-                    } else {
-                         summaryHTML = sortedCategories.map(category => `
-                            <div class="flex justify-between items-center bg-gray-700 p-3 rounded-md">
-                                <span class="font-semibold text-white">${category}</span>
-                                <span class="font-bold text-blue-400">${categoryCounts[category]} serie</span>
-                            </div>
-                        `).join('');
-                    }
-                    summaryContent.innerHTML = summaryHTML;
-                    summaryModal.classList.remove('hidden');
-
-                } else {
-                    delete sheetPasswords[passwordKey];
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                showStatus(`Errore riepilogo: ${error.message}`, 'error');
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        async function handleAddNewRow() {
-            showLoader(true);
+        async function handleEndSheet() {
             const sheetName = sheetSelector.value;
-            const payload = { action: 'addRow', sheetName };
-            try {
-                const response = await fetch(currentScriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showStatus('Nuova riga aggiunta!', 'success');
-                    await loadSheetData(sheetName);
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                } else { throw new Error(result.message); }
-            } catch (error) {
-                 showStatus(`Errore: ${error.message}`, 'error');
-            } finally {
-                showLoader(false);
-            }
-        }
-        
-        async function handleAddWeek() {
-            showLoader(true);
-            const sheetName = sheetSelector.value;
-            const payload = { action: 'addWeek', sheetName };
-            try {
-                const response = await fetch(currentScriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showStatus('Nuova settimana aggiunta!', 'success');
-                    await loadSheetData(sheetName);
-                } else { throw new Error(result.message); }
-            } catch (error) {
-                 showStatus(`Errore: ${error.message}`, 'error');
-            } finally {
-                showLoader(false);
+            if (!sheetName) return;
+            const confirmed = await showConfirmModal(`Sei sicuro di voler segnare la scheda "${sheetName}" come completata?`);
+            if (confirmed) {
+                showLoader(true);
+                const payload = { action: 'markSheetAsComplete', sheetName };
+                try {
+                    const response = await fetch(currentScriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        showStatus(result.message, 'success');
+                        await loadAndSelectSheet();
+                    } else { throw new Error(result.message); }
+                } catch (error) {
+                    showStatus(`Errore: ${error.message}`, 'error');
+                } finally {
+                    showLoader(false);
+                }
             }
         }
 
         async function handleNewSheet() {
             const newSheetName = prompt("Inserisci il nome per la nuova scheda:");
             if (!newSheetName || newSheetName.trim() === '') return;
-
+            await genericActionHandler('createSheet', 'Scheda creata!', 'Errore creazione', { action: 'createSheet', sheetName: newSheetName.trim() });
+            await loadAndSelectSheet();
+        }
+        
+        async function genericActionHandler(action, successMsg, errorMsg, customPayload = null) {
             showLoader(true);
-            const payload = { action: 'createSheet', sheetName: newSheetName.trim() };
-
-            try {
-                const response = await fetch(currentScriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
+            const sheetName = sheetSelector.value;
+            const payload = customPayload || { action, sheetName };
+             try {
+                const response = await fetch(currentScriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showStatus(result.message, 'success');
-                    await loadSheets();
-                    sheetSelector.value = newSheetName.trim();
-                    await loadSheetData(newSheetName.trim());
+                    showStatus(successMsg, 'success');
+                    if (action !== 'createSheet') {
+                        await loadSheetData(sheetName);
+                    }
                 } else { throw new Error(result.message); }
             } catch (error) {
-                showStatus(`Errore creazione: ${error.message}`, 'error');
+                 showStatus(`${errorMsg}: ${error.message}`, 'error');
             } finally {
                 showLoader(false);
             }
         }
 
-        function showLoader(show) {
-            loader.classList.toggle('hidden', !show);
+        // --- GESTIONE UI (Viste, Modali, Messaggi) ---
+        function showListView() {
+            listView.classList.remove('hidden'); detailView.classList.add('hidden'); controlsPanel.classList.remove('hidden');
         }
-
+        function showExerciseDetail(exerciseIndex) {
+            listView.classList.add('hidden'); detailView.classList.remove('hidden'); controlsPanel.classList.add('hidden'); renderExerciseDetail(exerciseIndex);
+        }
+        function toggleEditMode(button) {
+            const card = button.closest('.exercise-card');
+            card.classList.toggle('card-editing');
+        }
+        function showLoader(show) { loader.classList.toggle('hidden', !show); }
         function showStatus(message, type = 'info') {
             statusMessage.textContent = message;
             statusMessage.className = 'text-center mb-4 h-6 font-semibold transition-opacity duration-300';
-            const colors = { success: 'text-green-400', error: 'text-red-400', info: 'text-blue-400' };
-            statusMessage.classList.add(colors[type] || 'text-gray-400');
-            
+            const colors = { success: 'text-teal-400', error: 'text-red-400', info: 'text-amber-400' };
+            statusMessage.classList.add(colors[type] || 'text-slate-400');
             if (type === 'success' || type === 'error') {
-                setTimeout(() => {
-                    if (statusMessage.textContent === message) {
-                       statusMessage.textContent = '';
-                    }
-                }, 3000);
+                setTimeout(() => { if (statusMessage.textContent === message) statusMessage.textContent = ''; }, 3000);
             }
         }
-        
-        function startTimer(durationStr) {
-            clearInterval(timerInterval);
-            let duration = parseInt(durationStr, 10);
-            if (isNaN(duration)) {
-                showStatus('Tempo di recupero non valido.', 'error');
-                return;
-            }
-            
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            
-            timerModal.classList.remove('hidden');
-            let timer = duration;
-            timerInterval = setInterval(() => {
-                const minutes = Math.floor(timer / 60);
-                const seconds = timer % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                if (--timer < 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = "Fine!";
-                    playTimerSound();
-                }
-            }, 1000);
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const modalContent = modal.querySelector('.modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
         }
-
-        function playTimerSound() {
-            if (!audioCtx) return;
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
-
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 1);
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const modalContent = modal.querySelector('.modal-content');
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 250);
         }
-
-        function showLoadChart(exerciseIndex) {
-            const originalRowIndex = exerciseIndex + exerciseStartRowIndex;
-            const row = currentSheetData[originalRowIndex];
-            
-            const labels = [];
-            const data = [];
-
-            Object.keys(weekColRanges).sort((a,b) => a-b).forEach(weekNumStr => {
-                const weekNum = parseInt(weekNumStr, 10);
-                const weekCols = weekColRanges[weekNum];
-                if (!weekCols) return;
-                
-                let maxLoad = 0;
-                for (let i = 0; i < 4; i++) {
-                    const load = parseFloat(row[weekCols.start + (i * 2)]);
-                    if (!isNaN(load) && load > maxLoad) {
-                        maxLoad = load;
-                    }
-                }
-                if (maxLoad > 0) {
-                    labels.push(`Sett. ${weekNum}`);
-                    data.push(maxLoad);
-                }
+        function showPasswordModal(sheetName) {
+            return new Promise((resolve, reject) => {
+                const modalId = 'password-modal';
+                const modal = document.getElementById(modalId);
+                document.getElementById('password-modal-title').textContent = `Password per "${sheetName}"`;
+                const input = document.getElementById('password-input');
+                const submitBtn = document.getElementById('password-submit-btn');
+                input.value = '';
+                showModal(modalId);
+                input.focus();
+                const cleanup = () => { submitBtn.onclick = null; input.onkeyup = null; modal.onclick = null; };
+                const handleSubmit = () => { hideModal(modalId); cleanup(); resolve(input.value); };
+                const handleCancel = (e) => { if (e.target === modal) { hideModal(modalId); cleanup(); reject(new Error("Accesso annullato.")); } };
+                submitBtn.onclick = handleSubmit;
+                input.onkeyup = (e) => { if (e.key === 'Enter') handleSubmit(); };
+                modal.onclick = handleCancel;
             });
-
-            if (loadChartInstance) {
-                loadChartInstance.destroy();
-            }
-
-            const ctx = document.getElementById('load-chart').getContext('2d');
-            loadChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Carico Massimo Sollevato (kg)',
-                        data: data,
-                        borderColor: '#60a5fa',
-                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
-                        fill: true,
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
+        }
+        function showConfirmModal(message) {
+            return new Promise((resolve) => {
+                const modalId = 'confirm-modal';
+                const modal = document.getElementById(modalId);
+                document.getElementById('confirm-modal-message').textContent = message;
+                const okBtn = document.getElementById('confirm-ok-btn');
+                const cancelBtn = document.getElementById('confirm-cancel-btn');
+                showModal(modalId);
+                const cleanup = () => { okBtn.onclick = null; cancelBtn.onclick = null; modal.onclick = null; };
+                const handleOk = () => { hideModal(modalId); cleanup(); resolve(true); };
+                const handleCancel = () => { hideModal(modalId); cleanup(); resolve(false); };
+                okBtn.onclick = handleOk;
+                cancelBtn.onclick = handleCancel;
+                modal.onclick = (e) => { if(e.target === modal) handleCancel(); };
             });
-            chartModal.classList.remove('hidden');
         }
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', init);
-        athleteSelector.addEventListener('change', async (e) => {
+        athleteSelector.addEventListener('change', (e) => {
             currentAthlete = e.target.value;
             currentScriptURL = athletes[currentAthlete].scriptURL;
-            sheetPasswords = {};
-            await loadSheets();
-            const selectedSheet = sheetSelector.value;
-            if(selectedSheet) await loadSheetData(selectedSheet);
+            mainTitle.textContent = `Scheda di ${currentAthlete}`;
+            sheetPasswords = {}; // Resetta le password quando cambi atleta
+            loadAndSelectSheet();
         });
         sheetSelector.addEventListener('change', (e) => loadSheetData(e.target.value));
         newSheetBtn.addEventListener('click', handleNewSheet);
-        addRowBtn.addEventListener('click', handleAddNewRow);
-        addWeekBtn.addEventListener('click', handleAddWeek);
-        summaryBtn.addEventListener('click', showSummary);
-        categorySummaryBtn.addEventListener('click', showCategorySummary);
-        closeSummaryBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
-        closeTimerBtn.addEventListener('click', () => {
-            clearInterval(timerInterval);
-            timerModal.classList.add('hidden');
-        });
-        closeChartBtn.addEventListener('click', () => chartModal.classList.add('hidden'));
+        endSheetBtn.addEventListener('click', handleEndSheet);
         backToListBtn.addEventListener('click', showListView);
-        exerciseJumper.addEventListener('change', (e) => {
-            const newIndex = parseInt(e.target.value, 10);
-            renderExerciseDetail(newIndex);
-        });
     </script>
 </body>
 </html>
