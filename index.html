@@ -97,10 +97,10 @@
             background-color: rgba(245, 158, 11, 0.1);
         }
         .intensity-glow {
-            border-color: #fca5a5; /* A lighter red for the border */
-            box-shadow: 0 0 12px 2px rgba(251, 113, 133, 0.5), /* Outer glow */
-                        0 0 4px 1px rgba(251, 113, 133, 0.7),  /* Inner glow */
-                        inset 0 0 6px 0px rgba(251, 113, 133, 0.4); /* Inset glow */
+            border-color: var(--text-accent);
+            box-shadow: 0 0 15px 4px rgba(245, 158, 11, 0.5), 
+                        0 0 5px 2px rgba(245, 158, 11, 0.7),
+                        inset 0 0 8px 1px rgba(245, 158, 11, 0.4);
         }
     </style>
 </head>
@@ -958,16 +958,13 @@
             seriesHTML += '</div>';
             
             let imagesHTML = '';
-            const hasOneImage = (ex.imageUrl && !ex.imageUrl2) || (!ex.imageUrl && ex.imageUrl2);
-            const hasTwoImages = ex.imageUrl && ex.imageUrl2;
-
-            if (hasOneImage || hasTwoImages) {
-                imagesHTML += `<div class="flex gap-2 mt-2 ${hasOneImage ? 'justify-center' : ''}">`;
+            if (ex.imageUrl || ex.imageUrl2) {
+                imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
                 if (ex.imageUrl) {
-                    imagesHTML += `<div class="${hasTwoImages ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                    imagesHTML += `<div class="${ex.imageUrl2 ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
                 }
                 if (ex.imageUrl2) {
-                    imagesHTML += `<div class="${hasTwoImages ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl2}" alt="${ex.nomeEsercizio} 2" class="exercise-image"></div>`;
+                    imagesHTML += `<div class="${ex.imageUrl ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl2}" alt="${ex.nomeEsercizio} 2" class="exercise-image"></div>`;
                 }
                 imagesHTML += '</div>';
             }
@@ -1640,7 +1637,7 @@
             const container = document.getElementById('favorites-container');
             container.innerHTML = '<div class="loader"></div>';
             try {
-                const favoritesSnapshot = await getDocs(getFavoriteExercisesRef());
+                const favoritesSnapshot = await getDocs(query(getFavoriteExercisesRef(), orderBy("nomeEsercizio")));
                 favoritesCache = favoritesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
                 const categories = [...new Set(favoritesCache.map(fav => fav.categoria))].sort();
@@ -1651,12 +1648,8 @@
                     <div class="mb-4">
                         <select id="favorite-category-filter" class="input-field">${categoryOptions}</select>
                     </div>
-                    <div id="favorites-list"></div>
+                    <div id="favorites-list" class="max-h-[60vh] overflow-y-auto pr-2"></div>
                 `;
-
-                document.getElementById('favorite-category-filter').addEventListener('change', (e) => {
-                    renderFilteredFavorites(e.target.value);
-                });
 
                 renderFilteredFavorites('all');
 
@@ -1680,49 +1673,51 @@
                     ${filteredFavorites.map(fav => `
                         <div class="bg-stone-800/50 p-4 rounded-lg flex flex-col">
                             <div class="flex-grow">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-bold text-white">${fav.nomeEsercizio}</h4>
-                                    <span class="text-sm text-amber-400 flex-shrink-0 ml-2">${fav.categoria}</span>
-                                </div>
-                                <p class="text-sm text-stone-400 mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
-                                ${fav.note ? `<p class="text-sm text-stone-300 mb-3">${fav.note}</p>` : ''}
+                                <h4 class="font-bold text-white">${fav.nomeEsercizio}</h4>
+                                <p class="text-sm text-amber-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
+                                <p class="text-xs text-stone-400 mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
+                                ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">${fav.note}</p>` : ''}
                             </div>
-                            <div class="flex justify-end gap-2 mt-auto">
+                            <div class="flex justify-end gap-2 mt-auto pt-2">
                                 <button class="btn btn-secondary !p-2 text-xs" data-add-fav-ex-id="${fav.id}" title="Aggiungi alla scheda"><i class="fas fa-plus"></i></button>
                                 <button class="btn btn-danger !p-2 text-xs" data-delete-fav-ex-id="${fav.id}" title="Elimina dai preferiti"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>`).join('')}
                 </div>`;
-            
-            listContainer.addEventListener('click', async (e) => {
-                const addBtn = e.target.closest('button[data-add-fav-ex-id]');
-                const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
-                if (addBtn && currentSheetId) {
-                    const fav = favoritesCache.find(f => f.id === addBtn.dataset.addFavExId);
-                    if (fav) {
-                        const { id, ...favData } = fav;
-                        await addDoc(getExercisesRef(currentMesoId, currentSheetId), { ...favData, ordine: (exercisesCache.length || 0) + 1, datiSettimanali: {} });
-                        await loadAndRenderExercises();
-                        showNotification("Esercizio aggiunto alla scheda!");
-                    }
-                } else if (deleteBtn) {
-                    if (await showConfirmModal('Eliminare questo esercizio dai preferiti?')) {
-                        await deleteDoc(doc(getFavoriteExercisesRef(), deleteBtn.dataset.deleteFavExId));
-                        loadAndRenderFavorites(); // Ricarica tutto per aggiornare le categorie
-                        showNotification("Esercizio eliminato dai preferiti!");
-                    }
-                }
-            });
         }
+        
+        favoritesModal.addEventListener('click', async (e) => {
+            if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
+                 favoritesModal.classList.add('opacity-0');
+                 setTimeout(() => favoritesModal.classList.add('hidden'), 250);
+                 return;
+            }
 
-        document.getElementById('close-favorites-modal').addEventListener('click', () => {
-            favoritesModal.classList.add('opacity-0');
-            setTimeout(() => favoritesModal.classList.add('hidden'), 250);
+            const addBtn = e.target.closest('button[data-add-fav-ex-id]');
+            const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
+            
+            if (addBtn && currentSheetId) {
+                const fav = favoritesCache.find(f => f.id === addBtn.dataset.addFavExId);
+                if (fav) {
+                    const { id, ...favData } = fav;
+                    await addDoc(getExercisesRef(currentMesoId, currentSheetId), { ...favData, ordine: (exercisesCache.length || 0) + 1, datiSettimanali: {} });
+                    await loadAndRenderExercises();
+                    showNotification("Esercizio aggiunto alla scheda!");
+                }
+            } else if (deleteBtn) {
+                if (await showConfirmModal('Eliminare questo esercizio dai preferiti?')) {
+                    await deleteDoc(doc(getFavoriteExercisesRef(), deleteBtn.dataset.deleteFavExId));
+                    loadAndRenderFavorites();
+                    showNotification("Esercizio eliminato dai preferiti!");
+                }
+            }
         });
-        favoritesModal.addEventListener('click', (e) => { if (e.target === favoritesModal) {
-            favoritesModal.classList.add('opacity-0');
-            setTimeout(() => favoritesModal.classList.add('hidden'), 250);
-        }});
+
+        favoritesModal.addEventListener('change', (e) => {
+            if (e.target.id === 'favorite-category-filter') {
+                renderFilteredFavorites(e.target.value);
+            }
+        });
 
         // --- GESTIONE UTENTI (ADMIN) ---
         function openUserManagementModal() {
