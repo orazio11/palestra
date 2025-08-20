@@ -383,8 +383,8 @@
         document.getElementById('timer-pause-btn').addEventListener('click', () => {
             timerPaused = !timerPaused;
             document.getElementById('timer-pause-btn').innerHTML = timerPaused ? 
-                 '<i class="fas fa-play"></i> Riprendi' : 
-                 '<i class="fas fa-pause"></i> Pausa';
+                '<i class="fas fa-play"></i> Riprendi' : 
+                '<i class="fas fa-pause"></i> Pausa';
         });
 
         document.getElementById('timer-stop-btn').addEventListener('click', () => {
@@ -957,13 +957,14 @@
                         setData.carico = prevSetData.carico;
                     }
                 }
-                let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-4 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
+                let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
                 seriesHTML += `
                     ${prevWeekHint}
-                    <div class="grid grid-cols-4 items-center gap-2">
-                        <span class="font-semibold text-stone-400 text-sm">Serie ${i + 1} (${targetRep} reps)</span>
+                    <div class="grid grid-cols-5 items-center gap-2">
+                        <span class="font-semibold text-stone-400 text-sm">S ${i + 1} (${targetRep})</span>
                         <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
                         <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
+                        <span class="text-xs text-center text-amber-300 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
                         <button class="btn btn-secondary !p-2 text-xs" data-timer="${ex.recupero}" title="Avvia timer"><i class="fas fa-stopwatch"></i></button>
                     </div>`;
             }
@@ -1026,6 +1027,18 @@
                 </div>
                 ${imagesHTML}
                 ${seriesHTML}`;
+            
+            // NEW: Set initial 1RM percentage values
+            const repsInputs = card.querySelectorAll('input[data-field="reps"]');
+            repsInputs.forEach(input => {
+                const reps = parseInt(input.value, 10);
+                const serieIndex = input.dataset.serieIndex;
+                const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
+                if (oneRmSpan) {
+                    oneRmSpan.textContent = calculate1RMEstimate(reps);
+                }
+            });
+
             return card;
         }
 
@@ -1229,7 +1242,15 @@
                 clearTimeout(saveTimeouts[key]);
                 saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value), 800);
 
+                // NEW: Update 1RM% on reps input
                 if (field === 'reps') {
+                    const card = e.target.closest('.bg-gradient-main');
+                    if (card) {
+                        const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
+                        if (oneRmSpan) {
+                            oneRmSpan.textContent = calculate1RMEstimate(parseInt(value, 10));
+                        }
+                    }
                     handleProcrastinationCheck(exId, parseInt(serieIndex, 10), e.target);
                 } else if (field === 'carico') {
                     clearProcrastinationTimer(exId);
@@ -1710,11 +1731,11 @@
         }
         
         favoritesModal.addEventListener('click', async (e) => {
-            if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
+             if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
                  favoritesModal.classList.add('opacity-0');
                  setTimeout(() => favoritesModal.classList.add('hidden'), 250);
                  return;
-            }
+             }
 
             const addBtn = e.target.closest('button[data-add-fav-ex-id]');
             const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
@@ -1990,7 +2011,8 @@
                 }
 
                 const timeForSets = ex.serie * avgReps * timePerRep;
-                const timeForRest = ex.recupero ? (ex.serie - 1) * ex.recupero : 0;
+                // MODIFIED: Calculate rest time for every set as requested by user
+                const timeForRest = ex.recupero ? ex.serie * ex.recupero : 0;
 
                 totalSeconds += timeForSets + timeForRest;
             });
@@ -2005,6 +2027,18 @@
                     <span class="font-bold text-amber-400">${formattedTime}</span>
                 </p>`;
         }
+
+        // NEW: Function to calculate the estimated 1RM percentage
+        function calculate1RMEstimate(reps) {
+            if (!reps || reps <= 0) {
+                return `~% 1RM`;
+            }
+            // Using Epley formula rearranged for percentage: %1RM = 1 / (1 + reps / 30)
+            const percentage = (1 / (1 + reps / 30)) * 100;
+            if (percentage > 100) return `>100%`;
+            return `~${Math.round(percentage)}%`;
+        }
+
 
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
