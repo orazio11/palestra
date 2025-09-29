@@ -227,6 +227,16 @@
             <div id="exercise-history-container"></div>
         </div>
     </div>
+
+    <div id="volume-analysis-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-5xl m-4 transform scale-95 border border-stone-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-calculator mr-2 text-red-500"></i> Analisi Volume Mesociclo</h3>
+                <button id="close-volume-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="volume-analysis-container" class="space-y-6"></div>
+        </div>
+    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -253,6 +263,24 @@
 
         // --- COSTANTI E VARIABILI GLOBALI ---
         const CATEGORIES = ["ABDUCTORS", "ABS", "ADDUCTORS", "BICEPS", "CALVES", "CHEST ISO", "DECLINE PUSH", "FRONT DELTS", "GLUTEI ISO", "HAMSTRINGS", "HIP HINGE", "HORIZONTAL HIP EXTENSION", "HORIZONTAL PULL", "HORIZONTAL PUSH", "INCLINE PULL", "INCLINE PUSH", "LEG PRESS VARIATION", "LOWER BACK", "LUNGE", "PULLOVER", "QUADS ISO", "REAR DELTS", "SIDE DELTS", "SQUAT PATTERN", "STRETCHING", "TRAPS", "TRICIPITI", "TRICEPS PUSH", "UPPER BACK", "VERTICAL PULL", "VERTICAL PUSH"];
+        const MACROCYCLE_RULES = {
+            "ADDOMINALI": { main: "ABS", additional: [] },
+            "ADDUTTORI": { main: "ADDUCTORS", additional: [] },
+            "BICIPITI": { main: "BICEPS", additional: [ { category: "HORIZONTAL PULL", percentage: 25 }, { category: "UPPER BACK", percentage: 25 }, { category: "INCLINE PULL", percentage: 25 } ] },
+            "DELTOIDI FRONTALI": { main: "FRONT DELTS", additional: [ { category: "INCLINE PUSH", percentage: 25 }, { category: "VERTICAL PUSH", percentage: 25 } ] },
+            "DELTOIDI LATERALI": { main: "SIDE DELTS", additional: [] },
+            "DELTOIDI POSTERIORI": { main: "REAR DELTS", additional: [ { category: "HORIZONTAL PULL", percentage: 25 }, { category: "UPPER BACK", percentage: 25 } ] },
+            "DORSALI": { main: "UPPER BACK", additional: [ { category: "HORIZONTAL PULL", percentage: 100 }, { category: "PULLOVER", percentage: 100 }, { category: "INCLINE PULL", percentage: 100 } ] },
+            "GLUTEI": { main: "HORIZONTAL HIP EXTENSION", additional: [ { category: "HIP HINGE", percentage: 100 }, { category: "LEG PRESS VARIATION", percentage: 100 }, { category: "LUNGE", percentage: 100 }, { category: "ABDUCTORS", percentage: 100 }, { category: "SQUAT PATTERN", percentage: 100 }, { category: "GLUTEI ISO", percentage: 100 } ] },
+            "LOMBARI": { main: "HIP HINGE", additional: [ { category: "LOWER BACK", percentage: 100 } ] },
+            "PETTORALI": { main: "HORIZONTAL PUSH", additional: [ { category: "INCLINE PUSH", percentage: 100 }, { category: "CHEST ISO", percentage: 100 }, { category: "DECLINE PUSH", percentage: 100 } ] },
+            "POLPACCI": { main: "CALVES", additional: [] },
+            "QUADRICIPITI": { main: "SQUAT PATTERN", additional: [ { category: "QUADS ISO", percentage: 100 }, { category: "LUNGE", percentage: 100 }, { category: "LEG PRESS VARIATION", percentage: 100 } ] },
+            "STRETCHING": { main: "STRETCHING", additional: [] },
+            "TRAPEZI": { main: "HIP HINGE", additional: [ { category: "TRAPS", percentage: 100 }, { category: "HORIZONTAL PULL", percentage: 100 } ] },
+            "TRICIPITI": { main: "TRICIPITI", additional: [ { category: "FRONT DELTS", percentage: 100 }, { category: "HORIZONTAL PUSH", percentage: 100 }, { category: "INCLINE PUSH", percentage: 100 }, { category: "DECLINE PUSH", percentage: 100 } ] },
+            "UPPER BACK": { main: "VERTICAL PULL", additional: [ { category: "UPPER BACK", percentage: 100 }, { category: "HORIZONTAL PULL", percentage: 100 } ] }
+        };
         const WEIGHT_INCREMENT = 2.5;
 
         // Riferimenti DOM
@@ -273,6 +301,7 @@
         const pdfPreviewModal = document.getElementById('pdf-preview-modal');
         const procrastinationModal = document.getElementById('procrastination-modal');
         const exerciseHistoryModal = document.getElementById('exercise-history-modal');
+        const volumeAnalysisModal = document.getElementById('volume-analysis-modal');
 
         let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, isLoginMode = true, selectedUserId = null, favoritesCache = [];
         
@@ -591,7 +620,10 @@
             mesocycleContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
-                    ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
+                     <div class="flex items-center gap-2">
+                        ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
+                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
+                    </div>
                 </div>
                 <select id="mesocycle-selector" class="input-field w-full">${options}</select>
                 ${currentUserRole === 'admin' ? `
@@ -606,6 +638,7 @@
             if (currentUserRole === 'admin') {
                 document.getElementById('create-meso-form').addEventListener('submit', handleCreateMeso);
                 document.getElementById('toggle-create-meso-btn').addEventListener('click', () => document.getElementById('create-meso-container').classList.toggle('open'));
+                document.getElementById('analyze-volume-btn').addEventListener('click', openVolumeAnalysisModal);
             }
             const effectiveUserId = selectedUserId || currentUser.uid;
             const lastMesoId = localStorage.getItem(`lastMesoId_${effectiveUserId}`);
@@ -748,19 +781,49 @@
 
         function calculateAndRenderSheetVolume() {
             const sheetVolumeSummaryContainer = document.getElementById('sheet-volume-summary-container');
-            const volumeByCategory = {};
+            const volumeByMuscleGroup = {};
+
+            for (const group in MACROCYCLE_RULES) {
+                volumeByMuscleGroup[group] = 0;
+            }
+
             exercisesCache.forEach(ex => {
-                const category = ex.categoria || 'Senza Categoria';
-                if (!volumeByCategory[category]) volumeByCategory[category] = 0;
-                volumeByCategory[category] += ex.serie;
+                const { categoria, serie } = ex;
+                if (!categoria || !serie) return;
+
+                for (const group in MACROCYCLE_RULES) {
+                    const rule = MACROCYCLE_RULES[group];
+                    
+                    if (rule.main === categoria) {
+                        volumeByMuscleGroup[group] += serie;
+                    } else {
+                        const additionalRule = rule.additional.find(r => r.category === categoria);
+                        if (additionalRule) {
+                            volumeByMuscleGroup[group] += serie * (additionalRule.percentage / 100);
+                        }
+                    }
+                }
             });
-            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Scheda</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
-            const sortedCategories = Object.keys(volumeByCategory).sort();
-            if (sortedCategories.length === 0) summaryHTML = '';
-            else sortedCategories.forEach(cat => {
-                summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-secondary">${cat}:</span> <span class="text-red-400 font-bold">${volumeByCategory[cat]} serie</span></div>`;
+
+            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Muscolare Totale</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
+            
+            const sortedGroups = Object.keys(volumeByMuscleGroup).sort();
+            
+            let hasVolume = false;
+            sortedGroups.forEach(group => {
+                const volume = Math.round(volumeByMuscleGroup[group] * 10) / 10;
+                if (volume > 0) {
+                    hasVolume = true;
+                    summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-secondary">${group}:</span> <span class="text-red-400 font-bold">${volume} serie</span></div>`;
+                }
             });
-            summaryHTML += `</div>`;
+            
+            if (!hasVolume) {
+                 summaryHTML = '';
+            } else {
+                summaryHTML += `</div>`;
+            }
+
             sheetVolumeSummaryContainer.innerHTML = summaryHTML;
         }
         
@@ -1599,6 +1662,156 @@
             setTimeout(() => procrastinationModal.classList.add('hidden'), 250);
         }
         document.getElementById('procrastination-ok-btn').addEventListener('click', closeProcrastinationModal);
+
+        async function openVolumeAnalysisModal() {
+            if (!currentMesoId) {
+                showNotification("Seleziona prima un mesociclo.", "warning");
+                return;
+            }
+
+            const container = document.getElementById('volume-analysis-container');
+            container.innerHTML = '<div class="loader"></div>';
+            volumeAnalysisModal.classList.remove('hidden');
+            setTimeout(() => volumeAnalysisModal.classList.remove('opacity-0'), 10);
+            
+            const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione")));
+            const sheets = sheetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            let sheetSelectionHTML = '<p class="text-secondary">Nessuna scheda trovata in questo mesociclo.</p>';
+            if (sheets.length > 0) {
+                sheetSelectionHTML = sheets.map(sheet => `
+                    <label class="flex items-center space-x-3 bg-stone-800/50 p-3 rounded-lg">
+                        <input type="checkbox" name="sheet" value="${sheet.id}" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500">
+                        <span>${sheet.nomeScheda}</span>
+                    </label>
+                `).join('');
+            }
+            
+            container.innerHTML = `
+                <div class="bg-stone-900/50 p-4 rounded-lg">
+                    <h4 class="font-bold text-white mb-3">1. Imposta Frequenza Settimanale</h4>
+                    <p class="text-xs text-secondary mb-2">Quante volte a settimana si allena l'utente?</p>
+                    <input type="number" id="workouts-per-week" class="input-field w-full sm:w-1/3" placeholder="Es: 4" min="1">
+                </div>
+                <div class="bg-stone-900/50 p-4 rounded-lg">
+                     <h4 class="font-bold text-white mb-3">2. Seleziona le Schede della Rotazione</h4>
+                     <p class="text-xs text-secondary mb-2">Quali schede vengono eseguite nella settimana? (Es. Scheda A e Scheda B per una frequenza di 4 volte/sett)</p>
+                     <div id="sheet-selection-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">${sheetSelectionHTML}</div>
+                </div>
+                <div class="text-center">
+                    <button id="calculate-volume-btn" class="btn"><i class="fas fa-calculator mr-2"></i> Calcola Volume Mensile</button>
+                </div>
+                <div id="volume-results-container" class="mt-6"></div>
+            `;
+
+            document.getElementById('calculate-volume-btn').addEventListener('click', () => calculateAndDisplayProjectedVolume(sheets));
+        }
+
+        async function calculateAndDisplayProjectedVolume(sheets) {
+            const workoutsPerWeek = parseInt(document.getElementById('workouts-per-week').value, 10);
+            const selectedSheetCheckboxes = document.querySelectorAll('#sheet-selection-container input[type="checkbox"]:checked');
+            const selectedSheetIds = Array.from(selectedSheetCheckboxes).map(cb => cb.value);
+            const resultsContainer = document.getElementById('volume-results-container');
+            resultsContainer.innerHTML = '<div class="loader"></div>';
+
+            if (!workoutsPerWeek || workoutsPerWeek <= 0) {
+                resultsContainer.innerHTML = '<p class="text-center text-red-400">Inserisci un numero valido di allenamenti a settimana.</p>';
+                return;
+            }
+            if (selectedSheetIds.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-center text-red-400">Seleziona almeno una scheda da includere nel calcolo.</p>';
+                return;
+            }
+
+            const multiplier = workoutsPerWeek / selectedSheetIds.length;
+            
+            const allExercisesPromises = selectedSheetIds.map(sheetId => getDocs(getExercisesRef(currentMesoId, sheetId)));
+            const allExercisesSnapshots = await Promise.all(allExercisesPromises);
+            const allExercises = allExercisesSnapshots.flatMap(snapshot => snapshot.docs.map(doc => doc.data()));
+
+            const rotationVolumeData = {};
+            for (const group in MACROCYCLE_RULES) {
+                rotationVolumeData[group] = { totalSets: 0, composition: {} };
+            }
+
+            allExercises.forEach(ex => {
+                const { categoria, serie } = ex;
+                if (!categoria || !serie) return;
+
+                for (const group in MACROCYCLE_RULES) {
+                    const rule = MACROCYCLE_RULES[group];
+                    let addedVolume = 0;
+                    let contributingCategory = null;
+                    let percentage = 100;
+
+                    if (rule.main === categoria) {
+                        addedVolume = serie;
+                        contributingCategory = categoria;
+                    } else {
+                        const additionalRule = rule.additional.find(r => r.category === categoria);
+                        if (additionalRule) {
+                            addedVolume = serie * (additionalRule.percentage / 100);
+                            percentage = additionalRule.percentage;
+                            contributingCategory = categoria;
+                        }
+                    }
+
+                    if (addedVolume > 0) {
+                        rotationVolumeData[group].totalSets += addedVolume;
+                        if (!rotationVolumeData[group].composition[contributingCategory]) {
+                            rotationVolumeData[group].composition[contributingCategory] = { sets: 0, percentage: 0 };
+                        }
+                        rotationVolumeData[group].composition[contributingCategory].sets += serie;
+                        rotationVolumeData[group].composition[contributingCategory].percentage = percentage;
+                    }
+                }
+            });
+
+            const weeksInMonth = 4.33;
+            let resultsHTML = `
+                <h3 class="text-lg font-bold text-white mb-4">Risultati Volume Mensile Stimato</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-stone-800/50">
+                            <tr>
+                                <th class="p-3">Gruppo Muscolare</th>
+                                <th class="p-3">Volume Totale Mensile</th>
+                                <th class="p-3">Dettaglio Volume (per rotazione di ${selectedSheetIds.length} schede)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-800">
+            `;
+
+            const sortedGroups = Object.keys(rotationVolumeData).sort();
+            sortedGroups.forEach(group => {
+                const rotationSets = rotationVolumeData[group].totalSets;
+                if (rotationSets > 0) {
+                    const actualWeeklyVolume = rotationSets * multiplier;
+                    const monthlySets = (actualWeeklyVolume * weeksInMonth).toFixed(1);
+                    
+                    let compositionHTML = Object.entries(rotationVolumeData[group].composition).map(([cat, data]) => {
+                        const contribution = (data.sets * (data.percentage / 100)).toFixed(1);
+                        return `<div>${cat}: ${data.sets} serie (${data.percentage}%) = <b>${contribution}</b></div>`;
+                    }).join('');
+
+                    resultsHTML += `
+                        <tr class="hover:bg-stone-800/30">
+                            <td class="p-3 font-bold text-red-400">${group}</td>
+                            <td class="p-3 font-semibold">${monthlySets} serie</td>
+                            <td class="p-3 text-xs text-secondary">Volume rotazione: <b>${rotationSets.toFixed(1)}</b><hr class="my-1 border-stone-700">${compositionHTML}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            resultsHTML += `</tbody></table></div>`;
+            resultsContainer.innerHTML = resultsHTML;
+        }
+
+        document.getElementById('close-volume-modal').addEventListener('click', () => {
+            volumeAnalysisModal.classList.add('opacity-0');
+            setTimeout(() => volumeAnalysisModal.classList.add('hidden'), 250);
+        });
 
         // --- INIZIALIZZAZIONE APP ---
         window.addEventListener('load', setupAdminAccount);
