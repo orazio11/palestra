@@ -3,31 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra - Versione Completa</title>
+    <title>App Schede Palestra - Versione Migliorata</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-primary: #0c0a09; --bg-secondary: #1c1917; --bg-gradient-from: #1f2937; --bg-gradient-to: #0c0a09;
-            --text-primary: #e2e8f0; --text-secondary: #a8a29e; --text-accent: #f59e0b; --text-accent-dark: #431407;
-            --border-color: #44403c; --btn-secondary-bg: #262626; --btn-secondary-hover: #404040;
+            --bg-primary: #0c0a09;
+            --bg-secondary: #1c1917;
+            --bg-gradient-from: #1f2937;
+            --bg-gradient-to: #0c0a09;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a8a29e;
+            --text-accent: #dc2626; /* Red-600 */
+            --text-accent-hover: #b91c1c; /* Red-700 */
+            --text-accent-dark: #fef2f2; /* Red-50 */
+            --border-color: #44403c;
+            --btn-secondary-bg: #262626;
+            --btn-secondary-hover: #404040;
         }
         html.light {
-            --bg-primary: #f3f4f6; --bg-secondary: #ffffff; --bg-gradient-from: #e5e7eb; --bg-gradient-to: #f3f4f6;
-            --text-primary: #111827; --text-secondary: #4b5563; --text-accent: #d97706; --text-accent-dark: #ffffff;
-            --border-color: #d1d5db; --btn-secondary-bg: #e5e7eb; --btn-secondary-hover: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-gradient-from: #f3f4f6;
+            --bg-gradient-to: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-accent: #dc2626;
+            --text-accent-hover: #b91c1c;
+            --text-accent-dark: #ffffff;
+            --border-color: #d1d5db;
+            --btn-secondary-bg: #e5e7eb;
+            --btn-secondary-hover: #d1d5db;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
         .bg-gradient-main { background-image: linear-gradient(to bottom right, var(--bg-gradient-from), var(--bg-gradient-to)); }
         .input-field { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 10px 12px; width: 100%; transition: all 0.2s; color: var(--text-primary); }
-        .input-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4); }
+        .input-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
+        html.dark .input-field:focus { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3); }
         .textarea-field { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 10px 12px; width: 100%; transition: all 0.2s; color: var(--text-primary); resize: vertical; min-height: 80px; }
-        .textarea-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; background-color: var(--text-accent); color: var(--text-accent-dark); font-weight: 700; padding: 10px 16px; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+        .textarea-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
+        html.dark .textarea-field:focus { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; background-color: var(--text-accent); color: var(--text-accent-dark); font-weight: 700; padding: 10px 16px; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; border: none; }
+        .btn:hover { background-color: var(--text-accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
         .btn:disabled { cursor: not-allowed; filter: grayscale(50%); opacity: 0.7; }
         .btn-secondary { background-color: var(--btn-secondary-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: var(--btn-secondary-hover); }
@@ -37,7 +57,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .week-btn { flex-shrink: 0; background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); }
         .week-btn.active { background-color: var(--text-accent); color: var(--text-accent-dark); font-weight: 700; border-color: var(--text-accent); }
-        .week-btn.completed { background-color: #047857; color: #d1fae5; border-color: #065f46; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .modal { transition: opacity 0.25s ease; }
@@ -48,68 +67,29 @@
         .notification.warning { background-color: #be123c; color: #fff1f2; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .reward-badge { display: inline-block; background-color: #f59e0b; color: #431407; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 8px; }
-        .stats-card { background-color: var(--bg-secondary); border-radius: 0.5rem; padding: 1rem; border: 1px solid var(--border-color); }
         .progress-bar { height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background-color: var(--text-accent); }
         .timer-display { font-family: monospace; font-size: 1.5rem; font-weight: bold; }
-        .user-card { transition: all 0.2s; }
-        .user-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .action-btn { transition: all 0.2s; }
-        .action-btn:hover { transform: scale(1.1); }
-        .admin-setup-card { background: linear-gradient(135deg, #1f2937 0%, #111827 100%); border: 1px solid #374151; }
-        .admin-request-card { background: linear-gradient(135deg, #7c2d12 0%, #431407 100%); border: 1px solid #9a3412; }
         .user-indicator { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 8px 16px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .exercise-image {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-            border-radius: 0.5rem;
-            display: block;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .image-upload-container { position: relative; }
-        .image-preview { position: relative; display: inline-block; }
-        .remove-image-btn { position: absolute; top: -8px; right: -8px; background-color: #be123c; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+        .exercise-image { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border: 2px solid var(--border-color); border-radius: 0.5rem; display: block; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .pdf-preview { border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; background-color: var(--bg-secondary); }
-        .pdf-preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .pdf-preview-title { font-size: 1.5rem; font-weight: bold; color: var(--text-primary); }
-        .pdf-preview-info { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-        .pdf-preview-exercise { border-bottom: 1px solid var(--border-color); padding: 0.5rem 0; }
-        .pdf-preview-exercise:last-child { border-bottom: none; }
-        .pdf-preview-exercise-name { font-weight: bold; color: var(--text-primary); }
-        .pdf-preview-exercise-details { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem; }
         .macrocycle-card { background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); border: 1px solid #3b82f6; }
-        .macrocycle-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .macrocycle-table th, .macrocycle-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(59, 130, 246, 0.3); }
-        .macrocycle-table th { background-color: rgba(59, 130, 246, 0.2); color: white; font-weight: 600; }
-        .macrocycle-table tr:nth-child(even) { background-color: rgba(59, 130, 246, 0.05); }
-        .macrocycle-table tr:hover { background-color: rgba(59, 130, 246, 0.1); }
-        .volume-bar { height: 8px; background-color: rgba(59, 130, 246, 0.2); border-radius: 4px; overflow: hidden; margin-top: 0.25rem; }
-        .volume-fill { height: 100%; background-color: #3b82f6; border-radius: 4px; }
-        .category-tag { display: inline-block; background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; margin-right: 0.25rem; }
         .accordion-header { cursor: pointer; user-select: none; transition: background-color 0.2s; }
         .accordion-header:hover { background-color: rgba(59, 130, 246, 0.2); }
         .accordion-icon { transition: transform 0.3s; }
         .accordion-icon.open { transform: rotate(180deg); }
-        .intensity-active {
-            border-color: var(--text-accent);
-            background-color: rgba(245, 158, 11, 0.1);
-        }
-        .intensity-glow {
-            border-color: var(--text-accent);
-            box-shadow: 0 0 15px 4px rgba(245, 158, 11, 0.5), 
-                        0 0 5px 2px rgba(245, 158, 11, 0.7),
-                        inset 0 0 8px 1px rgba(245, 158, 11, 0.4);
-        }
+        .intensity-active { border-color: var(--text-accent); background-color: rgba(220, 38, 38, 0.1); }
+        .intensity-glow { border-color: var(--text-accent); box-shadow: 0 0 15px 4px rgba(220, 38, 38, 0.4), inset 0 0 8px 1px rgba(220, 38, 38, 0.3); }
+        .recap-card { background: linear-gradient(135deg, #4a044e, #1e1b4b); border: 1px solid #7e22ce; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
     </style>
 </head>
 <body class="antialiased">
     <div id="app-container" class="container mx-auto p-4 max-w-3xl">
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center space-x-3">
-                <i class="fas fa-dumbbell text-amber-400 text-2xl"></i>
+                <i class="fas fa-dumbbell text-red-500 text-2xl"></i>
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Gym App</h1>
             </div>
             <div class="flex items-center gap-4">
@@ -123,7 +103,7 @@
 
         <div id="user-indicator" class="user-indicator hidden">
             <div class="flex items-center gap-2">
-                <i class="fas fa-user text-amber-400"></i>
+                <i class="fas fa-user text-red-500"></i>
                 <span id="selected-user-name" class="text-sm font-medium"></span>
                 <button id="back-to-admin-btn" class="btn btn-secondary !p-1 text-xs">
                     <i class="fas fa-times"></i>
@@ -133,26 +113,23 @@
 
         <div id="main-view"></div>
     </div>
-
+    
+    <!-- Modals -->
     <div id="auth-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
             <h3 id="auth-title" class="text-xl font-bold text-white mb-4 text-center">Area Personale</h3>
             <p id="auth-error" class="text-red-400 mb-4 text-center text-sm"></p>
             <form id="auth-form" class="space-y-4">
                 <input type="email" name="email" class="input-field" placeholder="Email" required>
                 <input type="password" name="password" class="input-field" placeholder="Password (min. 6 caratteri)" required>
                 <button type="submit" id="auth-submit-btn" class="btn w-full">Accedi</button>
-                <button type="button" id="toggle-auth-mode-btn" class="text-center w-full mt-4 text-sm text-amber-400 hover:text-amber-300">Non hai un account? Registrati</button>
+                <button type="button" id="toggle-auth-mode-btn" class="text-center w-full mt-4 text-sm text-red-500 hover:text-red-400">Non hai un account? Registrati</button>
             </form>
-            <div class="mt-6 text-center text-sm text-stone-500">
-                <p>Se sei l'amministratore, usa le tue credenziali esistenti.</p>
-                <p class="mt-2">Se hai bisogno di impostare un account admin, contatta lo sviluppatore.</p>
-            </div>
         </div>
     </div>
 
     <div id="confirm-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
             <h3 id="confirm-title" class="text-xl font-bold text-white mb-4">Conferma Azione</h3>
             <p id="confirm-message" class="text-stone-300 mb-6">Sei sicuro?</p>
             <div class="flex justify-end gap-4">
@@ -163,37 +140,29 @@
     </div>
 
     <div id="edit-exercise-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
              <h3 class="text-xl font-bold text-white mb-4">Modifica Esercizio</h3>
              <div id="edit-exercise-container"></div>
         </div>
     </div>
 
     <div id="favorites-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-3xl m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-3xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white">Esercizi Preferiti</h3>
-                <button id="close-favorites-modal" class="btn btn-secondary !p-2">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button id="close-favorites-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
             </div>
             <div id="favorites-container"></div>
         </div>
     </div>
 
     <div id="user-management-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-4xl m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-4xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white">
-                    <i class="fas fa-users-cog mr-2 text-amber-400"></i> Gestione Utenti
-                </h3>
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-users-cog mr-2 text-red-500"></i> Gestione Utenti</h3>
                 <div class="flex gap-2">
-                    <button id="refresh-users-btn" class="btn btn-secondary !p-2" title="Aggiorna lista">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button id="close-user-modal" class="btn btn-secondary !p-2">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button id="refresh-users-btn" class="btn btn-secondary !p-2" title="Aggiorna lista"><i class="fas fa-sync-alt"></i></button>
+                    <button id="close-user-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             <div id="user-management-container"></div>
@@ -201,63 +170,49 @@
     </div>
 
     <div id="edit-user-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-md m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-md m-4 transform scale-95 border border-stone-800">
             <h3 class="text-xl font-bold text-white mb-4">Modifica Utente</h3>
             <div id="edit-user-container"></div>
         </div>
     </div>
 
     <div id="user-details-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white">Dettagli Utente</h3>
-                <button id="close-user-details-btn" class="btn btn-secondary !p-2">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button id="close-user-details-btn" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
             </div>
             <div id="user-details-container"></div>
         </div>
     </div>
 
     <div id="timer-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
             <h3 class="text-xl font-bold text-white mb-4 text-center">Timer Recupero</h3>
-            <div class="timer-display text-amber-400 text-center mb-6" id="timer-display">00:00</div>
+            <div class="timer-display text-red-500 text-center mb-6" id="timer-display">00:00</div>
             <div class="flex justify-center gap-4">
-                <button id="timer-pause-btn" class="btn btn-secondary">
-                    <i class="fas fa-pause"></i> Pausa
-                </button>
-                <button id="timer-stop-btn" class="btn btn-danger">
-                    <i class="fas fa-stop"></i> Ferma
-                </button>
+                <button id="timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
+                <button id="timer-stop-btn" class="btn btn-danger"><i class="fas fa-stop"></i> Ferma</button>
             </div>
         </div>
     </div>
 
     <div id="pdf-preview-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white">Anteprima PDF</h3>
                 <div class="flex gap-2">
-                    <button id="download-pdf-btn" class="btn btn-secondary">
-                        <i class="fas fa-download mr-2"></i> Scarica PDF
-                    </button>
-                    <button id="create-gdoc-btn" class="btn btn-secondary">
-                        <i class="fab fa-google-drive mr-2"></i> Crea Google Doc
-                    </button>
-                    <button id="close-pdf-preview-btn" class="btn btn-secondary !p-2">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button id="download-pdf-btn" class="btn btn-secondary"><i class="fas fa-download mr-2"></i> Scarica PDF</button>
+                    <button id="close-pdf-preview-btn" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
                 </div>
             </div>
-            <div id="pdf-preview-container" class="pdf-preview">
-                </div>
+            <div id="pdf-preview-container" class="pdf-preview"></div>
         </div>
     </div>
 
     <div id="procrastination-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-stone-900 p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-amber-500 text-center">
-            <h3 class="text-3xl font-bold text-amber-400 mb-4 animate-pulse">Ci stai mettendo troppo!</h3>
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-red-500 text-center">
+            <h3 class="text-3xl font-bold text-red-500 mb-4 animate-pulse">Ci stai mettendo troppo!</h3>
             <p class="text-stone-300 mb-6">Mantieni alta l'intensità. È ora della prossima serie!</p>
             <button id="procrastination-ok-btn" class="btn">Ho capito!</button>
         </div>
@@ -265,9 +220,9 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, writeBatch, setDoc, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, writeBatch, setDoc, where, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
         // --- CONFIGURAZIONE FIREBASE ---
         const firebaseConfig = {
@@ -287,33 +242,7 @@
         const storage = getStorage(app);
 
         // --- COSTANTI E VARIABILI GLOBALI ---
-        const CATEGORIES = [
-            "ABDUCTORS", "ABS", "ADDUCTORS", "BICEPS", "CALVES", "CHEST ISO", 
-            "DECLINE PUSH", "FRONT DELTS", "GLUTEI ISO", "HAMSTRINGS", "HIP HINGE", 
-            "HORIZONTAL HIP EXTENSION", "HORIZONTAL PULL", "HORIZONTAL PUSH", 
-            "INCLINE PULL", "INCLINE PUSH", "LEG PRESS VARIATION", "LOWER BACK", 
-            "LUNGE", "PULLOVER", "QUADS ISO", "REAR DELTS", "SIDE DELTS", 
-            "SQUAT PATTERN", "STRETCHING", "TRAPS", "TRICIPITI", "TRICEPS PUSH", "UPPER BACK", 
-            "VERTICAL PULL", "VERTICAL PUSH"
-        ];
-        const MACROCYCLE_RULES = {
-            "ADDOMINALI": { main: "ABS", additional: [] },
-            "ADDUTTORI": { main: "ADDUCTORS", additional: [] },
-            "BICIPITI": { main: "BICEPS", additional: [ { category: "HORIZONTAL PULL", percentage: 25 }, { category: "UPPER BACK", percentage: 25 }, { category: "INCLINE PULL", percentage: 25 } ] },
-            "DELTOIDI FRONTALI": { main: "FRONT DELTS", additional: [ { category: "INCLINE PUSH", percentage: 25 }, { category: "VERTICAL PUSH", percentage: 25 } ] },
-            "DELTOIDI LATERALI": { main: "SIDE DELTS", additional: [] },
-            "DELTOIDI POSTERIORI": { main: "REAR DELTS", additional: [ { category: "HORIZONTAL PULL", percentage: 25 }, { category: "UPPER BACK", percentage: 25 } ] },
-            "DORSALI": { main: "UPPER BACK", additional: [ { category: "HORIZONTAL PULL", percentage: 100 }, { category: "PULLOVER", percentage: 100 }, { category: "INCLINE PULL", percentage: 100 } ] },
-            "GLUTEI": { main: "HORIZONTAL HIP EXTENSION", additional: [ { category: "HIP HINGE", percentage: 100 }, { category: "LEG PRESS VARIATION", percentage: 100 }, { category: "LUNGE", percentage: 100 }, { category: "ABDUCTORS", percentage: 100 }, { category: "SQUAT PATTERN", percentage: 100 }, { category: "GLUTEI ISO", percentage: 100 } ] },
-            "LOMBARI": { main: "HIP HINGE", additional: [ { category: "LOWER BACK", percentage: 100 } ] },
-            "PETTORALI": { main: "HORIZONTAL PUSH", additional: [ { category: "INCLINE PUSH", percentage: 100 }, { category: "CHEST ISO", percentage: 100 }, { category: "DECLINE PUSH", percentage: 100 } ] },
-            "POLPACCI": { main: "CALVES", additional: [] },
-            "QUADRICIPITI": { main: "SQUAT PATTERN", additional: [ { category: "QUADS ISO", percentage: 100 }, { category: "LUNGE", percentage: 100 }, { category: "LEG PRESS VARIATION", percentage: 100 } ] },
-            "STRETCHING": { main: "STRETCHING", additional: [] },
-            "TRAPEZI": { main: "HIP HINGE", additional: [ { category: "TRAPS", percentage: 100 }, { category: "HORIZONTAL PULL", percentage: 100 } ] },
-            "TRICIPITI": { main: "TRICIPITI", additional: [ { category: "FRONT DELTS", percentage: 100 }, { category: "HORIZONTAL PUSH", percentage: 100 }, { category: "INCLINE PUSH", percentage: 100 }, { category: "DECLINE PUSH", percentage: 100 } ] },
-            "UPPER BACK": { main: "VERTICAL PULL", additional: [ { category: "UPPER BACK", percentage: 100 }, { category: "HORIZONTAL PULL", percentage: 100 } ] }
-        };
+        const CATEGORIES = ["ABDUCTORS", "ABS", "ADDUCTORS", "BICEPS", "CALVES", "CHEST ISO", "DECLINE PUSH", "FRONT DELTS", "GLUTEI ISO", "HAMSTRINGS", "HIP HINGE", "HORIZONTAL HIP EXTENSION", "HORIZONTAL PULL", "HORIZONTAL PUSH", "INCLINE PULL", "INCLINE PUSH", "LEG PRESS VARIATION", "LOWER BACK", "LUNGE", "PULLOVER", "QUADS ISO", "REAR DELTS", "SIDE DELTS", "SQUAT PATTERN", "STRETCHING", "TRAPS", "TRICIPITI", "TRICEPS PUSH", "UPPER BACK", "VERTICAL PULL", "VERTICAL PUSH"];
         const WEIGHT_INCREMENT = 2.5;
 
         // Riferimenti DOM
@@ -332,14 +261,15 @@
         const selectedUserName = document.getElementById('selected-user-name');
         const backToAdminBtn = document.getElementById('back-to-admin-btn');
         const pdfPreviewModal = document.getElementById('pdf-preview-modal');
-        const pdfPreviewContainer = document.getElementById('pdf-preview-container');
-        const downloadPdfBtn = document.getElementById('download-pdf-btn');
-        const createGdocBtn = document.getElementById('create-gdoc-btn');
-        const closePdfPreviewBtn = document.getElementById('close-pdf-preview-btn');
         const procrastinationModal = document.getElementById('procrastination-modal');
 
-        let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, workoutStartTime = null, activeTimerInterval = null, isLoginMode = true, timerSeconds = 0, timerPaused = false, selectedUserId = null, pdfContent = null, favoritesCache = [];
+        let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, isLoginMode = true, selectedUserId = null, favoritesCache = [];
+        
+        // Variabili di stato per il timer e il tracciamento
+        let activeTimerInterval = null, timerSeconds = 0, timerPaused = false;
         let procrastinationTimers = {};
+        let modifiedExercisesThisWeek = new Set();
+
 
         // --- GESTIONE TEMA ---
         function applyTheme(theme) {
@@ -351,14 +281,13 @@
         themeToggleBtn.addEventListener('click', () => applyTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light'));
         applyTheme(localStorage.getItem('theme') || 'dark');
 
-        // --- GESTIONE TIMER ---
+        // --- GESTIONE TIMER RECUPERO ---
         function startTimerModal(duration) {
             timerSeconds = duration;
             timerPaused = false;
             updateTimerDisplay();
             timerModal.classList.remove('hidden');
             setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
-
             if (activeTimerInterval) clearInterval(activeTimerInterval);
             activeTimerInterval = setInterval(() => {
                 if (!timerPaused && timerSeconds > 0) {
@@ -372,21 +301,15 @@
                 }
             }, 1000);
         }
-
         function updateTimerDisplay() {
             const minutes = Math.floor(timerSeconds / 60);
             const seconds = timerSeconds % 60;
-            document.getElementById('timer-display').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
-
         document.getElementById('timer-pause-btn').addEventListener('click', () => {
             timerPaused = !timerPaused;
-            document.getElementById('timer-pause-btn').innerHTML = timerPaused ? 
-                '<i class="fas fa-play"></i> Riprendi' : 
-                '<i class="fas fa-pause"></i> Pausa';
+            document.getElementById('timer-pause-btn').innerHTML = timerPaused ? '<i class="fas fa-play"></i> Riprendi' : '<i class="fas fa-pause"></i> Pausa';
         });
-
         document.getElementById('timer-stop-btn').addEventListener('click', () => {
             clearInterval(activeTimerInterval);
             timerModal.classList.add('opacity-0');
@@ -398,39 +321,31 @@
             try {
                 const adminQuery = query(collection(db, 'users'), where('role', '==', 'admin'));
                 const adminSnapshot = await getDocs(adminQuery);
-                                
                 if (adminSnapshot.empty) {
                     const email = 'naccio@live.it';
                     try {
-                        const userCredential = await signInWithEmailAndPassword(auth, email, 'admin123');
-                        const user = userCredential.user;
-                        await setDoc(doc(db, 'users', user.uid), { email, role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' });
+                        await signInWithEmailAndPassword(auth, email, 'admin123');
+                        const userCredential = auth.currentUser;
+                        await setDoc(doc(db, 'users', userCredential.uid), { email, role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' }, { merge: true });
                         console.log('Account esistente promosso ad admin!');
-                        showNotification('Il tuo account è stato impostato come amministratore!');
                         await signOut(auth);
                     } catch (error) {
                         if (error.code === 'auth/user-not-found') {
                             try {
                                 const userCredential = await createUserWithEmailAndPassword(auth, email, 'admin123');
-                                const user = userCredential.user;
-                                await setDoc(doc(db, 'users', user.uid), { email, role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' });
+                                await setDoc(doc(db, 'users', userCredential.user.uid), { email, role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' });
                                 console.log('Admin creato con successo!');
-                                showNotification('Account admin creato. Accedi con naccio@live.it e password admin123');
                                 await signOut(auth);
-                            } catch (createError) {
-                                console.error('Errore durante la creazione dell\'admin:', createError);
-                            }
-                        } else if (error.code === 'auth/wrong-password') {
-                            showNotification('L\'account admin esiste ma la password è errata. Contatta lo sviluppatore per reimpostare la password.');
-                        } else {
-                            console.error('Errore durante l\'accesso:', error);
+                            } catch (createError) { console.error('Errore creazione admin:', createError); }
+                        } else { 
+                            console.error('Errore durante il setup dell\'admin:', error); 
                         }
                     }
-                } else {
-                    console.log('Admin già presente nel sistema');
+                } else { 
+                    console.log('Admin già presente nel sistema'); 
                 }
-            } catch (error) {
-                console.error('Errore durante la verifica dell\'admin:', error);
+            } catch (error) { 
+                console.error('Errore verifica admin:', error); 
             }
         }
 
@@ -439,35 +354,33 @@
             selectedUserId = userId;
             selectedUserName.textContent = userEmail;
             userIndicator.classList.remove('hidden');
-            currentMesoId = null;
-            currentSheetId = null;
-            currentSheetData = null;
-            currentWeek = 1;
-            exercisesCache = [];
+            resetState();
             renderAppView();
         }
-
         function deselectUser() {
             selectedUserId = null;
             userIndicator.classList.add('hidden');
+            resetState();
+            renderAppView();
+        }
+        backToAdminBtn.addEventListener('click', deselectUser);
+        
+        function resetState() {
             currentMesoId = null;
             currentSheetId = null;
             currentSheetData = null;
             currentWeek = 1;
             exercisesCache = [];
-            renderAppView();
         }
-        backToAdminBtn.addEventListener('click', deselectUser);
 
         // --- GESTIONE AUTENTICAZIONE E UI PRINCIPALE ---
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
-                
                 if (user.email === 'naccio@live.it') {
                     if (!userDoc.exists() || userDoc.data().role !== 'admin') {
-                        await setDoc(doc(db, 'users', user.uid), { email: user.email, role: 'admin', createdAt: userDoc.exists() ? userDoc.data().createdAt : new Date().toISOString(), updatedAt: new Date().toISOString() }, { merge: true });
+                        await setDoc(doc(db, 'users', user.uid), { email: user.email, role: 'admin' }, { merge: true });
                         currentUserRole = 'admin';
                     } else {
                         currentUserRole = userDoc.data().role || 'user';
@@ -489,77 +402,32 @@
         function renderLoginView() {
             mainView.innerHTML = `
                 <div class="text-center py-12">
-                    <i class="fas fa-dumbbell text-amber-400 text-5xl mb-6"></i>
-                    <h2 class="text-2xl font-bold text-white mb-4">Benvenuto in Gym App</h2>
-                    <p class="text-stone-400 mb-8">Effettua il login per accedere alla tua area personale.</p>
-                    <div class="admin-setup-card max-w-md mx-auto p-6 rounded-xl mb-8">
-                        <h3 class="text-lg font-semibold text-white mb-3"><i class="fas fa-user-shield mr-2 text-amber-400"></i> Informazioni Admin</h3>
-                        <p class="text-stone-300 mb-4">Se sei l'amministratore del sistema, utilizza le tue credenziali esistenti. Se non hai ancora un account admin, verrà creato automaticamente al primo accesso.</p>
-                        <div class="bg-stone-800 p-4 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-stone-400">Email admin:</span>
-                                <span class="font-mono text-amber-400">naccio@live.it</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-stone-400">Password:</span>
-                                <span class="font-mono text-amber-400">admin123</span>
-                            </div>
-                        </div>
-                    </div>
+                    <i class="fas fa-dumbbell text-red-500 text-5xl mb-6"></i>
+                    <h2 class="text-2xl font-bold mb-4">Benvenuto in Gym App</h2>
+                    <p class="text-secondary mb-8">Effettua il login per accedere alla tua area personale.</p>
                 </div>`;
             userControls.innerHTML = `<button id="login-btn" class="btn">Accedi / Registrati</button>`;
             document.getElementById('login-btn').addEventListener('click', openAuthModal);
         }
 
-        function renderAppView() {
-            if (currentUser && currentUser.email === 'naccio@live.it' && currentUserRole !== 'admin') {
-                mainView.innerHTML = `
-                    <div class="text-center py-12">
-                        <i class="fas fa-user-shield text-amber-400 text-5xl mb-6"></i>
-                        <h2 class="text-2xl font-bold text-white mb-4">Accesso Amministratore Richiesto</h2>
-                        <p class="text-stone-400 mb-8">Il tuo account è registrato come amministratore ma non ha i privilegi di admin nel sistema. Clicca sul pulsante qui sotto per impostare i privilegi di amministratore.</p>
-                        <div class="admin-request-card max-w-md mx-auto p-6 rounded-xl mb-8">
-                            <h3 class="text-lg font-semibold text-white mb-3"><i class="fas fa-exclamation-triangle mr-2 text-amber-400"></i> Richiesta Admin</h3>
-                            <p class="text-stone-300 mb-4">Per accedere alle funzionalità di amministratore, devi impostare manualmente i privilegi di admin per questo account.</p>
-                            <button id="request-admin-btn" class="btn w-full"><i class="fas fa-user-shield mr-2"></i> Imposta Privilegi Admin</button>
-                        </div>
-                    </div>`;
-                document.getElementById('request-admin-btn').addEventListener('click', async () => {
-                    if (await showConfirmModal('Impostare questo account come amministratore?')) {
-                        try {
-                            await updateDoc(doc(db, 'users', currentUser.uid), { role: 'admin', promotedBy: 'self', promotedAt: new Date().toISOString() });
-                            currentUserRole = 'admin';
-                            showNotification("Privilegi di amministratore impostati con successo!");
-                            renderAppView();
-                        } catch (error) {
-                            console.error("Errore durante l'impostazione dei privilegi admin:", error);
-                            showNotification("Errore durante l'impostazione dei privilegi admin.", "error");
-                        }
-                    }
-                });
-                userControls.innerHTML = `<div class="flex items-center gap-2"><span class="text-sm text-stone-400 hidden sm:block">Ciao, ${currentUser.email}</span><button id="logout-btn" class="btn btn-secondary">Logout</button></div>`;
-                document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-                return;
-            }
-
-            userControls.innerHTML = `<div class="flex items-center gap-2"><span class="text-sm text-stone-400 hidden sm:block">Ciao, ${currentUser.email}</span><button id="logout-btn" class="btn btn-secondary">Logout</button></div>`;
+        async function renderAppView() {
+            userControls.innerHTML = `<div class="flex items-center gap-2"><span class="text-sm text-secondary hidden sm:block">Ciao, ${currentUser.email}</span><button id="logout-btn" class="btn btn-secondary">Logout</button></div>`;
             document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-
+            
             const isAdmin = currentUserRole === 'admin';
             mainView.innerHTML = `
                 <div class="space-y-6">
+                    <div id="last-workout-container" class="mb-6"></div>
                     ${isAdmin && !selectedUserId ? `
                     <div class="bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg">
-                        <h3 class="text-lg font-bold text-white mb-3"><i class="fas fa-users mr-2 text-amber-400"></i> Seleziona Utente</h3>
+                        <h3 class="text-lg font-bold text-white mb-3"><i class="fas fa-users mr-2 text-red-500"></i> Seleziona Utente</h3>
                         <div id="user-selector-container"></div>
                     </div>` : ''}
                     <div id="mesocycle-container" class="bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg"></div>
-                    <div id="macrocycle-volume-container" class="hidden macrocycle-card p-4 rounded-xl border border-blue-600 shadow-lg"></div>
                     <div id="sheet-container" class="bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg hidden"></div>
                     <div id="sheet-content" class="hidden">
                         <div id="week-selector-container" class="mb-4"></div>
-                        <div id="week-actions-container" class="mb-4 text-center"></div>
-                        <div id="workout-duration-container" class="mb-4 text-center"></div>
+                        <div id="workout-controls-container" class="mb-4"></div>
                         <div id="sheet-volume-summary-container" class="mb-4"></div>
                         <div id="exercise-list-container" class="space-y-4"></div>
                         ${isAdmin ? `
@@ -571,753 +439,47 @@
                             <div id="add-exercise-container" class="collapsible-content"></div>
                         </div>` : ''}
                         <div class="mt-6 text-center">
-                            <button id="export-csv-btn" class="btn btn-secondary mr-2"><i class="fas fa-file-csv mr-2"></i> Esporta CSV</button>
                             <button id="export-pdf-btn" class="btn btn-secondary"><i class="fas fa-file-pdf mr-2"></i> Esporta PDF</button>
                         </div>
                     </div>
-                    <div id="initial-message" class="text-center p-8 text-stone-400">
+                    <div id="initial-message" class="text-center p-8 text-secondary">
                         <i class="fas fa-clipboard-list text-4xl mb-4 text-stone-600"></i>
                         <p>Seleziona o crea un mesociclo per iniziare.</p>
                     </div>
                     ${isAdmin && !selectedUserId ? `
                     <div class="mt-6 bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg">
-                        <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-shield mr-2 text-amber-400"></i> Area Amministratore</h3>
+                        <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-shield mr-2 text-red-500"></i> Area Amministratore</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button id="manage-favorites-btn" class="btn btn-secondary"><i class="fas fa-star mr-2"></i> Gestisci Preferiti</button>
                             <button id="manage-users-btn" class="btn btn-secondary"><i class="fas fa-users-cog mr-2"></i> Gestisci Utenti</button>
                         </div>
                     </div>` : ''}
                 </div>`;
-
+            
+            renderLastWorkoutRecap();
             if (isAdmin && !selectedUserId) {
                 renderUserSelector();
             }
             renderMesocycleSelector();
         }
 
-        // --- FUNZIONE PER IL SELETTORE DI UTENTI (ADMIN) ---
-        async function renderUserSelector() {
-            const container = document.getElementById('user-selector-container');
-            if (!container) return;
-            container.innerHTML = '<div class="loader"></div>';
-            try {
-                const usersSnapshot = await getDocs(getUsersRef());
-                const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if (users.length === 0) {
-                    container.innerHTML = '<p class="text-stone-400 text-center">Nessun utente trovato.</p>';
-                    return;
-                }
-                let options = '<option value="">-- Seleziona un utente --</option>';
-                users.forEach(user => {
-                    options += `<option value="${user.id}">${user.email} ${user.role === 'admin' ? '(Admin)' : ''}</option>`;
-                });
-                container.innerHTML = `
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <select id="user-selector" class="input-field flex-grow">${options}</select>
-                        <button id="view-user-details-btn" class="btn btn-secondary" disabled><i class="fas fa-user-circle mr-2"></i> Dettagli</button>
-                    </div>`;
-                const userSelector = document.getElementById('user-selector');
-                const viewUserDetailsBtn = document.getElementById('view-user-details-btn');
-                userSelector.addEventListener('change', (e) => {
-                    const userId = e.target.value;
-                    viewUserDetailsBtn.disabled = !userId;
-                    if (userId) {
-                        const selectedUser = users.find(u => u.id === userId);
-                        if (selectedUser) selectUser(userId, selectedUser.email);
-                    }
-                });
-                viewUserDetailsBtn.addEventListener('click', () => {
-                    const userId = userSelector.value;
-                    if (userId) {
-                        const selectedUser = users.find(u => u.id === userId);
-                        if (selectedUser) openUserDetailsModal(selectedUser);
-                    }
-                });
-            } catch (error) {
-                console.error("Errore durante il caricamento degli utenti:", error);
-                container.innerHTML = '<p class="text-red-400 text-center">Errore durante il caricamento degli utenti.</p>';
-            }
-        }
-
-        // --- FUNZIONI DI LOGICA PRINCIPALE E RIFERIMENTI DB ---
+        // --- RIFERIMENTI DB DINAMICI ---
         const getMesocyclesRef = () => collection(db, 'users', selectedUserId || currentUser.uid, 'mesocycles');
         const getSheetsRef = (mesoId) => collection(db, 'users', selectedUserId || currentUser.uid, 'mesocycles', mesoId, 'trainingSheets');
         const getExercisesRef = (mesoId, sheetId) => collection(db, 'users', selectedUserId || currentUser.uid, 'mesocycles', mesoId, 'trainingSheets', sheetId, 'exercises');
-        const getRewardsRef = () => collection(db, 'users', selectedUserId || currentUser.uid, 'rewards');
         const getFavoriteExercisesRef = () => collection(db, 'favoriteExercises');
         const getUsersRef = () => collection(db, 'users');
-
-        async function renderMesocycleSelector() {
-            const mesocycleContainer = document.getElementById('mesocycle-container');
-            if (!mesocycleContainer) return;
-            const mesocyclesSnapshot = await getDocs(query(getMesocyclesRef(), orderBy("dataCreazione", "desc")));
-            let options = '<option value="">-- Seleziona un mesociclo --</option>';
-            mesocyclesSnapshot.forEach(doc => {
-                options += `<option value="${doc.id}">${doc.data().nome}</option>`;
-            });
-            mesocycleContainer.innerHTML = `
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-amber-400"></i> Mesociclo</h3>
-                    <div class="flex items-center gap-2">
-                        <button id="export-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Esporta Mesociclo (JSON)"><i class="fas fa-file-export"></i></button>
-                        <button id="import-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Importa Mesociclo (JSON)"><i class="fas fa-file-import"></i></button>
-                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
-                    </div>
-                </div>
-                <select id="mesocycle-selector" class="input-field w-full">${options}</select>
-                ${currentUserRole === 'admin' ? `
-                <div id="create-meso-container" class="collapsible-content mt-3">
-                    <form id="create-meso-form" class="space-y-3">
-                        <input type="text" name="name" class="input-field" placeholder="Nome mesociclo..." required>
-                        <button type="submit" class="btn w-full"><i class="fas fa-plus mr-2"></i> Crea</button>
-                    </form>
-                </div>` : ''}
-                <input type="file" id="import-file-input" class="hidden" accept=".json">`;
-            const mesoSelector = document.getElementById('mesocycle-selector');
-            mesoSelector.addEventListener('change', (e) => selectMesocycle(e.target.value));
-            if (currentUserRole === 'admin') {
-                document.getElementById('create-meso-form').addEventListener('submit', handleCreateMeso);
-                document.getElementById('toggle-create-meso-btn').addEventListener('click', () => document.getElementById('create-meso-container').classList.toggle('open'));
-            }
-            document.getElementById('export-meso-btn').addEventListener('click', handleExportMeso);
-            document.getElementById('import-meso-btn').addEventListener('click', () => document.getElementById('import-file-input').click());
-            document.getElementById('import-file-input').addEventListener('change', handleImportMeso);
-            const effectiveUserId = selectedUserId || currentUser.uid;
-            const lastMesoId = localStorage.getItem(`lastMesoId_${effectiveUserId}`);
-            if (lastMesoId && mesoSelector.querySelector(`option[value="${lastMesoId}"]`)) {
-                mesoSelector.value = lastMesoId;
-                selectMesocycle(lastMesoId);
-            }
-        }
-
-        async function selectMesocycle(mesoId) {
-            currentMesoId = mesoId;
-            const effectiveUserId = selectedUserId || currentUser.uid;
-            localStorage.setItem(`lastMesoId_${effectiveUserId}`, mesoId || '');
-            const sheetContent = document.getElementById('sheet-content');
-            const initialMessage = document.getElementById('initial-message');
-            const sheetContainer = document.getElementById('sheet-container');
-            const macrocycleVolumeContainer = document.getElementById('macrocycle-volume-container');
-            sheetContent.classList.add('hidden');
-            initialMessage.classList.remove('hidden');
-            if (!mesoId) {
-                sheetContainer.classList.add('hidden');
-                macrocycleVolumeContainer.classList.add('hidden');
-                return;
-            }
-            sheetContainer.classList.remove('hidden');
-            await renderSheetSelector();
-            await calculateAndRenderMacrocycleVolume();
-        }
-
-        async function renderSheetSelector() {
-            const sheetContainer = document.getElementById('sheet-container');
-            const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione", "desc")));
-            let options = '<option value="">-- Seleziona una scheda --</option>';
-            sheetsSnapshot.forEach(doc => {
-                const sheet = doc.data();
-                options += `<option value="${doc.id}">${sheet.nomeScheda}${sheet.isCompleta ? ' (Completata)' : ''}</option>`;
-            });
-            sheetContainer.innerHTML = `
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-clipboard-list mr-2 text-amber-400"></i> Scheda di Allenamento</h3>
-                    ${currentUserRole === 'admin' ? `<button id="toggle-create-sheet-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
-                </div>
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <select id="sheet-selector" class="input-field flex-grow">${options}</select>
-                    <div class="flex items-center gap-3">
-                        ${currentUserRole === 'admin' ? `
-                        <button id="duplicate-sheet-btn" class="btn btn-secondary w-full" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
-                        <button id="delete-sheet-btn" class="btn btn-danger w-full" title="Elimina Scheda"><i class="fas fa-trash"></i></button>` : ''}
-                        <button id="complete-sheet-btn" class="btn btn-secondary w-full" title="Termina Scheda"><i class="fas fa-check"></i></button>
-                    </div>
-                </div>
-                ${currentUserRole === 'admin' ? `
-                <div id="create-sheet-container" class="collapsible-content mt-3">
-                    <form id="create-sheet-form" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <input type="text" id="new-sheet-name" class="input-field flex-grow" placeholder="Nome nuova scheda..." required>
-                        <input type="number" id="new-sheet-weeks" class="input-field sm:w-28" placeholder="Sett." min="1" required>
-                        <button type="submit" class="btn !w-full sm:!w-auto"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
-                    </form>
-                </div>` : ''}`;
-            document.getElementById('sheet-selector').addEventListener('change', (e) => selectSheet(e.target.value));
-            if (currentUserRole === 'admin') {
-                document.getElementById('toggle-create-sheet-btn').addEventListener('click', () => document.getElementById('create-sheet-container').classList.toggle('open'));
-                document.getElementById('create-sheet-form').addEventListener('submit', handleCreateSheet);
-                document.getElementById('duplicate-sheet-btn').addEventListener('click', handleDuplicateSheet);
-                document.getElementById('delete-sheet-btn').addEventListener('click', handleDeleteSheet);
-            }
-            document.getElementById('complete-sheet-btn').addEventListener('click', handleCompleteSheet);
-        }
-
-        async function selectSheet(sheetId) {
-            Object.values(procrastinationTimers).forEach(clearTimeout);
-            procrastinationTimers = {};
-
-            const sheetContent = document.getElementById('sheet-content');
-            const initialMessage = document.getElementById('initial-message');
-            const macrocycleVolumeContainer = document.getElementById('macrocycle-volume-container');
-            if (!sheetId) {
-                sheetContent.classList.add('hidden');
-                macrocycleVolumeContainer.classList.remove('hidden');
-                currentSheetId = null;
-                return;
-            }
-            macrocycleVolumeContainer.classList.add('hidden');
-            initialMessage.classList.add('hidden');
-            sheetContent.classList.remove('hidden');
-            currentSheetId = sheetId;
-            currentWeek = 1;
-            workoutStartTime = null;
-            const sheetDocRef = doc(getSheetsRef(currentMesoId), sheetId);
-            const sheetDocSnap = await getDoc(sheetDocRef);
-            if (!sheetDocSnap.exists()) {
-                showNotification("Scheda non trovata!", "error");
-                return;
-            }
-            currentSheetData = sheetDocSnap.data();
-            renderWeekSelector();
-            renderWeekActions();
-            if (currentUserRole === 'admin') {
-                renderAddExerciseForm();
-            }
-            await loadAndRenderExercises();
-        }
-
-        async function loadAndRenderExercises() {
-            const exerciseContainer = document.getElementById('exercise-list-container');
-            exerciseContainer.innerHTML = '<div class="loader"></div>';
-            const exercisesRef = getExercisesRef(currentMesoId, currentSheetId);
-            const q = query(exercisesRef, orderBy("ordine"));
-            const exercisesSnapshot = await getDocs(q);
-            exercisesCache = exercisesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderExercises();
-            calculateEstimatedWorkoutTime();
-        }
-
-        // --- RENDERING UI SPECIFICA ---
-        function renderWeekSelector() {
-            const weekSelectorContainer = document.getElementById('week-selector-container');
-            const numWeeks = currentSheetData.numeroSettimane || 1;
-            const completedWeeks = currentSheetData.completedWeeks || [];
-            weekSelectorContainer.innerHTML = `<div class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar"></div>`;
-            const container = weekSelectorContainer.firstElementChild;
-            for (let i = 1; i <= numWeeks; i++) {
-                const btn = document.createElement('button');
-                btn.textContent = `Sett. ${i}`;
-                let classes = 'week-btn px-4 py-2 rounded-md font-semibold text-sm';
-                if (i === currentWeek) classes += ' active';
-                if (completedWeeks.includes(i)) classes += ' completed';
-                btn.className = classes;
-                btn.onclick = () => { 
-                    currentWeek = i; 
-                    renderWeekSelector(); 
-                    renderExercises(); 
-                    renderWeekActions();
-                    calculateEstimatedWorkoutTime();
-                };
-                container.appendChild(btn);
-            }
-        }
-
-        function renderWeekActions() {
-            const weekActionsContainer = document.getElementById('week-actions-container');
-            const duration = currentSheetData.workoutDurations?.[currentWeek];
-            let durationHTML = duration ? `<p class="text-sm text-stone-400"><i class="fas fa-clock mr-1"></i> Durata Allenamento: <span class="font-bold text-amber-400">${duration}</span></p>` : '';
-            weekActionsContainer.innerHTML = `
-                <button id="complete-week-btn" class="btn btn-secondary">
-                    <i class="fas fa-check-circle mr-2"></i> Completa Settimana ${currentWeek}
-                </button>
-                ${durationHTML}`;
-            document.getElementById('complete-week-btn').addEventListener('click', handleCompleteWeek);
-        }
-
-        async function calculateAndRenderMacrocycleVolume() {
-            const macrocycleVolumeContainer = document.getElementById('macrocycle-volume-container');
-            if (!macrocycleVolumeContainer) return;
-            macrocycleVolumeContainer.classList.remove('hidden');
-            macrocycleVolumeContainer.innerHTML = '<div class="loader"></div>';
-            try {
-                const volumeByCategory = {};
-                const sheetsSnapshot = await getDocs(getSheetsRef(currentMesoId));
-                for (const sheetDoc of sheetsSnapshot.docs) {
-                    const exercisesSnapshot = await getDocs(getExercisesRef(currentMesoId, sheetDoc.id));
-                    exercisesSnapshot.forEach(exDoc => {
-                        const ex = exDoc.data();
-                        const category = ex.categoria || 'Senza Categoria';
-                        if (!volumeByCategory[category]) volumeByCategory[category] = 0;
-                        volumeByCategory[category] += ex.serie;
-                    });
-                }
-                const macrocycleVolume = {};
-                const macrocycleDetails = {};
-                for (const [groupName, rule] of Object.entries(MACROCYCLE_RULES)) {
-                    const mainVolume = volumeByCategory[rule.main] || 0;
-                    let totalVolume = mainVolume;
-                    const additionalContributions = [];
-                    for (const additional of rule.additional) {
-                        const additionalVolume = volumeByCategory[additional.category] || 0;
-                        const contribution = Math.round(additionalVolume * additional.percentage / 100);
-                        totalVolume += contribution;
-                        additionalContributions.push({ category: additional.category, percentage: additional.percentage, volume: additionalVolume, contribution });
-                    }
-                    macrocycleVolume[groupName] = totalVolume;
-                    macrocycleDetails[groupName] = { mainCategory: rule.main, mainVolume, additionalContributions };
-                }
-                let summaryHTML = `
-                    <div class="accordion-header flex justify-between items-center p-3 rounded-lg cursor-pointer" id="macrocycle-accordion-header">
-                        <h3 class="text-lg font-bold text-white"><i class="fas fa-chart-line mr-2 text-blue-400"></i> Volume Macrociclo</h3>
-                        <i class="fas fa-chevron-down accordion-icon text-blue-400"></i>
-                    </div>
-                    <div id="macrocycle-accordion-content" class="collapsible-content">
-                        <div class="overflow-x-auto mt-3">
-                            <table class="macrocycle-table">
-                                <thead><tr><th>Gruppo Muscolare</th><th>Volume Totale</th><th>Composizione</th></tr></thead>
-                                <tbody>`;
-                for (const [groupName, volume] of Object.entries(macrocycleVolume)) {
-                    const details = macrocycleDetails[groupName];
-                    let compositionHtml = `<span class="category-tag">${details.mainCategory}: ${details.mainVolume} serie</span>`;
-                    details.additionalContributions.forEach(add => {
-                        compositionHtml += `<span class="category-tag">${add.category}: ${add.volume} serie (${add.percentage}%)</span>`;
-                    });
-                    summaryHTML += `<tr><td class="font-medium text-white">${groupName}</td><td class="text-blue-400 font-bold">${volume} serie</td><td>${compositionHtml}</td></tr>`;
-                }
-                summaryHTML += `</tbody></table></div></div>`;
-                macrocycleVolumeContainer.innerHTML = summaryHTML;
-                document.getElementById('macrocycle-accordion-header').addEventListener('click', () => {
-                    document.getElementById('macrocycle-accordion-content').classList.toggle('open');
-                    document.querySelector('#macrocycle-accordion-header .accordion-icon').classList.toggle('open');
-                });
-            } catch (error) {
-                console.error("Errore durante il calcolo del volume macrociclo:", error);
-                macrocycleVolumeContainer.innerHTML = `<div class="text-center py-4"><i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i><p class="text-stone-400">Errore durante il calcolo del volume macrociclo.</p></div>`;
-            }
-        }
-
-        function calculateAndRenderSheetVolume() {
-            const sheetVolumeSummaryContainer = document.getElementById('sheet-volume-summary-container');
-            const volumeByCategory = {};
-            exercisesCache.forEach(ex => {
-                const category = ex.categoria || 'Senza Categoria';
-                if (!volumeByCategory[category]) volumeByCategory[category] = 0;
-                volumeByCategory[category] += ex.serie;
-            });
-            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-amber-400"></i> Volume Scheda</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
-            const sortedCategories = Object.keys(volumeByCategory).sort();
-            if (sortedCategories.length === 0) summaryHTML = '';
-            else sortedCategories.forEach(cat => {
-                summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-stone-300">${cat}:</span> <span class="text-amber-400 font-bold">${volumeByCategory[cat]} serie</span></div>`;
-            });
-            summaryHTML += `</div>`;
-            sheetVolumeSummaryContainer.innerHTML = summaryHTML;
-        }
-
-        function renderExercises() {
-            const exerciseContainer = document.getElementById('exercise-list-container');
-            exerciseContainer.innerHTML = '';
-            if (exercisesCache.length === 0) {
-                exerciseContainer.innerHTML = `<div class="text-center py-8"><i class="fas fa-dumbbell text-4xl text-stone-600 mb-4"></i><p class="text-stone-400">Nessun esercizio. Aggiungine uno qui sotto.</p></div>`;
-            } else {
-                exercisesCache.forEach(ex => exerciseContainer.appendChild(createExerciseCard(ex)));
-                const reorderBtns = exerciseContainer.querySelectorAll('.reorder-btn');
-                if (reorderBtns.length > 0) {
-                    exerciseContainer.querySelector('.reorder-btn[data-direction="up"]').disabled = true;
-                    const allDownButtons = exerciseContainer.querySelectorAll('.reorder-btn[data-direction="down"]');
-                    allDownButtons[allDownButtons.length - 1].disabled = true;
-                }
-            }
-            calculateAndRenderSheetVolume();
-        }
-
-        function createExerciseCard(ex) {
-            const card = document.createElement('div');
-            card.id = `ex-card-${ex.id}`;
-            card.className = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
-            
-            if (ex.tecnicheIntensita && ex.tecnicheIntensita.trim() !== '') {
-                card.classList.add('intensity-glow');
-            } else {
-                card.classList.add('border-stone-800');
-            }
-
-            let seriesHTML = '<div class="space-y-2 mt-2">';
-            const weeklyData = ex.datiSettimanali?.[currentWeek] || [];
-            const prevWeeklyData = ex.datiSettimanali?.[currentWeek - 1] || [];
-            const targetReps = ex.ripetizioniPerSerie || [];
-            for (let i = 0; i < ex.serie; i++) {
-                let setData = weeklyData[i] || { carico: '', reps: '' };
-                const prevSetData = prevWeeklyData[i] || null;
-                const targetRep = targetReps[i] || ex.ripetizioni || '';
-                if (currentWeek > 1 && !setData.carico && prevSetData?.carico && prevSetData?.reps) {
-                    const repRange = (targetRep.toString() || "").split('-').map(Number);
-                    const maxReps = repRange.length > 1 ? repRange[1] : repRange[0];
-                    if (parseInt(prevSetData.reps) >= maxReps) {
-                        setData.carico = parseFloat(prevSetData.carico) + WEIGHT_INCREMENT;
-                    } else {
-                        setData.carico = prevSetData.carico;
-                    }
-                }
-                let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
-                seriesHTML += `
-                    ${prevWeekHint}
-                    <div class="grid grid-cols-5 items-center gap-2">
-                        <span class="font-semibold text-stone-400 text-sm">S ${i + 1} (${targetRep})</span>
-                        <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
-                        <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
-                        <span class="text-xs text-center text-amber-300 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
-                        <button class="btn btn-secondary !p-2 text-xs" data-timer="${ex.recupero}" title="Avvia timer"><i class="fas fa-stopwatch"></i></button>
-                    </div>`;
-            }
-            seriesHTML += '</div>';
-            
-            let imagesHTML = '';
-            if (ex.imageUrl || ex.imageUrl2) {
-                imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
-                if (ex.imageUrl) {
-                    imagesHTML += `<div class="${ex.imageUrl2 ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
-                }
-                if (ex.imageUrl2) {
-                    imagesHTML += `<div class="${ex.imageUrl ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl2}" alt="${ex.nomeEsercizio} 2" class="exercise-image"></div>`;
-                }
-                imagesHTML += '</div>';
-            }
-
-
-            let progressReward = '';
-            if (currentWeek > 1) {
-                const prevWeekData = ex.datiSettimanali?.[currentWeek - 1] || [];
-                const currentWeekData = ex.datiSettimanali?.[currentWeek] || [];
-                for (let i = 0; i < Math.min(prevWeekData.length, currentWeekData.length); i++) {
-                    if (parseFloat(currentWeekData[i]?.carico || 0) > parseFloat(prevWeekData[i]?.carico || 0)) {
-                        progressReward = '<span class="reward-badge"><i class="fas fa-trophy mr-1"></i> Progresso!</span>';
-                        break;
-                    }
-                }
-            }
-            const repsDisplay = ex.ripetizioniPerSerie && ex.ripetizioniPerSerie.length > 0 ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '');
-            
-            card.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex-grow pr-4">
-                        <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio} ${progressReward}</h4>
-                        <p class="text-sm text-amber-400"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
-                        <p class="text-xs text-stone-400 mt-1">
-                            <i class="fas fa-list-ol mr-1"></i> Serie: ${ex.serie} | 
-                             <i class="fas fa-redo mr-1 ml-2"></i> Reps: ${repsDisplay} | 
-                             <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
-                             <i class="fas fa-hourglass-half mr-1 ml-2"></i> Recupero: ${ex.recupero || '-'}s |
-                             <i class="fas fa-stopwatch-20 mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
-                        </p>
-                        ${ex.tecnicheIntensita ? `<p class="text-sm text-amber-300 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
-                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2">${ex.note}</p>` : ''}
-                    </div>
-                    <div class="flex items-start gap-2">
-                        ${currentUserRole === 'admin' ? `
-                        <div class="flex flex-col gap-1">
-                            <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="up" title="Sposta su"><i class="fas fa-arrow-up"></i></button>
-                            <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="down" title="Sposta giù"><i class="fas fa-arrow-down"></i></button>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <button class="btn btn-secondary !p-2" data-save-fav-ex-id="${ex.id}" title="Salva nei preferiti"><i class="fas fa-star"></i></button>
-                            <button class="btn btn-secondary !p-2" data-edit-ex-id="${ex.id}" title="Modifica"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger !p-2" data-delete-ex-id="${ex.id}" title="Elimina"><i class="fas fa-trash"></i></button>
-                        </div>` : ''}
-                        ${ex.videoUrl ? `<a href="${ex.videoUrl}" target="_blank" class="text-amber-400 hover:text-amber-300 self-center" title="Guarda il video"><i class="fab fa-youtube text-xl"></i></a>` : ''}
-                    </div>
-                </div>
-                ${imagesHTML}
-                ${seriesHTML}`;
-            
-            // NEW: Set initial 1RM percentage values
-            const repsInputs = card.querySelectorAll('input[data-field="reps"]');
-            repsInputs.forEach(input => {
-                const reps = parseInt(input.value, 10);
-                const serieIndex = input.dataset.serieIndex;
-                const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
-                if (oneRmSpan) {
-                    oneRmSpan.textContent = calculate1RMEstimate(reps);
-                }
-            });
-
-            return card;
-        }
-
-        function renderRepsPerSerieInputs(form, numSets, values = []) {
-            const container = form.querySelector('.reps-per-serie-container');
-            if (!container) return;
-            container.innerHTML = '';
-            if (numSets > 0) {
-                let inputsHTML = '<label class="block text-sm font-medium text-stone-400 mb-1">Ripetizioni per Serie</label><div class="grid grid-cols-3 sm:grid-cols-5 gap-2">';
-                for (let i = 0; i < numSets; i++) {
-                    inputsHTML += `<input type="text" class="input-field text-center reps-per-serie-input" placeholder="Set ${i+1}" value="${values[i] || ''}" required>`;
-                }
-                inputsHTML += '</div>';
-                container.innerHTML = inputsHTML;
-            }
-        }
-
-        function renderAddExerciseForm() {
-            const addExerciseContainer = document.getElementById('add-exercise-container');
-            const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-            addExerciseContainer.innerHTML = `
-                <form id="add-exercise-form" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Nome Esercizio</label><input type="text" name="nomeEsercizio" class="input-field" placeholder="Nome Esercizio" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Categoria</label><select name="categoria" class="input-field" required>${categoryOptions}</select></div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Ordine</label><input type="number" name="ordine" class="input-field" placeholder="Ordine" value="${(exercisesCache.length || 0) + 1}" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">N° Serie</label><input type="number" name="serie" class="input-field" placeholder="N° Serie" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">RIR</label><input type="text" name="rir" class="input-field" placeholder="RIR (es. 1-2)"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Recupero (s)</label><input type="number" name="recupero" class="input-field" placeholder="Recupero (s)"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">TUT</label><input type="text" name="tut" class="input-field" placeholder="es. 2-1-2-1"></div>
-                    </div>
-                    <div class="reps-per-serie-container"></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Tecnica di Intensità</label><div class="relative"><input type="text" name="tecnicheIntensita" class="input-field pl-10" placeholder="Es. Dropset, Rest-Pause..."><i class="fas fa-bolt text-stone-500 absolute left-3 top-1/2 -translate-y-1/2"></i></div></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Note (opzionale)</label><textarea name="note" class="textarea-field" rows="2"></textarea></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Link Video (opzionale)</label><input type="url" name="videoUrl" class="input-field"></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">URL Immagine 1 (opzionale)</label><input type="url" name="imageUrl" class="input-field"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">URL Immagine 2 (opzionale)</label><input type="url" name="imageUrl2" class="input-field"></div>
-                    </div>
-                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="text-sm text-stone-400 mb-1 block">Oppure carica immagine 1</label><input type="file" name="imageFile" class="input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200"></div>
-                        <div><label class="text-sm text-stone-400 mb-1 block">Oppure carica immagine 2</label><input type="file" name="imageFile2" class="input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200"></div>
-                    </div>
-                    <button type="submit" class="btn w-full"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
-                </form>`;
-            const form = document.getElementById('add-exercise-form');
-            form.elements.serie.addEventListener('input', (e) => renderRepsPerSerieInputs(form, parseInt(e.target.value, 10) || 0));
-            const intensityInput = form.elements.tecnicheIntensita;
-            intensityInput.addEventListener('input', () => intensityInput.classList.toggle('intensity-active', intensityInput.value.trim() !== ''));
-            form.addEventListener('submit', handleAddExercise);
-        }
-
-        // --- GESTIONE EVENTI E AZIONI ---
-        async function handleCreateMeso(e) {
-            e.preventDefault();
-            const form = e.target;
-            const mesoName = form.elements['name'].value.trim();
-            if (!mesoName) return;
-            await addDoc(getMesocyclesRef(), { nome: mesoName, dataCreazione: new Date().toISOString() });
-            await renderMesocycleSelector();
-            showNotification("Mesociclo creato con successo!");
-        }
-
-        async function handleCreateSheet(e) {
-            e.preventDefault();
-            const form = e.target;
-            const sheetName = form.elements['new-sheet-name'].value.trim();
-            const numWeeks = parseInt(form.elements['new-sheet-weeks'].value, 10);
-            if (!sheetName || !numWeeks) return;
-            await addDoc(getSheetsRef(currentMesoId), { nomeScheda: sheetName, numeroSettimane: numWeeks, dataCreazione: new Date().toISOString(), isCompleta: false, completedWeeks: [] });
-            await renderSheetSelector();
-            showNotification("Scheda creata con successo!");
-        }
-
-        async function handleDuplicateSheet() {
-            if (!currentSheetId) { showNotification("Seleziona una scheda da duplicare.", "error"); return; }
-            const newName = prompt("Nuovo nome per la scheda:", `${currentSheetData.nomeScheda} (Copia)`);
-            if (!newName) return;
-            const newSheetRef = await addDoc(getSheetsRef(currentMesoId), { ...currentSheetData, nomeScheda: newName, dataCreazione: new Date().toISOString(), isCompleta: false, completedWeeks: [] });
-            const exercisesSnapshot = await getDocs(getExercisesRef(currentMesoId, currentSheetId));
-            const batch = writeBatch(db);
-            exercisesSnapshot.forEach(exDoc => {
-                const newExerciseRef = doc(getExercisesRef(currentMesoId, newSheetRef.id));
-                batch.set(newExerciseRef, exDoc.data());
-            });
-            await batch.commit();
-            showNotification(`Scheda "${newName}" creata!`);
-            await renderSheetSelector();
-        }
-
-        async function handleDeleteSheet() {
-            if (!currentSheetId) { showNotification("Seleziona una scheda da eliminare.", "error"); return; }
-            if (await showConfirmModal(`Sei sicuro di voler eliminare la scheda "${currentSheetData.nomeScheda}"? Questa azione è irreversibile.`)) {
-                const exercisesRef = getExercisesRef(currentMesoId, currentSheetId);
-                const exercisesSnapshot = await getDocs(exercisesRef);
-                const batch = writeBatch(db);
-                exercisesSnapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                await deleteDoc(doc(getSheetsRef(currentMesoId), currentSheetId));
-                showNotification("Scheda eliminata con successo.");
-                currentSheetId = null;
-                document.getElementById('sheet-content').classList.add('hidden');
-                document.getElementById('initial-message').classList.remove('hidden');
-                await renderSheetSelector();
-            }
-        }
-
-        async function handleCompleteSheet() {
-            if (!currentSheetId) { showNotification("Seleziona una scheda da terminare.", "error"); return; }
-            if (await showConfirmModal(`Contrassegnare la scheda "${currentSheetData.nomeScheda}" come completata?`)) {
-                await updateDoc(doc(getSheetsRef(currentMesoId), currentSheetId), { isCompleta: true });
-                await renderSheetSelector();
-                showNotification("Scheda completata!");
-            }
-        }
-
-        async function handleCompleteWeek() {
-            const completedWeeks = currentSheetData.completedWeeks || [];
-            if (!completedWeeks.includes(currentWeek)) {
-                completedWeeks.push(currentWeek);
-                const updateData = { completedWeeks };
-                if (workoutStartTime) {
-                    const durationMs = new Date() - workoutStartTime;
-                    const hours = Math.floor(durationMs / 3600000).toString().padStart(2, '0');
-                    const minutes = Math.floor((durationMs % 3600000) / 60000).toString().padStart(2, '0');
-                    const seconds = Math.floor((durationMs % 60000) / 1000).toString().padStart(2, '0');
-                    const durationString = `${hours}:${minutes}:${seconds}`;
-                    const durations = currentSheetData.workoutDurations || {};
-                    durations[currentWeek] = durationString;
-                    updateData.workoutDurations = durations;
-                    workoutStartTime = null;
-                }
-                await updateDoc(doc(getSheetsRef(currentMesoId), currentSheetId), updateData);
-                currentSheetData = { ...currentSheetData, ...updateData };
-                if (completedWeeks.length === currentSheetData.numeroSettimane) {
-                    await awardReward('completion', `Hai completato la scheda ${currentSheetData.nomeScheda}!`);
-                }
-                renderWeekSelector();
-                renderWeekActions();
-                showNotification(`Settimana ${currentWeek} completata!`);
-            }
-        }
-
-        async function handleAddExercise(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = form.querySelector('button');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Caricamento...';
-            
-            let imageUrl = form.elements.imageUrl.value || "";
-            let imageUrl2 = form.elements.imageUrl2.value || "";
-            const imageFile = form.elements.imageFile.files[0];
-            const imageFile2 = form.elements.imageFile2.files[0];
-
-            if (imageFile) {
-                const storageRef = ref(storage, `exercise_images/${currentUser.uid}/${currentMesoId}/${Date.now()}_${imageFile.name}`);
-                const snapshot = await uploadBytes(storageRef, imageFile);
-                imageUrl = await getDownloadURL(snapshot.ref);
-            }
-            if (imageFile2) {
-                const storageRef2 = ref(storage, `exercise_images/${currentUser.uid}/${currentMesoId}/${Date.now()}_${imageFile2.name}`);
-                const snapshot2 = await uploadBytes(storageRef2, imageFile2);
-                imageUrl2 = await getDownloadURL(snapshot2.ref);
-            }
-
-            const ripetizioniPerSerie = Array.from(form.querySelectorAll('.reps-per-serie-input')).map(input => input.value);
-            const newExercise = {
-                nomeEsercizio: form.elements.nomeEsercizio.value,
-                categoria: form.elements.categoria.value,
-                ordine: parseInt(form.elements.ordine.value, 10),
-                serie: parseInt(form.elements.serie.value, 10),
-                ripetizioniPerSerie: ripetizioniPerSerie,
-                rir: form.elements.rir.value || "",
-                tut: form.elements.tut.value || "",
-                recupero: parseInt(form.elements.recupero.value, 10) || null,
-                tecnicheIntensita: form.elements.tecnicheIntensita.value || "",
-                note: form.elements.note.value || "",
-                videoUrl: form.elements.videoUrl.value || "",
-                imageUrl: imageUrl,
-                imageUrl2: imageUrl2,
-                datiSettimanali: {}
-            };
-            await addDoc(getExercisesRef(currentMesoId, currentSheetId), newExercise);
-            form.reset();
-            document.getElementById('add-exercise-container').classList.remove('open');
-            await loadAndRenderExercises();
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-plus mr-2"></i> Aggiungi';
-            showNotification("Esercizio aggiunto con successo!");
-        }
-
-        mainView.addEventListener('input', (e) => {
-            if (e.target.matches('input[data-ex-id]')) {
-                if (!workoutStartTime) workoutStartTime = new Date();
-                const { exId, serieIndex, field } = e.target.dataset;
-                const value = e.target.value;
-                const key = `${exId}-${currentWeek}-${serieIndex}-${field}`;
-                clearTimeout(saveTimeouts[key]);
-                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value), 800);
-
-                // NEW: Update 1RM% on reps input
-                if (field === 'reps') {
-                    const card = e.target.closest('.bg-gradient-main');
-                    if (card) {
-                        const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
-                        if (oneRmSpan) {
-                            oneRmSpan.textContent = calculate1RMEstimate(parseInt(value, 10));
-                        }
-                    }
-                    handleProcrastinationCheck(exId, parseInt(serieIndex, 10), e.target);
-                } else if (field === 'carico') {
-                    clearProcrastinationTimer(exId);
-                }
-            }
-        });
-
-        mainView.addEventListener('click', async (e) => {
-            const target = e.target;
-            const reorderBtn = target.closest('button[data-reorder-ex-id]');
-            const editBtn = target.closest('button[data-edit-ex-id]');
-            const deleteBtn = target.closest('button[data-delete-ex-id]');
-            const timerBtn = target.closest('button[data-timer]');
-            const saveFavBtn = target.closest('button[data-save-fav-ex-id]');
-
-            if (reorderBtn) {
-                reorderBtn.disabled = true;
-                await handleReorderExercise(reorderBtn.dataset.reorderExId, reorderBtn.dataset.direction);
-            } else if (editBtn) {
-                openEditExerciseModal(editBtn.dataset.editExId);
-            } else if (deleteBtn) {
-                if (await showConfirmModal('Sei sicuro di voler eliminare questo esercizio?')) {
-                    await deleteDoc(doc(getExercisesRef(currentMesoId, currentSheetId), deleteBtn.dataset.deleteExId));
-                    await loadAndRenderExercises();
-                    showNotification("Esercizio eliminato!");
-                }
-            } else if (timerBtn) {
-                const time = parseInt(timerBtn.dataset.timer, 10);
-                if (time && !timerBtn.disabled) startTimerModal(time);
-            } else if (saveFavBtn) {
-                const exId = saveFavBtn.dataset.saveFavExId;
-                const exerciseToSave = exercisesCache.find(ex => ex.id === exId);
-                if (exerciseToSave) await handleSaveToFavorites(exerciseToSave);
-            } else if (target.id === 'toggle-add-exercise-btn') {
-                document.getElementById('add-exercise-container').classList.toggle('open');
-            } else if (target.id === 'add-from-favorites-btn') {
-                openFavoritesModal();
-            } else if (target.id === 'export-csv-btn') {
-                exportSheetToCSV();
-            } else if (target.id === 'export-pdf-btn') {
-                previewAndExportPDF();
-            } else if (target.id === 'manage-favorites-btn') {
-                openFavoritesModal();
-            } else if (target.id === 'manage-users-btn') {
-                openUserManagementModal();
-            }
-        });
-
-        async function saveWeeklyData(exId, serieIndex, field, value) {
-            const exercise = exercisesCache.find(ex => ex.id === exId);
-            if (!exercise) return;
-            const updatedDati = JSON.parse(JSON.stringify(exercise.datiSettimanali || {}));
-            if (!updatedDati[currentWeek]) updatedDati[currentWeek] = [];
-            while (updatedDati[currentWeek].length <= serieIndex) updatedDati[currentWeek].push({ carico: '', reps: '' });
-            updatedDati[currentWeek][serieIndex][field] = value;
-            await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), { datiSettimanali: updatedDati });
-            exercise.datiSettimanali = updatedDati;
-            if (field === 'carico' && currentWeek > 1) {
-                const prevWeekData = exercise.datiSettimanali?.[currentWeek - 1]?.[serieIndex];
-                if (prevWeekData && prevWeekData.carico && parseFloat(value) > parseFloat(prevWeekData.carico)) {
-                    await awardReward('progress', `Hai superato il carico in ${exercise.nomeEsercizio}!`);
-                }
-            }
-            calculateAndRenderSheetVolume();
-        }
+        const getWorkoutHistoryRef = () => collection(db, 'users', selectedUserId || currentUser.uid, 'workoutHistory');
 
         // --- FUNZIONI MODAL E UTILITY ---
+        function showNotification(message, type = "success") {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type === 'error' ? 'warning' : ''}`;
+            notification.innerHTML = `<div class="flex items-center"><i class="fas ${type === "error" ? "fa-exclamation-circle" : "fa-check-circle"} mr-2"></i><span>${message}</span></div>`;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
         function showConfirmModal(message) {
             return new Promise(resolve => {
                 confirmModal.classList.remove('hidden');
@@ -1357,7 +519,8 @@
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = e.target.elements.email.value, password = e.target.elements.password.value;
+            const email = e.target.elements.email.value;
+            const password = e.target.elements.password.value;
             const authError = document.getElementById('auth-error');
             const authSubmitBtn = document.getElementById('auth-submit-btn');
             authError.textContent = '';
@@ -1372,132 +535,427 @@
                 }
                 closeAuthModal();
             } catch (error) {
+                console.error("Authentication error:", error.code, error.message);
                 authError.textContent = "Credenziali non valide o utente già esistente.";
             } finally {
                 authSubmitBtn.disabled = false;
                 authSubmitBtn.innerHTML = isLoginMode ? 'Accedi' : 'Registrati';
             }
         });
-
-        // --- MODIFICA, RIORDINO E SALVATAGGIO PREFERITI ---
-        function openEditExerciseModal(exId) {
-            const exercise = exercisesCache.find(ex => ex.id === exId);
-            if (!exercise) return;
-            const container = document.getElementById('edit-exercise-container');
-            const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
-            container.innerHTML = `
-                <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Nome Esercizio</label><input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio}" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Categoria</label><select name="categoria" class="input-field" required>${categoryOptions}</select></div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Ordine</label><input type="number" name="ordine" class="input-field" value="${exercise.ordine}" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">N° Serie</label><input type="number" name="serie" class="input-field" value="${exercise.serie}" required></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">RIR</label><input type="text" name="rir" class="input-field" value="${exercise.rir || ''}"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">Recupero (s)</label><input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">TUT</label><input type="text" name="tut" class="input-field" value="${exercise.tut || ''}"></div>
-                    </div>
-                    <div class="reps-per-serie-container"></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Tecnica di Intensità</label><div class="relative"><input type="text" name="tecnicheIntensita" class="input-field pl-10" value="${exercise.tecnicheIntensita || ''}"><i class="fas fa-bolt text-stone-500 absolute left-3 top-1/2 -translate-y-1/2"></i></div></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Note (opzionale)</label><textarea name="note" class="textarea-field" rows="2">${exercise.note || ''}</textarea></div>
-                    <div><label class="block text-sm font-medium text-stone-400 mb-1">Link Video (opzionale)</label><input type="url" name="videoUrl" class="input-field" value="${exercise.videoUrl || ''}"></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">URL Immagine 1</label><input type="url" name="imageUrl" class="input-field" value="${exercise.imageUrl || ''}"></div>
-                        <div><label class="block text-sm font-medium text-stone-400 mb-1">URL Immagine 2</label><input type="url" name="imageUrl2" class="input-field" value="${exercise.imageUrl2 || ''}"></div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-sm text-stone-400 mb-1 block">Oppure carica/sostituisci immagine 1</label>
-                            <input type="file" name="imageFile" class="input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200">
-                            ${exercise.imageUrl ? `<div class="image-preview mt-3"><img src="${exercise.imageUrl}" class="exercise-image"><button type="button" class="remove-image-btn" data-remove-image-for="imageUrl" title="Rimuovi immagine 1"><i class="fas fa-times"></i></button></div>` : ''}
-                        </div>
-                        <div>
-                            <label class="text-sm text-stone-400 mb-1 block">Oppure carica/sostituisci immagine 2</label>
-                            <input type="file" name="imageFile2" class="input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200">
-                            ${exercise.imageUrl2 ? `<div class="image-preview mt-3"><img src="${exercise.imageUrl2}" class="exercise-image"><button type="button" class="remove-image-btn" data-remove-image-for="imageUrl2" title="Rimuovi immagine 2"><i class="fas fa-times"></i></button></div>` : ''}
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-4 pt-4">
-                        <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
-                        <button type="submit" class="btn"><i class="fas fa-save mr-2"></i> Salva Modifiche</button>
-                    </div>
-                </form>`;
-            const form = document.getElementById('edit-exercise-form');
-            const serieInput = form.elements.serie;
-            const intensityInput = form.elements.tecnicheIntensita;
-            intensityInput.classList.toggle('intensity-active', intensityInput.value.trim() !== '');
-            intensityInput.addEventListener('input', () => intensityInput.classList.toggle('intensity-active', intensityInput.value.trim() !== ''));
-            renderRepsPerSerieInputs(form, parseInt(serieInput.value, 10), exercise.ripetizioniPerSerie || []);
-            serieInput.addEventListener('input', (e) => {
-                const numSets = parseInt(e.target.value, 10) || 0;
-                const currentReps = Array.from(form.querySelectorAll('.reps-per-serie-input')).map(input => input.value);
-                renderRepsPerSerieInputs(form, numSets, currentReps);
-            });
-            editExerciseModal.classList.remove('hidden');
-            setTimeout(() => editExerciseModal.classList.remove('opacity-0'), 10);
-            form.addEventListener('submit', handleUpdateExercise);
-            document.getElementById('cancel-edit-btn').addEventListener('click', closeEditExerciseModal);
-            container.querySelectorAll('[data-remove-image-for]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetInputName = btn.dataset.removeImageFor;
-                    container.querySelector(`input[name="${targetInputName}"]`).value = '';
-                    btn.closest('.image-preview').remove();
+        
+        // --- FUNZIONI DI LOGICA PRINCIPALE ---
+        async function renderUserSelector() {
+            const container = document.getElementById('user-selector-container');
+            if (!container) return;
+            container.innerHTML = '<div class="loader"></div>';
+            try {
+                const usersSnapshot = await getDocs(getUsersRef());
+                const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                let options = '<option value="">-- Seleziona un utente --</option>';
+                users.forEach(user => {
+                    options += `<option value="${user.id}">${user.email}</option>`;
                 });
+                container.innerHTML = `<select id="user-selector" class="input-field w-full">${options}</select>`;
+                document.getElementById('user-selector').addEventListener('change', (e) => {
+                    const userId = e.target.value;
+                    if (userId) {
+                        const selectedUser = users.find(u => u.id === userId);
+                        if (selectedUser) selectUser(userId, selectedUser.email);
+                    }
+                });
+            } catch (error) {
+                console.error("Errore caricamento utenti:", error);
+                container.innerHTML = '<p class="text-red-400 text-center">Errore durante il caricamento degli utenti.</p>';
+            }
+        }
+        
+        async function renderMesocycleSelector() {
+            const mesocycleContainer = document.getElementById('mesocycle-container');
+            if (!mesocycleContainer) return;
+            const mesocyclesSnapshot = await getDocs(query(getMesocyclesRef(), orderBy("dataCreazione", "desc")));
+            let options = '<option value="">-- Seleziona un mesociclo --</option>';
+            mesocyclesSnapshot.forEach(doc => {
+                options += `<option value="${doc.id}">${doc.data().nome}</option>`;
             });
+            mesocycleContainer.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
+                    ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
+                </div>
+                <select id="mesocycle-selector" class="input-field w-full">${options}</select>
+                ${currentUserRole === 'admin' ? `
+                <div id="create-meso-container" class="collapsible-content mt-3">
+                    <form id="create-meso-form" class="space-y-3">
+                        <input type="text" name="name" class="input-field" placeholder="Nome mesociclo..." required>
+                        <button type="submit" class="btn w-full"><i class="fas fa-plus mr-2"></i> Crea</button>
+                    </form>
+                </div>` : ''}`;
+            const mesoSelector = document.getElementById('mesocycle-selector');
+            mesoSelector.addEventListener('change', (e) => selectMesocycle(e.target.value));
+            if (currentUserRole === 'admin') {
+                document.getElementById('create-meso-form').addEventListener('submit', handleCreateMeso);
+                document.getElementById('toggle-create-meso-btn').addEventListener('click', () => document.getElementById('create-meso-container').classList.toggle('open'));
+            }
+            const effectiveUserId = selectedUserId || currentUser.uid;
+            const lastMesoId = localStorage.getItem(`lastMesoId_${effectiveUserId}`);
+            if (lastMesoId && mesoSelector.querySelector(`option[value="${lastMesoId}"]`)) {
+                mesoSelector.value = lastMesoId;
+                selectMesocycle(lastMesoId);
+            }
         }
 
-        function closeEditExerciseModal() {
-            editExerciseModal.classList.add('opacity-0');
-            setTimeout(() => {
-                editExerciseModal.classList.add('hidden');
-                document.getElementById('edit-exercise-container').innerHTML = '';
-            }, 250);
+        async function selectMesocycle(mesoId) {
+            currentMesoId = mesoId;
+            const effectiveUserId = selectedUserId || currentUser.uid;
+            localStorage.setItem(`lastMesoId_${effectiveUserId}`, mesoId || '');
+            const sheetContent = document.getElementById('sheet-content');
+            const initialMessage = document.getElementById('initial-message');
+            const sheetContainer = document.getElementById('sheet-container');
+            sheetContent.classList.add('hidden');
+            initialMessage.classList.remove('hidden');
+            if (!mesoId) {
+                sheetContainer.classList.add('hidden');
+                return;
+            }
+            sheetContainer.classList.remove('hidden');
+            await renderSheetSelector();
         }
-        editExerciseModal.addEventListener('click', (e) => { if (e.target === editExerciseModal) closeEditExerciseModal(); });
 
-        async function handleUpdateExercise(e) {
+        async function renderSheetSelector() {
+            const sheetContainer = document.getElementById('sheet-container');
+            const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione", "desc")));
+            let options = '<option value="">-- Seleziona una scheda --</option>';
+            sheetsSnapshot.forEach(doc => {
+                const sheet = doc.data();
+                options += `<option value="${doc.id}">${sheet.nomeScheda}${sheet.isCompleta ? ' (Completata)' : ''}</option>`;
+            });
+            sheetContainer.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-clipboard-list mr-2 text-red-500"></i> Scheda di Allenamento</h3>
+                    ${currentUserRole === 'admin' ? `<button id="toggle-create-sheet-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
+                </div>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <select id="sheet-selector" class="input-field flex-grow">${options}</select>
+                    <div class="flex items-center gap-3">
+                        ${currentUserRole === 'admin' ? `
+                        <button id="duplicate-sheet-btn" class="btn btn-secondary" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
+                        <button id="delete-sheet-btn" class="btn btn-danger" title="Elimina Scheda"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+                ${currentUserRole === 'admin' ? `
+                <div id="create-sheet-container" class="collapsible-content mt-3">
+                    <form id="create-sheet-form" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <input type="text" id="new-sheet-name" class="input-field flex-grow" placeholder="Nome nuova scheda..." required>
+                        <input type="number" id="new-sheet-weeks" class="input-field sm:w-28" placeholder="Sett." min="1" required>
+                        <button type="submit" class="btn !w-full sm:!w-auto"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                    </form>
+                </div>` : ''}`;
+            document.getElementById('sheet-selector').addEventListener('change', (e) => selectSheet(e.target.value));
+            
+            if (currentUserRole === 'admin') {
+                document.getElementById('toggle-create-sheet-btn').addEventListener('click', () => document.getElementById('create-sheet-container').classList.toggle('open'));
+                document.getElementById('create-sheet-form').addEventListener('submit', handleCreateSheet);
+                document.getElementById('duplicate-sheet-btn').addEventListener('click', handleDuplicateSheet);
+                document.getElementById('delete-sheet-btn').addEventListener('click', handleDeleteSheet);
+            }
+        }
+
+        async function selectSheet(sheetId) {
+            Object.values(procrastinationTimers).forEach(clearTimeout);
+            procrastinationTimers = {};
+            
+            const sheetContent = document.getElementById('sheet-content');
+            const initialMessage = document.getElementById('initial-message');
+            
+            if (!sheetId) {
+                sheetContent.classList.add('hidden');
+                initialMessage.classList.remove('hidden');
+                currentSheetId = null;
+                return;
+            }
+            
+            initialMessage.classList.add('hidden');
+            sheetContent.classList.remove('hidden');
+            currentSheetId = sheetId;
+            currentWeek = 1;
+            modifiedExercisesThisWeek = new Set();
+
+            const sheetDocRef = doc(getSheetsRef(currentMesoId), sheetId);
+            const sheetDocSnap = await getDoc(sheetDocRef);
+            if (!sheetDocSnap.exists()) {
+                showNotification("Scheda non trovata!", "error");
+                return;
+            }
+            currentSheetData = sheetDocSnap.data();
+
+            renderWeekSelector();
+            renderWorkoutControls(); 
+            renderSpecificRecap();  
+            if (currentUserRole === 'admin') {
+                renderAddExerciseForm();
+            }
+            await loadAndRenderExercises();
+        }
+
+        async function loadAndRenderExercises() {
+            const exerciseContainer = document.getElementById('exercise-list-container');
+            exerciseContainer.innerHTML = '<div class="loader"></div>';
+            const exercisesRef = getExercisesRef(currentMesoId, currentSheetId);
+            const q = query(exercisesRef, orderBy("ordine"));
+            const exercisesSnapshot = await getDocs(q);
+            exercisesCache = exercisesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderExercises();
+        }
+
+        // --- RENDERING UI SPECIFICA ---
+        
+        function renderWeekSelector() {
+            const weekSelectorContainer = document.getElementById('week-selector-container');
+            const numWeeks = currentSheetData.numeroSettimane || 1;
+            weekSelectorContainer.innerHTML = `<div class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar"></div>`;
+            const container = weekSelectorContainer.firstElementChild;
+            for (let i = 1; i <= numWeeks; i++) {
+                const isCompleted = currentSheetData.completedWeeks?.some(w => (w.week || w) === i);
+                const btn = document.createElement('button');
+                btn.innerHTML = `Sett. ${i} ${isCompleted ? '<i class="fas fa-check-circle ml-1 text-green-400"></i>' : ''}`;
+                let classes = 'week-btn px-4 py-2 rounded-md font-semibold text-sm';
+                if (i === currentWeek) classes += ' active';
+                if (isCompleted) {
+                    btn.classList.add('opacity-70', 'border-green-500/50');
+                }
+                btn.className = classes;
+                btn.onclick = () => { 
+                    currentWeek = i; 
+                    modifiedExercisesThisWeek = new Set();
+                    renderWeekSelector(); 
+                    renderExercises();
+                    renderWorkoutControls();
+                };
+                container.appendChild(btn);
+            }
+        }
+
+        function calculateAndRenderSheetVolume() {
+            const sheetVolumeSummaryContainer = document.getElementById('sheet-volume-summary-container');
+            const volumeByCategory = {};
+            exercisesCache.forEach(ex => {
+                const category = ex.categoria || 'Senza Categoria';
+                if (!volumeByCategory[category]) volumeByCategory[category] = 0;
+                volumeByCategory[category] += ex.serie;
+            });
+            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Scheda</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
+            const sortedCategories = Object.keys(volumeByCategory).sort();
+            if (sortedCategories.length === 0) summaryHTML = '';
+            else sortedCategories.forEach(cat => {
+                summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-secondary">${cat}:</span> <span class="text-red-400 font-bold">${volumeByCategory[cat]} serie</span></div>`;
+            });
+            summaryHTML += `</div>`;
+            sheetVolumeSummaryContainer.innerHTML = summaryHTML;
+        }
+        
+        function renderExercises() {
+            const exerciseContainer = document.getElementById('exercise-list-container');
+            exerciseContainer.innerHTML = '';
+            if (exercisesCache.length === 0) {
+                exerciseContainer.innerHTML = `<div class="text-center py-8"><i class="fas fa-dumbbell text-4xl text-stone-600 mb-4"></i><p class="text-secondary">Nessun esercizio. Aggiungine uno.</p></div>`;
+            } else {
+                exercisesCache.forEach(ex => exerciseContainer.appendChild(createExerciseCard(ex)));
+            }
+            calculateAndRenderSheetVolume();
+        }
+        
+        function createExerciseCard(ex) {
+            const card = document.createElement('div');
+            card.id = `ex-card-${ex.id}`;
+            card.className = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
+            
+            if (ex.tecnicheIntensita && ex.tecnicheIntensita.trim() !== '') {
+                card.classList.add('intensity-glow');
+            } else {
+                card.classList.add('border-stone-800');
+            }
+
+            let seriesHTML = '<div class="space-y-2 mt-2">';
+            const weeklyData = ex.datiSettimanali?.[currentWeek] || [];
+            const prevWeeklyData = ex.datiSettimanali?.[currentWeek - 1] || [];
+            const targetReps = ex.ripetizioniPerSerie || [];
+            for (let i = 0; i < ex.serie; i++) {
+                let setData = weeklyData[i] || { carico: '', reps: '' };
+                const prevSetData = prevWeeklyData[i] || null;
+                const targetRep = targetReps[i] || ex.ripetizioni || '';
+                if (currentWeek > 1 && !setData.carico && prevSetData?.carico && prevSetData?.reps) {
+                    const repRange = (targetRep.toString() || "").split('-').map(Number);
+                    const maxReps = repRange.length > 1 ? repRange[1] : repRange[0];
+                    if (parseInt(prevSetData.reps, 10) >= maxReps) {
+                        setData.carico = (parseFloat(prevSetData.carico) + WEIGHT_INCREMENT).toString();
+                    } else {
+                        setData.carico = prevSetData.carico;
+                    }
+                }
+                let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
+                seriesHTML += `
+                    ${prevWeekHint}
+                    <div class="grid grid-cols-5 items-center gap-2">
+                        <span class="font-semibold text-secondary text-sm">S ${i + 1} (${targetRep})</span>
+                        <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
+                        <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
+                        <span class="text-xs text-center text-red-400 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
+                        <button class="btn btn-secondary !p-2 text-xs" data-timer="${ex.recupero}" title="Avvia timer"><i class="fas fa-stopwatch"></i></button>
+                    </div>`;
+            }
+            seriesHTML += '</div>';
+            
+            let imagesHTML = '';
+            if (ex.imageUrl || ex.imageUrl2) {
+                imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
+                if (ex.imageUrl) {
+                    imagesHTML += `<div class="${ex.imageUrl2 ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                }
+                if (ex.imageUrl2) {
+                    imagesHTML += `<div class="${ex.imageUrl ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl2}" alt="${ex.nomeEsercizio} 2" class="exercise-image"></div>`;
+                }
+                imagesHTML += '</div>';
+            }
+
+            const repsDisplay = ex.ripetizioniPerSerie && ex.ripetizioniPerSerie.length > 0 ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '');
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-grow pr-4">
+                        <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio}</h4>
+                        <p class="text-sm text-red-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
+                        <p class="text-xs text-secondary mt-1">
+                            <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
+                            <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} | 
+                            <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
+                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s
+                        </p>
+                        ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
+                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2">${ex.note}</p>` : ''}
+                    </div>
+                    <div class="flex items-start gap-2">
+                        ${currentUserRole === 'admin' ? `
+                        <div class="flex flex-col gap-1">
+                            <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="up" title="Sposta su"><i class="fas fa-arrow-up"></i></button>
+                            <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="down" title="Sposta giù"><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button class="btn btn-secondary !p-2" data-save-fav-ex-id="${ex.id}" title="Salva nei preferiti"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-secondary !p-2" data-edit-ex-id="${ex.id}" title="Modifica"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger !p-2" data-delete-ex-id="${ex.id}" title="Elimina"><i class="fas fa-trash"></i></button>
+                        </div>` : ''}
+                    </div>
+                </div>
+                ${imagesHTML}
+                ${seriesHTML}`;
+            
+            const repsInputs = card.querySelectorAll('input[data-field="reps"]');
+            repsInputs.forEach(input => {
+                const reps = parseInt(input.value, 10);
+                const serieIndex = input.dataset.serieIndex;
+                const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
+                if (oneRmSpan) {
+                    oneRmSpan.textContent = calculate1RMEstimate(reps);
+                }
+            });
+            return card;
+        }
+
+        function renderAddExerciseForm() {
+            const addExerciseContainer = document.getElementById('add-exercise-container');
+            const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            addExerciseContainer.innerHTML = `
+                <form id="add-exercise-form" class="space-y-4">
+                    <input type="text" name="nomeEsercizio" class="input-field" placeholder="Nome Esercizio" required>
+                    <select name="categoria" class="input-field" required>${categoryOptions}</select>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <input type="number" name="serie" class="input-field" placeholder="N° Serie" required>
+                        <input type="text" name="ripetizioni" class="input-field" placeholder="Reps (es. 8-12)">
+                        <input type="text" name="rir" class="input-field" placeholder="RIR (es. 1-2)">
+                        <input type="number" name="recupero" class="input-field" placeholder="Recupero (s)">
+                    </div>
+                    <textarea name="note" class="textarea-field" placeholder="Note (opzionale)"></textarea>
+                    <input type="url" name="imageUrl" class="input-field" placeholder="URL Immagine (opzionale)">
+                    <button type="submit" class="btn w-full">Aggiungi Esercizio</button>
+                </form>`;
+            document.getElementById('add-exercise-form').addEventListener('submit', handleAddExercise);
+        }
+
+        // --- GESTIONE EVENTI E AZIONI ---
+        async function handleCreateMeso(e) {
             e.preventDefault();
             const form = e.target;
-            const exId = form.dataset.exId;
-            const btn = form.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvataggio...';
-            
-            let imageUrl = form.elements.imageUrl.value || "";
-            let imageUrl2 = form.elements.imageUrl2.value || "";
-            const imageFile = form.elements.imageFile.files[0];
-            const imageFile2 = form.elements.imageFile2.files[0];
+            const mesoName = form.elements['name'].value.trim();
+            if (!mesoName) return;
+            await addDoc(getMesocyclesRef(), { nome: mesoName, dataCreazione: new Date().toISOString() });
+            await renderMesocycleSelector();
+            showNotification("Mesociclo creato con successo!");
+        }
 
-            if (imageFile) {
-                const storageRef = ref(storage, `exercise_images/${currentUser.uid}/${currentMesoId}/${Date.now()}_${imageFile.name}`);
-                imageUrl = await getDownloadURL(await uploadBytes(storageRef, imageFile));
-            }
-            if (imageFile2) {
-                const storageRef2 = ref(storage, `exercise_images/${currentUser.uid}/${currentMesoId}/${Date.now()}_${imageFile2.name}`);
-                imageUrl2 = await getDownloadURL(await uploadBytes(storageRef2, imageFile2));
-            }
+        async function handleCreateSheet(e) {
+            e.preventDefault();
+            const form = e.target;
+            const sheetName = form.elements['new-sheet-name'].value.trim();
+            const numWeeks = parseInt(form.elements['new-sheet-weeks'].value, 10);
+            if (!sheetName || !numWeeks) return;
+            await addDoc(getSheetsRef(currentMesoId), { nomeScheda: sheetName, numeroSettimane: numWeeks, dataCreazione: new Date().toISOString(), isCompleta: false, completedWeeks: [] });
+            await renderSheetSelector();
+            showNotification("Scheda creata con successo!");
+        }
 
-            const ripetizioniPerSerie = Array.from(form.querySelectorAll('.reps-per-serie-input')).map(input => input.value);
-            const updatedData = {
+        async function handleDuplicateSheet() {
+            if (!currentSheetId) { showNotification("Seleziona una scheda da duplicare.", "warning"); return; }
+            const newName = prompt("Nuovo nome per la scheda:", `${currentSheetData.nomeScheda} (Copia)`);
+            if (!newName) return;
+            const newSheetRef = await addDoc(getSheetsRef(currentMesoId), { ...currentSheetData, nomeScheda: newName, dataCreazione: new Date().toISOString(), isCompleta: false });
+            const exercisesSnapshot = await getDocs(getExercisesRef(currentMesoId, currentSheetId));
+            const batch = writeBatch(db);
+            exercisesSnapshot.forEach(exDoc => {
+                const newExerciseRef = doc(getExercisesRef(currentMesoId, newSheetRef.id));
+                batch.set(newExerciseRef, exDoc.data());
+            });
+            await batch.commit();
+            showNotification(`Scheda "${newName}" creata!`);
+            await renderSheetSelector();
+        }
+
+        async function handleDeleteSheet() {
+            if (!currentSheetId) { showNotification("Seleziona una scheda da eliminare.", "warning"); return; }
+            if (await showConfirmModal(`Sei sicuro di voler eliminare la scheda "${currentSheetData.nomeScheda}"?`)) {
+                const exercisesRef = getExercisesRef(currentMesoId, currentSheetId);
+                const exercisesSnapshot = await getDocs(exercisesRef);
+                const batch = writeBatch(db);
+                exercisesSnapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                await deleteDoc(doc(getSheetsRef(currentMesoId), currentSheetId));
+                showNotification("Scheda eliminata.");
+                currentSheetId = null;
+                document.getElementById('sheet-content').classList.add('hidden');
+                document.getElementById('initial-message').classList.remove('hidden');
+                await renderSheetSelector();
+            }
+        }
+        
+        async function handleAddExercise(e) {
+            e.preventDefault();
+            const form = e.target;
+            const newExercise = {
                 nomeEsercizio: form.elements.nomeEsercizio.value,
                 categoria: form.elements.categoria.value,
-                ordine: parseInt(form.elements.ordine.value, 10),
+                ordine: (exercisesCache.length || 0) + 1,
                 serie: parseInt(form.elements.serie.value, 10),
-                ripetizioniPerSerie: ripetizioniPerSerie,
+                ripetizioni: form.elements.ripetizioni.value,
                 rir: form.elements.rir.value || "",
-                tut: form.elements.tut.value || "",
                 recupero: parseInt(form.elements.recupero.value, 10) || null,
-                tecnicheIntensita: form.elements.tecnicheIntensita.value || "",
                 note: form.elements.note.value || "",
-                videoUrl: form.elements.videoUrl.value || "",
-                imageUrl: imageUrl,
-                imageUrl2: imageUrl2
+                imageUrl: form.elements.imageUrl.value || "",
+                datiSettimanali: {}
             };
-            await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
-            closeEditExerciseModal();
+            await addDoc(getExercisesRef(currentMesoId, currentSheetId), newExercise);
+            form.reset();
+            document.getElementById('add-exercise-container').classList.remove('open');
             await loadAndRenderExercises();
-            showNotification("Esercizio aggiornato con successo!");
+            showNotification("Esercizio aggiunto!");
         }
 
         async function handleReorderExercise(exId, direction) {
@@ -1505,172 +963,157 @@
             if (currentIndex === -1) return;
             const otherIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
             if (otherIndex < 0 || otherIndex >= exercisesCache.length) return;
+            
             const [currentExercise, otherExercise] = [exercisesCache[currentIndex], exercisesCache[otherIndex]];
             const [currentOrder, otherOrder] = [currentExercise.ordine, otherExercise.ordine];
+
             const batch = writeBatch(db);
             batch.update(doc(getExercisesRef(currentMesoId, currentSheetId), currentExercise.id), { ordine: otherOrder });
             batch.update(doc(getExercisesRef(currentMesoId, currentSheetId), otherExercise.id), { ordine: currentOrder });
-            try {
-                await batch.commit();
-                await loadAndRenderExercises();
-            } catch (error) {
-                console.error("Errore durante il riordino:", error);
-                showNotification("Errore durante il riordino.", "error");
-            }
+            
+            await batch.commit();
+            await loadAndRenderExercises();
         }
-        
+
         async function handleSaveToFavorites(exercise) {
             const { datiSettimanali, id, ...favData } = exercise; 
-            const q = query(getFavoriteExercisesRef(), where("nomeEsercizio", "==", favData.nomeEsercizio));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                if (!await showConfirmModal(`Un esercizio chiamato "${favData.nomeEsercizio}" esiste già. Vuoi sovrascriverlo?`)) {
-                    showNotification("Operazione annullata.", "info");
-                    return;
-                }
-                const batch = writeBatch(db);
-                querySnapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-            }
             await addDoc(getFavoriteExercisesRef(), favData);
             showNotification(`"${favData.nomeEsercizio}" salvato nei preferiti!`);
         }
 
-        // --- GESTIONE PREMI E NOTIFICHE ---
-        async function awardReward(type, description) {
-            await addDoc(getRewardsRef(), { type, description, date: new Date().toISOString(), claimed: false });
-            showNotification(`🏆 ${description}`);
-        }
+        mainView.addEventListener('input', (e) => {
+            if (e.target.matches('input[data-ex-id]')) {
+                const { exId, serieIndex, field } = e.target.dataset;
+                const value = e.target.value;
+                const key = `${exId}-${currentWeek}-${serieIndex}-${field}`;
+                clearTimeout(saveTimeouts[key]);
+                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value), 800);
 
-        function showNotification(message, type = "success") {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `<div class="flex items-center"><i class="fas ${type === "error" ? "fa-exclamation-circle" : "fa-check-circle"} mr-2"></i><span>${message}</span></div>`;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-        // --- FUNZIONI DI ESPORTAZIONE ---
-        function exportSheetToCSV() {
-            if (!currentSheetId) return;
-            let csvContent = "data:text/csv;charset=utf-8,";
-            const headers = ["Ordine", "Esercizio", "Categoria", "Serie Target", "Reps Target", "Tecnica Intensità", "TUT", "Note"];
-            const maxSets = Math.max(0, ...exercisesCache.map(ex => ex.serie));
-            for (let i = 1; i <= currentSheetData.numeroSettimane; i++) {
-                for (let j = 1; j <= maxSets; j++) {
-                    headers.push(`Sett ${i} - Carico ${j}`, `Sett ${i} - Reps ${j}`);
+                if (field === 'reps') {
+                    const card = e.target.closest('.bg-gradient-main');
+                    if (card) {
+                        const oneRmSpan = card.querySelector(`span[data-field="1rm"][data-serie-index="${serieIndex}"]`);
+                        if (oneRmSpan) oneRmSpan.textContent = calculate1RMEstimate(parseInt(value, 10));
+                    }
+                    handleProcrastinationCheck(exId, parseInt(serieIndex, 10), e.target);
+                } else if (field === 'carico') {
+                    clearProcrastinationTimer(exId);
                 }
             }
-            csvContent += headers.join(",") + "\r\n";
-            exercisesCache.forEach(ex => {
-                const repsDisplay = ex.ripetizioniPerSerie ? ex.ripetizioniPerSerie.join('/') : (ex.ripetizioni || '');
-                const row = [ex.ordine, `"${ex.nomeEsercizio}"`, ex.categoria, ex.serie, `"${repsDisplay}"`, `"${ex.tecnicheIntensita || ''}"`, `"${ex.tut || ''}"`, `"${(ex.note || "").replace(/"/g, '""')}"`];
-                for (let i = 1; i <= currentSheetData.numeroSettimane; i++) {
-                    const weeklyData = ex.datiSettimanali?.[i] || [];
-                    for (let j = 0; j < maxSets; j++) {
-                        const set = weeklyData[j] || { carico: '', reps: '' };
-                        row.push(set.carico, set.reps);
-                    }
+        });
+
+        mainView.addEventListener('click', async (e) => {
+            const reorderBtn = e.target.closest('button[data-reorder-ex-id]');
+            const editBtn = e.target.closest('button[data-edit-ex-id]');
+            const deleteBtn = e.target.closest('button[data-delete-ex-id]');
+            const timerBtn = e.target.closest('button[data-timer]');
+            const saveFavBtn = e.target.closest('button[data-save-fav-ex-id]');
+
+            if (reorderBtn) {
+                await handleReorderExercise(reorderBtn.dataset.reorderExId, reorderBtn.dataset.direction);
+            } else if (editBtn) {
+                openEditExerciseModal(editBtn.dataset.editExId);
+            } else if (deleteBtn) {
+                if (await showConfirmModal('Eliminare questo esercizio?')) {
+                    await deleteDoc(doc(getExercisesRef(currentMesoId, currentSheetId), deleteBtn.dataset.deleteExId));
+                    await loadAndRenderExercises();
+                    showNotification("Esercizio eliminato!");
                 }
-                csvContent += row.join(",") + "\r\n";
-            });
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `${currentSheetData.nomeScheda.replace(/ /g, "_")}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotification("Scheda esportata in CSV!");
-        }
+            } else if (timerBtn) {
+                const time = parseInt(timerBtn.dataset.timer, 10);
+                if (time) startTimerModal(time);
+            } else if (saveFavBtn) {
+                const exerciseToSave = exercisesCache.find(ex => ex.id === saveFavBtn.dataset.saveFavExId);
+                if (exerciseToSave) await handleSaveToFavorites(exerciseToSave);
+            } else if (e.target.id === 'toggle-add-exercise-btn') {
+                document.getElementById('add-exercise-container').classList.toggle('open');
+            } else if (e.target.id === 'add-from-favorites-btn') {
+                openFavoritesModal();
+            } else if (e.target.id === 'export-pdf-btn') {
+                previewAndExportPDF();
+            } else if (e.target.id === 'manage-favorites-btn') {
+                openFavoritesModal();
+            } else if (e.target.id === 'manage-users-btn') {
+                openUserManagementModal();
+            }
+        });
 
-        function previewAndExportPDF() {
-            if (!currentSheetId) return;
-            pdfContent = generatePDFContent();
-            pdfPreviewContainer.innerHTML = pdfContent;
-            pdfPreviewModal.classList.remove('hidden');
-            setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
-        }
+        async function saveWeeklyData(exId, serieIndex, field, value) {
+            const exercise = exercisesCache.find(ex => ex.id === exId);
+            if (!exercise) return;
+            const updatedDati = JSON.parse(JSON.stringify(exercise.datiSettimanali || {}));
+            if (!updatedDati[currentWeek]) updatedDati[currentWeek] = [];
+            while (updatedDati[currentWeek].length <= serieIndex) updatedDati[currentWeek].push({ carico: '', reps: '' });
+            updatedDati[currentWeek][serieIndex][field] = value;
 
-        function generatePDFContent() {
-            const creationDate = new Date().toLocaleDateString('it-IT');
-            const repsDisplay = (ex) => ex.ripetizioniPerSerie ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '-');
-            let html = `<div class="pdf-preview-header"><h2 class="pdf-preview-title">Scheda Allenamento: ${currentSheetData.nomeScheda}</h2><div class="pdf-preview-info"><p><strong>Settimana:</strong> ${currentWeek}</p><p><strong>Data:</strong> ${creationDate}</p></div></div><div class="space-y-4">`;
-            exercisesCache.forEach((ex, index) => {
-                html += `<div class="pdf-preview-exercise"><div class="pdf-preview-exercise-name">${index + 1}. ${ex.nomeEsercizio}</div><div class="pdf-preview-exercise-details"><p><strong>Categoria:</strong> ${ex.categoria} | <strong>Serie:</strong> ${ex.serie} | <strong>Reps:</strong> ${repsDisplay(ex)} | <strong>TUT:</strong> ${ex.tut || '-'} | <strong>RIR:</strong> ${ex.rir || '-'} | <strong>Recupero:</strong> ${ex.recupero || '-'}s</p>${ex.tecnicheIntensita ? `<p><strong>Tecnica:</strong> ${ex.tecnicheIntensita}</p>` : ''}${ex.note ? `<p><strong>Note:</strong> ${ex.note}</p>` : ''}</div></div>`;
-            });
-            html += `</div>`;
-            return html;
-        }
-
-        async function exportSheetToPDF() {
-            if (!currentSheetId) return;
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const content = document.getElementById('pdf-preview-container');
+            const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
+            const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
             
-            const canvas = await html2canvas(content, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            const batch = writeBatch(db);
+            batch.update(exerciseRef, { datiSettimanali: updatedDati });
+            batch.update(sheetRef, { lastModified: new Date().toISOString() });
+            await batch.commit();
 
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`${currentSheetData.nomeScheda.replace(/ /g, "_")}_sett${currentWeek}.pdf`);
-            showNotification("Scheda esportata in PDF!");
+            exercise.datiSettimanali = updatedDati;
+            currentSheetData.lastModified = new Date().toISOString();
+            renderSpecificRecap(); 
+
+            calculateAndRenderSheetVolume();
+        }
+        
+        // --- MODIFICA, RIORDINO E PREFERITI (MODAL) ---
+        function openEditExerciseModal(exId) {
+             const exercise = exercisesCache.find(ex => ex.id === exId);
+             if (!exercise) return;
+             const container = document.getElementById('edit-exercise-container');
+             const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
+             container.innerHTML = `
+                  <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
+                       <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio}" required>
+                       <select name="categoria" class="input-field" required>${categoryOptions}</select>
+                       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                           <input type="number" name="serie" class="input-field" value="${exercise.serie}" required>
+                           <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}">
+                           <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}">
+                           <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}">
+                       </div>
+                       <textarea name="note" class="textarea-field">${exercise.note || ''}</textarea>
+                       <input type="url" name="imageUrl" class="input-field" value="${exercise.imageUrl || ''}">
+                       <div class="flex justify-end gap-4 pt-4">
+                           <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
+                           <button type="submit" class="btn">Salva</button>
+                       </div>
+                  </form>`;
+             editExerciseModal.classList.remove('hidden');
+             setTimeout(() => editExerciseModal.classList.remove('opacity-0'), 10);
+             document.getElementById('edit-exercise-form').addEventListener('submit', handleUpdateExercise);
+             document.getElementById('cancel-edit-btn').addEventListener('click', closeEditExerciseModal);
+        }
+        function closeEditExerciseModal() {
+             editExerciseModal.classList.add('opacity-0');
+             setTimeout(() => editExerciseModal.classList.add('hidden'), 250);
+        }
+        async function handleUpdateExercise(e) {
+             e.preventDefault();
+             const form = e.target;
+             const exId = form.dataset.exId;
+             const updatedData = {
+                  nomeEsercizio: form.elements.nomeEsercizio.value,
+                  categoria: form.elements.categoria.value,
+                  serie: parseInt(form.elements.serie.value, 10),
+                  ripetizioni: form.elements.ripetizioni.value,
+                  rir: form.elements.rir.value,
+                  recupero: parseInt(form.elements.recupero.value, 10) || null,
+                  note: form.elements.note.value,
+                  imageUrl: form.elements.imageUrl.value
+             };
+             await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
+             closeEditExerciseModal();
+             await loadAndRenderExercises();
+             showNotification("Esercizio aggiornato!");
         }
 
-        // --- FUNZIONI DI IMPORT/EXPORT MESOCICLO ---
-        async function handleExportMeso() {
-            if (!currentMesoId) { showNotification("Seleziona un mesociclo.", "error"); return; }
-            try {
-                const mesoDoc = await getDoc(doc(getMesocyclesRef(), currentMesoId));
-                if (!mesoDoc.exists()) { showNotification("Mesociclo non trovato.", "error"); return; }
-                const mesoData = mesoDoc.data();
-                const sheetsSnapshot = await getDocs(getSheetsRef(currentMesoId));
-                const sheetsData = [];
-                for (const sheetDoc of sheetsSnapshot.docs) {
-                    const sheetData = sheetDoc.data();
-                    const exercisesSnapshot = await getDocs(getExercisesRef(currentMesoId, sheetDoc.id));
-                    const exercisesData = exercisesSnapshot.docs.map(exDoc => exDoc.data());
-                    sheetsData.push({ ...sheetData, exercises: exercisesData });
-                }
-                const exportData = { mesocycle: mesoData, sheets: sheetsData, exportDate: new Date().toISOString() };
-                const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData, null, 2));
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', `${mesoData.nome.replace(/ /g, "_")}_export.json`);
-                linkElement.click();
-                showNotification("Mesociclo esportato!");
-            } catch (error) {
-                console.error("Errore esportazione mesociclo:", error);
-                showNotification("Errore durante l'esportazione.", "error");
-            }
-        }
-
-        async function handleImportMeso(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            try {
-                const importData = JSON.parse(await file.text());
-                if (!importData.mesocycle || !importData.sheets) { showNotification("Formato file non valido.", "error"); return; }
-                const newMesoRef = await addDoc(getMesocyclesRef(), { nome: importData.mesocycle.nome + " (Importato)", dataCreazione: new Date().toISOString() });
-                for (const sheet of importData.sheets) {
-                    const { exercises, ...sheetData } = sheet;
-                    const newSheetRef = await addDoc(getSheetsRef(newMesoRef.id), { ...sheetData, dataCreazione: new Date().toISOString() });
-                    for (const exercise of exercises) {
-                        await addDoc(getExercisesRef(newMesoRef.id, newSheetRef.id), { ...exercise, datiSettimanali: exercise.datiSettimanali || {} });
-                    }
-                }
-                await renderMesocycleSelector();
-                showNotification("Mesociclo importato!");
-            } catch (error) {
-                console.error("Errore importazione mesociclo:", error);
-                showNotification("Errore durante l'importazione.", "error");
-            }
-            e.target.value = '';
-        }
-
-        // --- GESTIONE PREFERITI (ADMIN) ---
+        // --- GESTIONE PREFERITI (RIPRISTINATO) ---
         function openFavoritesModal() {
             favoritesModal.classList.remove('hidden');
             setTimeout(() => favoritesModal.classList.remove('opacity-0'), 10);
@@ -1680,55 +1123,51 @@
         async function loadAndRenderFavorites() {
             const container = document.getElementById('favorites-container');
             container.innerHTML = '<div class="loader"></div>';
-            try {
-                const favoritesSnapshot = await getDocs(query(getFavoriteExercisesRef(), orderBy("nomeEsercizio")));
-                favoritesCache = favoritesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                const categories = [...new Set(favoritesCache.map(fav => fav.categoria))].sort();
-                let categoryOptions = '<option value="all">Tutte le Categorie</option>';
-                categories.forEach(cat => categoryOptions += `<option value="${cat}">${cat}</option>`);
-
-                container.innerHTML = `
-                    <div class="mb-4">
-                        <select id="favorite-category-filter" class="input-field">${categoryOptions}</select>
-                    </div>
-                    <div id="favorites-list" class="max-h-[60vh] overflow-y-auto pr-2"></div>
-                `;
-
-                renderFilteredFavorites('all');
-
-            } catch (error) {
-                console.error("Errore caricamento preferiti:", error);
-                container.innerHTML = `<div class="text-center py-8"><i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i><p class="text-stone-400">Errore durante il caricamento.</p></div>`;
-            }
+            const favoritesSnapshot = await getDocs(query(getFavoriteExercisesRef(), orderBy("nomeEsercizio")));
+            favoritesCache = favoritesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderFilteredFavorites('all');
         }
 
         function renderFilteredFavorites(category) {
-            const listContainer = document.getElementById('favorites-list');
+            const listContainer = document.getElementById('favorites-container');
             const filteredFavorites = category === 'all' ? favoritesCache : favoritesCache.filter(fav => fav.categoria === category);
+            
+            const categories = [...new Set(favoritesCache.map(fav => fav.categoria))].sort();
+            let categoryOptions = '<option value="all">Tutte le Categorie</option>';
+            categories.forEach(cat => categoryOptions += `<option value="${cat}" ${category === cat ? 'selected' : ''}>${cat}</option>`);
 
-            if (filteredFavorites.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-8"><i class="fas fa-star text-4xl text-stone-600 mb-4"></i><p class="text-stone-400">Nessun esercizio in questa categoria.</p></div>`;
-                return;
+            let favoritesHTML = filteredFavorites.map(fav => `
+                <div class="bg-stone-800/50 p-4 rounded-lg flex flex-col">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-white">${fav.nomeEsercizio}</h4>
+                        <p class="text-sm text-red-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
+                        <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
+                        ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">${fav.note}</p>` : ''}
+                    </div>
+                    <div class="flex justify-end gap-2 mt-auto pt-2">
+                        <button class="btn btn-secondary !p-2 text-xs" data-add-fav-ex-id="${fav.id}" title="Aggiungi alla scheda"><i class="fas fa-plus"></i></button>
+                        <button class="btn btn-danger !p-2 text-xs" data-delete-fav-ex-id="${fav.id}" title="Elimina dai preferiti"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`
+            ).join('');
+
+            if(filteredFavorites.length === 0) {
+                 favoritesHTML = `<div class="text-center py-8"><i class="fas fa-star text-4xl text-stone-600 mb-4"></i><p class="text-secondary">Nessun esercizio preferito in questa categoria.</p></div>`;
             }
 
             listContainer.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${filteredFavorites.map(fav => `
-                        <div class="bg-stone-800/50 p-4 rounded-lg flex flex-col">
-                            <div class="flex-grow">
-                                <h4 class="font-bold text-white">${fav.nomeEsercizio}</h4>
-                                <p class="text-sm text-amber-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
-                                <p class="text-xs text-stone-400 mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
-                                ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">${fav.note}</p>` : ''}
-                            </div>
-                            <div class="flex justify-end gap-2 mt-auto pt-2">
-                                <button class="btn btn-secondary !p-2 text-xs" data-add-fav-ex-id="${fav.id}" title="Aggiungi alla scheda"><i class="fas fa-plus"></i></button>
-                                <button class="btn btn-danger !p-2 text-xs" data-delete-fav-ex-id="${fav.id}" title="Elimina dai preferiti"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>`).join('')}
-                </div>`;
+                <div class="mb-4">
+                    <select id="favorite-category-filter" class="input-field">${categoryOptions}</select>
+                </div>
+                <div id="favorites-list" class="max-h-[60vh] overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 gap-4">${favoritesHTML}</div>
+            `;
         }
+
+        favoritesModal.addEventListener('change', (e) => {
+            if (e.target.id === 'favorite-category-filter') {
+                renderFilteredFavorites(e.target.value);
+            }
+        });
         
         favoritesModal.addEventListener('click', async (e) => {
              if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
@@ -1737,354 +1176,220 @@
                  return;
              }
 
-            const addBtn = e.target.closest('button[data-add-fav-ex-id]');
-            const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
+             const addBtn = e.target.closest('button[data-add-fav-ex-id]');
+             const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
+             
+             if (addBtn && currentSheetId) {
+                 const fav = favoritesCache.find(f => f.id === addBtn.dataset.addFavExId);
+                 if (fav) {
+                     const { id, ...favData } = fav;
+                     await addDoc(getExercisesRef(currentMesoId, currentSheetId), { ...favData, ordine: (exercisesCache.length || 0) + 1, datiSettimanali: {} });
+                     await loadAndRenderExercises();
+                     showNotification("Esercizio aggiunto alla scheda!");
+                 }
+             } else if (deleteBtn) {
+                 if (await showConfirmModal('Eliminare questo esercizio dai preferiti?')) {
+                     await deleteDoc(doc(getFavoriteExercisesRef(), deleteBtn.dataset.deleteFavExId));
+                     loadAndRenderFavorites();
+                     showNotification("Esercizio eliminato dai preferiti!");
+                 }
+             }
+        });
+
+        // --- ESPORTAZIONE ---
+        function previewAndExportPDF() { 
+             if (!currentSheetId) return;
+             let content = `<h2>Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}</h2>`;
+             exercisesCache.forEach(ex => {
+                 content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
+             });
+             document.getElementById('pdf-preview-container').innerHTML = content;
+             pdfPreviewModal.classList.remove('hidden');
+             setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
+        }
+        document.getElementById('download-pdf-btn').addEventListener('click', async () => {
+             const { jsPDF } = window.jspdf;
+             const pdf = new jsPDF();
+             const content = document.getElementById('pdf-preview-container');
+             const canvas = await html2canvas(content);
+             const imgData = canvas.toDataURL('image/png');
+             pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+             pdf.save(`${currentSheetData.nomeScheda}.pdf`);
+        });
+        document.getElementById('close-pdf-preview-btn').addEventListener('click', () => {
+            pdfPreviewModal.classList.add('opacity-0');
+            setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
+        });
+
+
+        // --- NUOVE FUNZIONALITÀ ---
+        function renderWorkoutControls() {
+            const container = document.getElementById('workout-controls-container');
+            if (!container || !currentSheetData) return;
             
-            if (addBtn && currentSheetId) {
-                const fav = favoritesCache.find(f => f.id === addBtn.dataset.addFavExId);
-                if (fav) {
-                    const { id, ...favData } = fav;
-                    await addDoc(getExercisesRef(currentMesoId, currentSheetId), { ...favData, ordine: (exercisesCache.length || 0) + 1, datiSettimanali: {} });
-                    await loadAndRenderExercises();
-                    showNotification("Esercizio aggiunto alla scheda!");
-                }
-            } else if (deleteBtn) {
-                if (await showConfirmModal('Eliminare questo esercizio dai preferiti?')) {
-                    await deleteDoc(doc(getFavoriteExercisesRef(), deleteBtn.dataset.deleteFavExId));
-                    loadAndRenderFavorites();
-                    showNotification("Esercizio eliminato dai preferiti!");
-                }
-            }
-        });
-
-        favoritesModal.addEventListener('change', (e) => {
-            if (e.target.id === 'favorite-category-filter') {
-                renderFilteredFavorites(e.target.value);
-            }
-        });
-
-        // --- GESTIONE UTENTI (ADMIN) ---
-        function openUserManagementModal() {
-            userManagementModal.classList.remove('hidden');
-            setTimeout(() => userManagementModal.classList.remove('opacity-0'), 10);
-            loadAndRenderUsers();
-        }
-
-        async function loadAndRenderUsers() {
-            const container = document.getElementById('user-management-container');
-            container.innerHTML = '<div class="loader"></div>';
-            try {
-                const usersSnapshot = await getDocs(getUsersRef());
-                const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                container.innerHTML = `
-                    <div class="mb-4 flex justify-between items-center"><h3 class="text-lg font-bold text-white">Elenco Utenti</h3><span class="text-sm text-stone-400">Totale: ${users.length} utenti</span></div>
-                    <div class="overflow-x-auto"><table class="w-full text-sm">
-                        <thead><tr class="border-b border-stone-700"><th class="text-left py-2 px-3 text-stone-300">Email</th><th class="text-left py-2 px-3 text-stone-300">Ruolo</th><th class="text-left py-2 px-3 text-stone-300">Data Creazione</th><th class="text-left py-2 px-3 text-stone-300">Azioni</th></tr></thead>
-                        <tbody>${users.map(user => `
-                            <tr class="border-b border-stone-800 hover:bg-stone-800/30">
-                                <td class="py-3 px-3 text-white">${user.email}</td>
-                                <td class="py-3 px-3"><span class="px-2 py-1 rounded text-xs ${user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}">${user.role === 'admin' ? 'Admin' : 'Utente'}</span></td>
-                                <td class="py-3 px-3 text-stone-400">${new Date(user.createdAt).toLocaleDateString()}</td>
-                                <td class="py-3 px-3"><div class="flex gap-2">
-                                    <button class="btn btn-secondary !p-2 text-xs" data-view-user-id="${user.id}" title="Dettagli"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-secondary !p-2 text-xs" data-edit-user-id="${user.id}" title="Modifica"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-secondary !p-2 text-xs" data-access-user-id="${user.id}" title="Accedi come utente"><i class="fas fa-sign-in-alt"></i></button>
-                                    ${currentUserRole === 'admin' && user.id !== currentUser.uid ? `<button class="btn btn-danger !p-2 text-xs" data-delete-user-id="${user.id}" title="Elimina"><i class="fas fa-trash"></i></button>` : ''}
-                                </div></td>
-                            </tr>`).join('')}
-                        </tbody>
-                    </table></div>`;
-                container.addEventListener('click', async (e) => {
-                    const viewBtn = e.target.closest('button[data-view-user-id]');
-                    const editBtn = e.target.closest('button[data-edit-user-id]');
-                    const accessBtn = e.target.closest('button[data-access-user-id]');
-                    const deleteBtn = e.target.closest('button[data-delete-user-id]');
-                    const userId = viewBtn?.dataset.viewUserId || editBtn?.dataset.editUserId || accessBtn?.dataset.accessUserId || deleteBtn?.dataset.deleteUserId;
-                    const user = users.find(u => u.id === userId);
-                    if (!user) return;
-                    if (viewBtn) openUserDetailsModal(user);
-                    else if (editBtn) openEditUserModal(user);
-                    else if (accessBtn) {
-                        selectUser(user.id, user.email);
-                        userManagementModal.classList.add('opacity-0');
-                        setTimeout(() => userManagementModal.classList.add('hidden'), 250);
-                    } else if (deleteBtn && await showConfirmModal(`Eliminare l'utente ${user.email}?`)) {
-                        await deleteDoc(doc(getUsersRef(), userId));
-                        loadAndRenderUsers();
-                        showNotification("Utente eliminato!");
-                    }
-                });
-            } catch (error) {
-                console.error("Errore caricamento utenti:", error);
-                container.innerHTML = `<div class="text-center py-8"><i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i><p class="text-stone-400">Errore durante il caricamento.</p></div>`;
-            }
-        }
-
-        document.getElementById('refresh-users-btn').addEventListener('click', loadAndRenderUsers);
-        document.getElementById('close-user-modal').addEventListener('click', () => {
-            userManagementModal.classList.add('opacity-0');
-            setTimeout(() => userManagementModal.classList.add('hidden'), 250);
-        });
-        userManagementModal.addEventListener('click', (e) => { if (e.target === userManagementModal) {
-            userManagementModal.classList.add('opacity-0');
-            setTimeout(() => userManagementModal.classList.add('hidden'), 250);
-        }});
-
-        function openEditUserModal(user) {
-            const container = document.getElementById('edit-user-container');
             container.innerHTML = `
-                <form id="edit-user-form" class="space-y-4" data-user-id="${user.id}">
-                    <div><label class="block text-sm font-medium text-stone-300 mb-1">Email</label><input type="email" name="email" class="input-field" value="${user.email}" readonly></div>
-                    <div><label class="block text-sm font-medium text-stone-300 mb-1">Ruolo</label><select name="role" class="input-field" ${user.id === currentUser.uid ? 'disabled' : ''}><option value="user" ${user.role === 'user' ? 'selected' : ''}>Utente</option><option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Amministratore</option></select></div>
-                    <div class="flex justify-end gap-3 pt-2"><button type="button" id="cancel-edit-user-btn" class="btn btn-secondary">Annulla</button><button type="submit" class="btn"><i class="fas fa-save mr-2"></i> Salva</button></div>
-                </form>`;
-            editUserModal.classList.remove('hidden');
-            setTimeout(() => editUserModal.classList.remove('opacity-0'), 10);
-            document.getElementById('edit-user-form').addEventListener('submit', handleUpdateUser);
-            document.getElementById('cancel-edit-user-btn').addEventListener('click', closeEditUserModal);
-        }
-
-        function closeEditUserModal() {
-            editUserModal.classList.add('opacity-0');
-            setTimeout(() => {
-                editUserModal.classList.add('hidden');
-                document.getElementById('edit-user-container').innerHTML = '';
-            }, 250);
-        }
-
-        async function handleUpdateUser(e) {
-            e.preventDefault();
-            const form = e.target;
-            const userId = form.dataset.userId;
-            const role = form.elements.role.value;
-            try {
-                await updateDoc(doc(getUsersRef(), userId), { role });
-                closeEditUserModal();
-                loadAndRenderUsers();
-                showNotification("Utente aggiornato!");
-                if (userId === currentUser.uid) {
-                    currentUserRole = role;
-                    renderAppView();
-                }
-            } catch (error) {
-                console.error("Errore aggiornamento utente:", error);
-                showNotification("Errore durante l'aggiornamento.", "error");
-            }
-        }
-        editUserModal.addEventListener('click', (e) => { if (e.target === editUserModal) closeEditUserModal(); });
-
-        function openUserDetailsModal(user) {
-            const container = document.getElementById('user-details-container');
-            container.innerHTML = `<div class="space-y-4">
-                <div class="bg-stone-800/50 p-4 rounded-lg"><h3 class="text-lg font-bold text-white mb-2">Informazioni Account</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm"><div><span class="text-stone-400">Email:</span><p class="text-white">${user.email}</p></div><div><span class="text-stone-400">Ruolo:</span><p class="text-white">${user.role === 'admin' ? 'Amministratore' : 'Utente'}</p></div><div><span class="text-stone-400">ID Utente:</span><p class="text-white font-mono text-xs">${user.id}</p></div><div><span class="text-stone-400">Data Creazione:</span><p class="text-white">${new Date(user.createdAt).toLocaleString()}</p></div></div></div>
-                <div class="bg-stone-800/50 p-4 rounded-lg"><h3 class="text-lg font-bold text-white mb-2">Statistiche</h3><div id="user-stats-container"><div class="loader"></div></div></div>
-                <div class="bg-stone-800/50 p-4 rounded-lg"><h3 class="text-lg font-bold text-white mb-2">Premi</h3><div id="user-rewards-container"><div class="loader"></div></div></div>
-                <div class="flex justify-end gap-3 pt-2"><button id="access-user-btn" class="btn btn-secondary"><i class="fas fa-sign-in-alt mr-2"></i> Accedi come utente</button></div>
-            </div>`;
-            userDetailsModal.classList.remove('hidden');
-            setTimeout(() => userDetailsModal.classList.remove('opacity-0'), 10);
-            loadUserStats(user.id);
-            loadUserRewards(user.id);
-            document.getElementById('access-user-btn').addEventListener('click', () => {
-                selectUser(user.id, user.email);
-                userDetailsModal.classList.add('opacity-0');
-                setTimeout(() => userDetailsModal.classList.add('hidden'), 250);
-            });
-        }
-
-        async function loadUserStats(userId) {
-            const container = document.getElementById('user-stats-container');
-            try {
-                const mesocyclesSnapshot = await getDocs(collection(db, 'users', userId, 'mesocycles'));
-                let sheetsCount = 0, completedSheetsCount = 0, exercisesCount = 0;
-                for (const mesoDoc of mesocyclesSnapshot.docs) {
-                    const sheetsSnapshot = await getDocs(collection(db, 'users', userId, 'mesocycles', mesoDoc.id, 'trainingSheets'));
-                    sheetsCount += sheetsSnapshot.size;
-                    for (const sheetDoc of sheetsSnapshot.docs) {
-                        if (sheetDoc.data().isCompleta) completedSheetsCount++;
-                        const exercisesSnapshot = await getDocs(collection(db, 'users', userId, 'mesocycles', mesoDoc.id, 'trainingSheets', sheetDoc.id, 'exercises'));
-                        exercisesCount += exercisesSnapshot.size;
-                    }
-                }
-                container.innerHTML = `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                    <div class="bg-stone-700/50 p-3 rounded-lg"><p class="text-2xl font-bold text-amber-400">${mesocyclesSnapshot.size}</p><p class="text-xs text-stone-400">Mesocicli</p></div>
-                    <div class="bg-stone-700/50 p-3 rounded-lg"><p class="text-2xl font-bold text-amber-400">${sheetsCount}</p><p class="text-xs text-stone-400">Schede</p></div>
-                    <div class="bg-stone-700/50 p-3 rounded-lg"><p class="text-2xl font-bold text-amber-400">${completedSheetsCount}</p><p class="text-xs text-stone-400">Schede Completate</p></div>
-                    <div class="bg-stone-700/50 p-3 rounded-lg"><p class="text-2xl font-bold text-amber-400">${exercisesCount}</p><p class="text-xs text-stone-400">Esercizi</p></div>
+                <div class="bg-gradient-main p-3 rounded-lg border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div id="workout-recap-specific" class="text-sm text-secondary flex-grow text-center sm:text-left">
+                        <!-- Lo specchietto verrà caricato qui -->
+                    </div>
+                     <button id="mark-week-complete-btn" class="btn btn-secondary flex-shrink-0"><i class="fas fa-check mr-2"></i> Segna come Completato</button>
                 </div>`;
-            } catch (error) {
-                console.error("Errore caricamento statistiche:", error);
-                container.innerHTML = `<div class="text-center py-4"><i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i><p class="text-stone-400">Errore caricamento statistiche.</p></div>`;
+
+            const markBtn = document.getElementById('mark-week-complete-btn');
+            const isWeekCompleted = currentSheetData.completedWeeks?.some(w => (w.week || w) === currentWeek);
+
+            if (isWeekCompleted) {
+                markBtn.disabled = true;
+                markBtn.innerHTML = '<i class="fas fa-check-double mr-2"></i> Settimana Completata';
+                markBtn.classList.add('!bg-green-600', '!text-white', '!border-green-500', 'opacity-80');
+            } else {
+                markBtn.addEventListener('click', handleMarkWeekComplete);
             }
         }
 
-        async function loadUserRewards(userId) {
-            const container = document.getElementById('user-rewards-container');
-            try {
-                const rewardsSnapshot = await getDocs(collection(db, 'users', userId, 'rewards'));
-                const rewards = rewardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if (rewards.length === 0) {
-                    container.innerHTML = `<div class="text-center py-4"><i class="fas fa-trophy text-2xl text-stone-600 mb-2"></i><p class="text-stone-400">Nessun premio ottenuto.</p></div>`;
-                    return;
-                }
-                container.innerHTML = `<div class="space-y-3 max-h-60 overflow-y-auto pr-2">${rewards.map(reward => `
-                    <div class="flex items-center gap-3 p-3 bg-stone-700/50 rounded-lg">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center"><i class="fas fa-trophy text-amber-400"></i></div>
-                        <div class="flex-grow"><p class="text-white font-medium">${reward.description}</p><p class="text-xs text-stone-400">${new Date(reward.date).toLocaleString()}</p></div>
-                        <div class="flex-shrink-0"><span class="px-2 py-1 rounded text-xs ${reward.type === 'completion' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}">${reward.type === 'completion' ? 'Completamento' : 'Progresso'}</span></div>
-                    </div>`).join('')}</div>`;
-            } catch (error) {
-                console.error("Errore caricamento premi:", error);
-                container.innerHTML = `<div class="text-center py-4"><i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i><p class="text-stone-400">Errore caricamento premi.</p></div>`;
-            }
-        }
-        document.getElementById('close-user-details-btn').addEventListener('click', () => {
-            userDetailsModal.classList.add('opacity-0');
-            setTimeout(() => userDetailsModal.classList.add('hidden'), 250);
-        });
-        userDetailsModal.addEventListener('click', (e) => { if (e.target === userDetailsModal) {
-            userDetailsModal.classList.add('opacity-0');
-            setTimeout(() => userDetailsModal.classList.add('hidden'), 250);
-        }});
-
-        // --- GESTIONE PDF E GOOGLE DOCS ---
-        downloadPdfBtn.addEventListener('click', () => {
-            exportSheetToPDF();
-            pdfPreviewModal.classList.add('opacity-0');
-            setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
-        });
-        createGdocBtn.addEventListener('click', createGoogleDoc);
-        closePdfPreviewBtn.addEventListener('click', () => {
-            pdfPreviewModal.classList.add('opacity-0');
-            setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
-        });
-        pdfPreviewModal.addEventListener('click', (e) => { if (e.target === pdfPreviewModal) {
-            pdfPreviewModal.classList.add('opacity-0');
-            setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
-        }});
-
-        function createGoogleDoc() {
-            const title = `Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}`;
-            let content = `<html><head><title>${title}</title></head><body><h1>${title}</h1><p><strong>Data:</strong> ${new Date().toLocaleDateString('it-IT')}</p><h2>Esercizi</h2><ul>`;
-            exercisesCache.forEach((ex, index) => {
-                const repsDisplay = ex.ripetizioniPerSerie ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '-');
-                content += `<li><strong>${index + 1}. ${ex.nomeEsercizio}</strong><br><em>Categoria:</em> ${ex.categoria} | <em>Serie:</em> ${ex.serie} | <em>Reps:</em> ${repsDisplay} | <em>RIR:</em> ${ex.rir || '-'} | <em>Recupero:</em> ${ex.recupero || '-'}s`;
-                if (ex.tecnicheIntensita) content += ` | <em>Tecnica:</em> ${ex.tecnicheIntensita}`;
-                if (ex.note) content += `<br><em>Note:</em> ${ex.note.replace(/\n/g, '<br>')}`;
-                content += `</li>`;
-            });
-            content += `</ul></body></html>`;
-            const blob = new Blob([content], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${title.replace(/ /g, '_')}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showNotification("File HTML creato! Puoi caricarlo su Google Docs.");
-        }
-
-        // --- NUOVE FUNZIONI ---
-        function calculateEstimatedWorkoutTime() {
-            const container = document.getElementById('workout-duration-container');
-            if (!container || exercisesCache.length === 0) {
-                if(container) container.innerHTML = '';
+        async function handleMarkWeekComplete() {
+            if (!currentSheetId) return;
+            const isAlreadyCompleted = currentSheetData.completedWeeks?.some(w => (w.week || w) === currentWeek);
+            if (isAlreadyCompleted) {
+                showNotification("Questa settimana è già stata completata.", "warning");
                 return;
             }
 
-            let totalSeconds = 0;
+            const confirmed = await showConfirmModal(`Sei sicuro di voler segnare la Settimana ${currentWeek} come completata?`);
+            if (confirmed) {
+                const oldWeeks = currentSheetData.completedWeeks || [];
+                const normalizedWeeks = oldWeeks.map(w => (typeof w === 'number' ? { week: w, completedAt: currentSheetData.dataCreazione || new Date().toISOString() } : w));
+                const completionRecord = { week: currentWeek, completedAt: new Date().toISOString() };
+                const updatedCompletedWeeks = [...normalizedWeeks, completionRecord];
 
-            exercisesCache.forEach(ex => {
-                const tutParts = (ex.tut || "1-0-1-0").split('-').map(Number);
-                const timePerRep = tutParts.length === 4 ? tutParts.reduce((a, b) => a + b, 0) : 2;
+                try {
+                    const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
+                    await updateDoc(sheetRef, { completedWeeks: updatedCompletedWeeks });
+                    
+                    currentSheetData.completedWeeks = updatedCompletedWeeks;
+                    showNotification(`Settimana ${currentWeek} completata!`, "success");
+                    
+                    renderWeekSelector();
+                    renderWorkoutControls();
+                    renderLastWorkoutRecap();
 
-                let avgReps = 0;
-                const repsArray = ex.ripetizioniPerSerie || [];
-                if (repsArray.length > 0) {
-                    const repsPerSet = repsArray.map(r => {
-                        const parts = r.toString().split('-').map(Number);
-                        return parts.length > 1 ? (parts[0] + parts[1]) / 2 : (parts[0] || 0);
-                    });
-                    avgReps = repsPerSet.reduce((a, b) => a + b, 0) / repsPerSet.length;
+                } catch (error) {
+                    console.error("Errore nel segnare la settimana come completata:", error);
+                    showNotification("Errore durante l'aggiornamento.", "error");
                 }
-
-                const timeForSets = ex.serie * avgReps * timePerRep;
-                // MODIFIED: Calculate rest time for every set as requested by user
-                const timeForRest = ex.recupero ? ex.serie * ex.recupero : 0;
-
-                totalSeconds += timeForSets + timeForRest;
-            });
-
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = Math.round(totalSeconds % 60);
-            const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            container.innerHTML = `
-                <p class="text-sm text-stone-400">
-                    <i class="fas fa-hourglass-start mr-1"></i> Durata Stimata Allenamento: 
-                    <span class="font-bold text-amber-400">${formattedTime}</span>
-                </p>`;
+            }
         }
 
-        // NEW: Function to calculate the estimated 1RM percentage
-        function calculate1RMEstimate(reps) {
-            if (!reps || reps <= 0) {
-                return `~% 1RM`;
+
+        async function renderLastWorkoutRecap() {
+            const container = document.getElementById('last-workout-container');
+            if (!container) return;
+            container.innerHTML = '<div class="text-center text-sm text-secondary p-2">Caricamento ultimo allenamento...</div>';
+
+            try {
+                const userId = selectedUserId || currentUser.uid;
+                const mesocyclesRef = collection(db, 'users', userId, 'mesocycles');
+                const mesocyclesSnapshot = await getDocs(mesocyclesRef);
+
+                let lastWorkout = null;
+
+                for (const mesoDoc of mesocyclesSnapshot.docs) {
+                    const sheetsRef = collection(mesoDoc.ref, 'trainingSheets');
+                    const sheetsSnapshot = await getDocs(sheetsRef);
+
+                    for (const sheetDoc of sheetsSnapshot.docs) {
+                        const sheetData = sheetDoc.data();
+                        if (sheetData.completedWeeks && sheetData.completedWeeks.length > 0) {
+                            const completedWeeksValid = sheetData.completedWeeks.filter(w => w && w.completedAt);
+                            if (completedWeeksValid.length === 0) continue;
+
+                            const latestInSheet = completedWeeksValid.reduce((latest, current) => {
+                                return new Date(current.completedAt) > new Date(latest.completedAt) ? current : latest;
+                            });
+
+                            if (!lastWorkout || new Date(latestInSheet.completedAt) > new Date(lastWorkout.completedAt)) {
+                                lastWorkout = {
+                                    ...latestInSheet,
+                                    sheetName: sheetData.nomeScheda,
+                                    mesoName: mesoDoc.data().nome
+                                };
+                            }
+                        }
+                    }
+                }
+
+                if (lastWorkout) {
+                    const lastDate = new Date(lastWorkout.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' });
+                    container.innerHTML = `
+                        <div class="recap-card p-4 rounded-xl text-center shadow-lg">
+                             <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
+                             <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
+                             <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
+                        </div>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="recap-card p-4 rounded-xl text-center shadow-lg">
+                            <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
+                            <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
+                        </div>`;
+                }
+
+            } catch (error) {
+                console.error("Errore nel caricare l'ultimo allenamento:", error);
+                container.innerHTML = '<p class="text-center text-red-400">Impossibile caricare i dati dell\'ultimo allenamento.</p>';
             }
-            // Using Epley formula rearranged for percentage: %1RM = 1 / (1 + reps / 30)
+        }
+
+
+        function renderSpecificRecap() {
+            const container = document.getElementById('workout-recap-specific');
+            if (!container) return;
+            if (currentSheetData && currentSheetData.lastModified) {
+                const lastDate = new Date(currentSheetData.lastModified).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+                container.innerHTML = `<i class="fas fa-pencil-alt mr-2 text-yellow-400"></i>Ultima modifica a questa scheda: <b>${lastDate}</b>`;
+            } else {
+                container.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Nessuna modifica ancora registrata.';
+            }
+        }
+
+        function calculate1RMEstimate(reps) {
+            if (!reps || reps <= 0) return `~% 1RM`;
             const percentage = (1 / (1 + reps / 30)) * 100;
             if (percentage > 100) return `>100%`;
             return `~${Math.round(percentage)}%`;
         }
-
-
+        
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
-            const exercise = exercisesCache.find(ex => ex.id === exId);
-            if (!exercise || !exercise.recupero || serieIndex >= exercise.serie - 1) {
-                return;
-            }
-
-            const card = document.getElementById(`ex-card-${exId}`);
-            if (!card) return;
-            const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
-
-            if (repsInput.value && caricoInput && caricoInput.value) {
-                clearProcrastinationTimer(exId);
-                
-                const delay = exercise.recupero * 2.5 * 1000;
-                const timerId = setTimeout(() => {
-                    procrastinationModal.classList.remove('hidden');
-                    setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
-                    delete procrastinationTimers[exId];
-                }, delay);
-
-                procrastinationTimers[exId] = timerId;
-            }
+             const exercise = exercisesCache.find(ex => ex.id === exId);
+             if (!exercise || !exercise.recupero || serieIndex >= exercise.serie - 1) return;
+             const card = document.getElementById(`ex-card-${exId}`);
+             if (!card) return;
+             const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
+             if (repsInput.value && caricoInput && caricoInput.value) {
+                 clearProcrastinationTimer(exId);
+                 const delay = exercise.recupero * 2.5 * 1000;
+                 procrastinationTimers[exId] = setTimeout(() => {
+                     procrastinationModal.classList.remove('hidden');
+                     setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
+                     delete procrastinationTimers[exId];
+                 }, delay);
+             }
         }
-
         function clearProcrastinationTimer(exId) {
             if (procrastinationTimers[exId]) {
                 clearTimeout(procrastinationTimers[exId]);
                 delete procrastinationTimers[exId];
             }
         }
-
         function closeProcrastinationModal() {
             procrastinationModal.classList.add('opacity-0');
             setTimeout(() => procrastinationModal.classList.add('hidden'), 250);
         }
-
         document.getElementById('procrastination-ok-btn').addEventListener('click', closeProcrastinationModal);
-        procrastinationModal.addEventListener('click', (e) => {
-            if (e.target === procrastinationModal) {
-                closeProcrastinationModal();
-            }
-        });
 
         // --- INIZIALIZZAZIONE APP ---
         window.addEventListener('load', setupAdminAccount);
+
     </script>
 </body>
 </html>
