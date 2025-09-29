@@ -217,6 +217,16 @@
             <button id="procrastination-ok-btn" class="btn">Ho capito!</button>
         </div>
     </div>
+
+    <div id="exercise-history-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-3xl m-4 transform scale-95 border border-stone-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="history-modal-title" class="text-xl font-bold text-white">Storico Esercizio</h3>
+                <button id="close-history-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="exercise-history-container"></div>
+        </div>
+    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -262,6 +272,7 @@
         const backToAdminBtn = document.getElementById('back-to-admin-btn');
         const pdfPreviewModal = document.getElementById('pdf-preview-modal');
         const procrastinationModal = document.getElementById('procrastination-modal');
+        const exerciseHistoryModal = document.getElementById('exercise-history-modal');
 
         let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, isLoginMode = true, selectedUserId = null, favoritesCache = [];
         
@@ -828,7 +839,8 @@
                             <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
                             <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} | 
                             <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
-                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s
+                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s |
+                            <i class="fas fa-clock mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
                         </p>
                         ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
                         ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2">${ex.note}</p>` : ''}
@@ -842,6 +854,7 @@
                         <div class="flex flex-col gap-1">
                             <button class="btn btn-secondary !p-2" data-save-fav-ex-id="${ex.id}" title="Salva nei preferiti"><i class="fas fa-star"></i></button>
                             <button class="btn btn-secondary !p-2" data-edit-ex-id="${ex.id}" title="Modifica"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-secondary !p-2" data-history-ex-id="${ex.id}" title="Storico"><i class="fas fa-chart-line"></i></button>
                             <button class="btn btn-danger !p-2" data-delete-ex-id="${ex.id}" title="Elimina"><i class="fas fa-trash"></i></button>
                         </div>` : ''}
                     </div>
@@ -861,6 +874,25 @@
             return card;
         }
 
+        function generateRepInputs(container, numSeries, values = []) {
+            container.innerHTML = '';
+            if (numSeries > 0) {
+                const label = document.createElement('label');
+                label.className = 'text-sm text-secondary col-span-full';
+                label.textContent = 'Ripetizioni per Serie';
+                container.appendChild(label);
+            }
+            for (let i = 0; i < numSeries; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'ripetizioniPerSerie';
+                input.className = 'input-field !p-2 text-center';
+                input.placeholder = `S ${i + 1}`;
+                input.value = values[i] || '';
+                container.appendChild(input);
+            }
+        }
+
         function renderAddExerciseForm() {
             const addExerciseContainer = document.getElementById('add-exercise-container');
             const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('');
@@ -868,17 +900,38 @@
                 <form id="add-exercise-form" class="space-y-4">
                     <input type="text" name="nomeEsercizio" class="input-field" placeholder="Nome Esercizio" required>
                     <select name="categoria" class="input-field" required>${categoryOptions}</select>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
                         <input type="number" name="serie" class="input-field" placeholder="N° Serie" required>
                         <input type="text" name="ripetizioni" class="input-field" placeholder="Reps (es. 8-12)">
                         <input type="text" name="rir" class="input-field" placeholder="RIR (es. 1-2)">
+                        <input type="text" name="tut" class="input-field" placeholder="TUT (es. 2-1-1)">
                         <input type="number" name="recupero" class="input-field" placeholder="Recupero (s)">
                     </div>
+                    <div id="add-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
+                    <input type="text" name="tecnicheIntensita" class="input-field" placeholder="Tecnica di Intensità (es. Dropset)">
                     <textarea name="note" class="textarea-field" placeholder="Note (opzionale)"></textarea>
-                    <input type="url" name="imageUrl" class="input-field" placeholder="URL Immagine (opzionale)">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-secondary">Immagine 1</label>
+                            <input type="url" name="imageUrl" class="input-field mb-2" placeholder="URL Immagine 1">
+                            <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                        </div>
+                        <div>
+                            <label class="text-sm text-secondary">Immagine 2</label>
+                            <input type="url" name="imageUrl2" class="input-field mb-2" placeholder="URL Immagine 2">
+                            <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                        </div>
+                    </div>
                     <button type="submit" class="btn w-full">Aggiungi Esercizio</button>
                 </form>`;
-            document.getElementById('add-exercise-form').addEventListener('submit', handleAddExercise);
+            
+            const addForm = document.getElementById('add-exercise-form');
+            addForm.elements.serie.addEventListener('input', (e) => {
+                const numSeries = parseInt(e.target.value, 10) || 0;
+                const container = addForm.querySelector('#add-ripetizioni-per-serie-container');
+                generateRepInputs(container, numSeries);
+            });
+            addForm.addEventListener('submit', handleAddExercise);
         }
 
         // --- GESTIONE EVENTI E AZIONI ---
@@ -935,10 +988,33 @@
                 await renderSheetSelector();
             }
         }
+
+        async function uploadImage(file) {
+            if (!file) return null;
+            const storageRef = ref(storage, `exercise_images/${Date.now()}_${file.name}`);
+            try {
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                return downloadURL;
+            } catch (error) {
+                console.error("Errore durante l'upload dell'immagine:", error);
+                showNotification("Errore upload immagine.", "error");
+                return null;
+            }
+        }
         
         async function handleAddExercise(e) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Aggiungo...';
+
+            const imageFile1 = form.elements.imageFile1.files[0];
+            const imageFile2 = form.elements.imageFile2.files[0];
+            const imageUrl1 = await uploadImage(imageFile1);
+            const imageUrl2 = await uploadImage(imageFile2);
+            
             const newExercise = {
                 nomeEsercizio: form.elements.nomeEsercizio.value,
                 categoria: form.elements.categoria.value,
@@ -946,13 +1022,19 @@
                 serie: parseInt(form.elements.serie.value, 10),
                 ripetizioni: form.elements.ripetizioni.value,
                 rir: form.elements.rir.value || "",
+                tut: form.elements.tut.value || "",
                 recupero: parseInt(form.elements.recupero.value, 10) || null,
+                tecnicheIntensita: form.elements.tecnicheIntensita.value || "",
                 note: form.elements.note.value || "",
-                imageUrl: form.elements.imageUrl.value || "",
+                imageUrl: imageUrl1 || form.elements.imageUrl.value || "",
+                imageUrl2: imageUrl2 || form.elements.imageUrl2.value || "",
+                ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
                 datiSettimanali: {}
             };
             await addDoc(getExercisesRef(currentMesoId, currentSheetId), newExercise);
             form.reset();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Aggiungi Esercizio';
             document.getElementById('add-exercise-container').classList.remove('open');
             await loadAndRenderExercises();
             showNotification("Esercizio aggiunto!");
@@ -1008,11 +1090,14 @@
             const deleteBtn = e.target.closest('button[data-delete-ex-id]');
             const timerBtn = e.target.closest('button[data-timer]');
             const saveFavBtn = e.target.closest('button[data-save-fav-ex-id]');
+            const historyBtn = e.target.closest('button[data-history-ex-id]');
 
             if (reorderBtn) {
                 await handleReorderExercise(reorderBtn.dataset.reorderExId, reorderBtn.dataset.direction);
             } else if (editBtn) {
                 openEditExerciseModal(editBtn.dataset.editExId);
+            } else if (historyBtn) {
+                openExerciseHistoryModal(historyBtn.dataset.historyExId);
             } else if (deleteBtn) {
                 if (await showConfirmModal('Eliminare questo esercizio?')) {
                     await deleteDoc(doc(getExercisesRef(currentMesoId, currentSheetId), deleteBtn.dataset.deleteExId));
@@ -1069,24 +1154,50 @@
              const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
              container.innerHTML = `
                   <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
-                       <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio}" required>
-                       <select name="categoria" class="input-field" required>${categoryOptions}</select>
-                       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                           <input type="number" name="serie" class="input-field" value="${exercise.serie}" required>
-                           <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}">
-                           <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}">
-                           <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}">
-                       </div>
-                       <textarea name="note" class="textarea-field">${exercise.note || ''}</textarea>
-                       <input type="url" name="imageUrl" class="input-field" value="${exercise.imageUrl || ''}">
+                        <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
+                        <select name="categoria" class="input-field" required>${categoryOptions}</select>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                            <input type="number" name="serie" class="input-field" value="${exercise.serie || ''}" placeholder="N° Serie" required>
+                            <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}" placeholder="Reps (es. 8-12)">
+                            <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}" placeholder="RIR (es. 1-2)">
+                            <input type="text" name="tut" class="input-field" value="${exercise.tut || ''}" placeholder="TUT (es. 2-1-1)">
+                            <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}" placeholder="Recupero (s)">
+                        </div>
+                        <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
+                        <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
+                        <textarea name="note" class="textarea-field" placeholder="Note (opzionale)">${exercise.note || ''}</textarea>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-secondary">Immagine 1</label>
+                                <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
+                                <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            </div>
+                            <div>
+                                <label class="text-sm text-secondary">Immagine 2</label>
+                                <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
+                                <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            </div>
+                        </div>
                        <div class="flex justify-end gap-4 pt-4">
                            <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
-                           <button type="submit" class="btn">Salva</button>
+                           <button type="submit" class="btn">Salva Modifiche</button>
                        </div>
                   </form>`;
+            const editForm = document.getElementById('edit-exercise-form');
+            const seriesInput = editForm.elements.serie;
+            const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
+            
+            generateRepInputs(repsContainer, exercise.serie, exercise.ripetizioniPerSerie);
+
+            seriesInput.addEventListener('input', (e) => {
+                const numSeries = parseInt(e.target.value, 10) || 0;
+                const currentValues = Array.from(repsContainer.querySelectorAll('input')).map(input => input.value);
+                generateRepInputs(repsContainer, numSeries, currentValues);
+            });
+
              editExerciseModal.classList.remove('hidden');
              setTimeout(() => editExerciseModal.classList.remove('opacity-0'), 10);
-             document.getElementById('edit-exercise-form').addEventListener('submit', handleUpdateExercise);
+             editForm.addEventListener('submit', handleUpdateExercise);
              document.getElementById('cancel-edit-btn').addEventListener('click', closeEditExerciseModal);
         }
         function closeEditExerciseModal() {
@@ -1097,21 +1208,118 @@
              e.preventDefault();
              const form = e.target;
              const exId = form.dataset.exId;
+             const submitBtn = form.querySelector('button[type="submit"]');
+             submitBtn.disabled = true;
+             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvataggio...';
+
+             const imageFile1 = form.elements.imageFile1.files[0];
+             const imageFile2 = form.elements.imageFile2.files[0];
+             const imageUrl1 = await uploadImage(imageFile1);
+             const imageUrl2 = await uploadImage(imageFile2);
+             const exercise = exercisesCache.find(ex => ex.id === exId);
+
              const updatedData = {
                   nomeEsercizio: form.elements.nomeEsercizio.value,
                   categoria: form.elements.categoria.value,
                   serie: parseInt(form.elements.serie.value, 10),
                   ripetizioni: form.elements.ripetizioni.value,
                   rir: form.elements.rir.value,
+                  tut: form.elements.tut.value,
                   recupero: parseInt(form.elements.recupero.value, 10) || null,
+                  tecnicheIntensita: form.elements.tecnicheIntensita.value,
                   note: form.elements.note.value,
-                  imageUrl: form.elements.imageUrl.value
+                  imageUrl: imageUrl1 || form.elements.imageUrl.value,
+                  imageUrl2: imageUrl2 || form.elements.imageUrl2.value,
+                  ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value)
              };
              await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
              closeEditExerciseModal();
              await loadAndRenderExercises();
              showNotification("Esercizio aggiornato!");
         }
+
+        function openExerciseHistoryModal(exId) {
+            const exercise = exercisesCache.find(ex => ex.id === exId);
+            if (!exercise) {
+                showNotification("Esercizio non trovato.", "error");
+                return;
+            }
+
+            const container = document.getElementById('exercise-history-container');
+            document.getElementById('history-modal-title').textContent = `Storico: ${exercise.nomeEsercizio}`;
+            container.innerHTML = '<div class="loader"></div>';
+
+            const historyData = exercise.datiSettimanali || {};
+            const weeks = Object.keys(historyData).map(Number).sort((a, b) => a - b);
+
+            if (weeks.length === 0) {
+                container.innerHTML = '<p class="text-center text-secondary">Nessun dato registrato per questo esercizio.</p>';
+            } else {
+                let historyHTML = `<div class="max-h-[60vh] overflow-y-auto pr-2 space-y-4">`;
+                let lastBestE1RM = 0;
+
+                weeks.forEach(week => {
+                    const weekData = historyData[week];
+                    if (!weekData || weekData.length === 0) return;
+
+                    let bestSetThisWeek = { e1rm: 0, text: 'N/D' };
+                    let setsHTML = '';
+                    
+                    weekData.forEach((set, index) => {
+                        if (set && set.carico && set.reps) {
+                            const e1rm = calculateE1RM(set.carico, set.reps);
+                            if (e1rm > bestSetThisWeek.e1rm) {
+                                bestSetThisWeek = { e1rm, text: `${set.carico}kg x ${set.reps}` };
+                            }
+                            setsHTML += `<div class="text-sm text-stone-300"><b>Set ${index + 1}:</b> ${set.carico}kg x ${set.reps} reps</div>`;
+                        }
+                    });
+
+                    let progressIndicator = '';
+                    if (bestSetThisWeek.e1rm > 0) {
+                        if (lastBestE1RM > 0) {
+                            if (bestSetThisWeek.e1rm > lastBestE1RM) {
+                                progressIndicator = '<i class="fas fa-arrow-up text-green-400 ml-2" title="Miglioramento"></i>';
+                            } else if (bestSetThisWeek.e1rm < lastBestE1RM) {
+                                progressIndicator = '<i class="fas fa-arrow-down text-red-400 ml-2" title="Peggioramento"></i>';
+                            } else {
+                                progressIndicator = '<i class="fas fa-equals text-yellow-400 ml-2" title="Stabile"></i>';
+                            }
+                        }
+                        lastBestE1RM = bestSetThisWeek.e1rm;
+                    }
+
+                    historyHTML += `
+                        <div class="bg-stone-800/50 p-4 rounded-lg">
+                            <h4 class="font-bold text-white text-lg mb-2">Settimana ${week}</h4>
+                            <div class="mb-3 p-2 bg-stone-900/50 rounded">
+                                <span class="font-semibold text-secondary">Miglior Set: </span>
+                                <span class="font-bold text-red-400">${bestSetThisWeek.text}</span>
+                                ${progressIndicator}
+                            </div>
+                            <div class="space-y-1">${setsHTML || '<p class="text-sm text-stone-400">Nessun dato completo per questa settimana.</p>'}</div>
+                        </div>
+                    `;
+                });
+
+                historyHTML += '</div>';
+                container.innerHTML = historyHTML;
+            }
+
+            exerciseHistoryModal.classList.remove('hidden');
+            setTimeout(() => exerciseHistoryModal.classList.remove('opacity-0'), 10);
+        }
+        
+        document.getElementById('close-history-modal').addEventListener('click', () => {
+            exerciseHistoryModal.classList.add('opacity-0');
+            setTimeout(() => exerciseHistoryModal.classList.add('hidden'), 250);
+        });
+        exerciseHistoryModal.addEventListener('click', (e) => {
+            if(e.target === exerciseHistoryModal) {
+                exerciseHistoryModal.classList.add('opacity-0');
+                setTimeout(() => exerciseHistoryModal.classList.add('hidden'), 250);
+            }
+        });
 
         // --- GESTIONE PREFERITI (RIPRISTINATO) ---
         function openFavoritesModal() {
@@ -1359,6 +1567,11 @@
             return `~${Math.round(percentage)}%`;
         }
         
+        const calculateE1RM = (carico, reps) => {
+            if (!carico || !reps) return 0;
+            return parseFloat(carico) * (1 + parseInt(reps) / 30);
+        }
+
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
              if (!exercise || !exercise.recupero || serieIndex >= exercise.serie - 1) return;
@@ -1393,3 +1606,4 @@
     </script>
 </body>
 </html>
+
