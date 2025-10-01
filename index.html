@@ -621,8 +621,8 @@
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
                      <div class="flex items-center gap-2">
-                        ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
-                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
+                         ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
+                         ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
                     </div>
                 </div>
                 <select id="mesocycle-selector" class="input-field w-full">${options}</select>
@@ -1130,9 +1130,10 @@
             if (e.target.matches('input[data-ex-id]')) {
                 const { exId, serieIndex, field } = e.target.dataset;
                 const value = e.target.value;
-                const key = `${exId}-${currentWeek}-${serieIndex}-${field}`;
+                const weekForSave = currentWeek; // CORREZIONE: Cattura la settimana al momento dell'input
+                const key = `${exId}-${weekForSave}-${serieIndex}-${field}`;
                 clearTimeout(saveTimeouts[key]);
-                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value), 800);
+                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value, weekForSave), 800);
 
                 if (field === 'reps') {
                     const card = e.target.closest('.bg-gradient-main');
@@ -1186,13 +1187,13 @@
             }
         });
 
-        async function saveWeeklyData(exId, serieIndex, field, value) {
+        async function saveWeeklyData(exId, serieIndex, field, value, week) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
             if (!exercise) return;
             const updatedDati = JSON.parse(JSON.stringify(exercise.datiSettimanali || {}));
-            if (!updatedDati[currentWeek]) updatedDati[currentWeek] = [];
-            while (updatedDati[currentWeek].length <= serieIndex) updatedDati[currentWeek].push({ carico: '', reps: '' });
-            updatedDati[currentWeek][serieIndex][field] = value;
+            if (!updatedDati[week]) updatedDati[week] = [];
+            while (updatedDati[week].length <= serieIndex) updatedDati[week].push({ carico: '', reps: '' });
+            updatedDati[week][serieIndex][field] = value;
 
             const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
             const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
@@ -1204,9 +1205,12 @@
 
             exercise.datiSettimanali = updatedDati;
             currentSheetData.lastModified = new Date().toISOString();
-            renderSpecificRecap(); 
-
-            calculateAndRenderSheetVolume();
+            
+            // CORREZIONE: Esegui il re-rendering solo se la settimana salvata è quella attualmente visualizzata
+            if (week === currentWeek) {
+                renderSpecificRecap();
+                calculateAndRenderSheetVolume();
+            }
         }
         
         // --- MODIFICA, RIORDINO E PREFERITI (MODAL) ---
@@ -1242,8 +1246,8 @@
                             </div>
                         </div>
                        <div class="flex justify-end gap-4 pt-4">
-                           <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
-                           <button type="submit" class="btn">Salva Modifiche</button>
+                          <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
+                          <button type="submit" class="btn">Salva Modifiche</button>
                        </div>
                   </form>`;
             const editForm = document.getElementById('edit-exercise-form');
@@ -1600,8 +1604,8 @@
                 } else {
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                            <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
-                            <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
+                             <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
+                             <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
                         </div>`;
                 }
 
@@ -1780,7 +1784,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-stone-800">
-            `;
+                `;
 
             const sortedGroups = Object.keys(rotationVolumeData).sort();
             sortedGroups.forEach(group => {
@@ -1819,4 +1823,3 @@
     </script>
 </body>
 </html>
-
