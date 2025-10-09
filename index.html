@@ -82,7 +82,6 @@
         .intensity-glow { border-color: var(--text-accent); box-shadow: 0 0 15px 4px rgba(220, 38, 38, 0.4), inset 0 0 8px 1px rgba(220, 38, 38, 0.3); }
         .recap-card { background: linear-gradient(135deg, #4a044e, #1e1b4b); border: 1px solid #7e22ce; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
     </style>
 </head>
 <body class="antialiased">
@@ -113,8 +112,7 @@
 
         <div id="main-view"></div>
     </div>
-    
-    <!-- Modals -->
+
     <div id="auth-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
             <h3 id="auth-title" class="text-xl font-bold text-white mb-4 text-center">Area Personale</h3>
@@ -237,7 +235,7 @@
             <div id="volume-analysis-container" class="space-y-6"></div>
         </div>
     </div>
-    
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -310,7 +308,6 @@
         let procrastinationTimers = {};
         let modifiedExercisesThisWeek = new Set();
 
-
         // --- GESTIONE TEMA ---
         function applyTheme(theme) {
             document.documentElement.classList.toggle('light', theme === 'light');
@@ -377,15 +374,15 @@
                                 console.log('Admin creato con successo!');
                                 await signOut(auth);
                             } catch (createError) { console.error('Errore creazione admin:', createError); }
-                        } else { 
-                            console.error('Errore durante il setup dell\'admin:', error); 
+                        } else {
+                             console.error('Errore durante il setup dell\'admin:', error);
                         }
                     }
-                } else { 
-                    console.log('Admin già presente nel sistema'); 
+                } else {
+                    console.log('Admin già presente nel sistema');
                 }
-            } catch (error) { 
-                console.error('Errore verifica admin:', error); 
+            } catch (error) {
+                 console.error('Errore verifica admin:', error);
             }
         }
 
@@ -582,7 +579,7 @@
                 authSubmitBtn.innerHTML = isLoginMode ? 'Accedi' : 'Registrati';
             }
         });
-        
+
         // --- FUNZIONI DI LOGICA PRINCIPALE ---
         async function renderUserSelector() {
             const container = document.getElementById('user-selector-container');
@@ -621,8 +618,8 @@
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
                      <div class="flex items-center gap-2">
-                         ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
-                         ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
+                        ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
+                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
                     </div>
                 </div>
                 <select id="mesocycle-selector" class="input-field w-full">${options}</select>
@@ -682,7 +679,7 @@
                     <select id="sheet-selector" class="input-field flex-grow">${options}</select>
                     <div class="flex items-center gap-3">
                         ${currentUserRole === 'admin' ? `
-                        <button id="duplicate-sheet-btn" class="btn btn-secondary" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
+                        <button id="add-weeks-btn" class="btn btn-secondary" title="Aggiungi Settimane"><i class="fas fa-calendar-plus"></i></button> <button id="duplicate-sheet-btn" class="btn btn-secondary" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
                         <button id="delete-sheet-btn" class="btn btn-danger" title="Elimina Scheda"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
                 </div>
@@ -699,6 +696,7 @@
             if (currentUserRole === 'admin') {
                 document.getElementById('toggle-create-sheet-btn').addEventListener('click', () => document.getElementById('create-sheet-container').classList.toggle('open'));
                 document.getElementById('create-sheet-form').addEventListener('submit', handleCreateSheet);
+                document.getElementById('add-weeks-btn').addEventListener('click', handleAddWeeks); // NUOVO EVENT LISTENER
                 document.getElementById('duplicate-sheet-btn').addEventListener('click', handleDuplicateSheet);
                 document.getElementById('delete-sheet-btn').addEventListener('click', handleDeleteSheet);
             }
@@ -733,8 +731,8 @@
             currentSheetData = sheetDocSnap.data();
 
             renderWeekSelector();
-            renderWorkoutControls(); 
-            renderSpecificRecap();  
+            renderWorkoutControls();
+            renderSpecificRecap();
             if (currentUserRole === 'admin') {
                 renderAddExerciseForm();
             }
@@ -768,11 +766,11 @@
                     btn.classList.add('opacity-70', 'border-green-500/50');
                 }
                 btn.className = classes;
-                btn.onclick = () => { 
-                    currentWeek = i; 
-                    modifiedExercisesThisWeek = new Set();
-                    renderWeekSelector(); 
-                    renderExercises();
+                btn.onclick = () => {
+                     currentWeek = i;
+                     modifiedExercisesThisWeek = new Set();
+                    renderWeekSelector();
+                     renderExercises();
                     renderWorkoutControls();
                 };
                 container.appendChild(btn);
@@ -808,7 +806,6 @@
             let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Muscolare Totale</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
             
             const sortedGroups = Object.keys(volumeByMuscleGroup).sort();
-            
             let hasVolume = false;
             sortedGroups.forEach(group => {
                 const volume = Math.round(volumeByMuscleGroup[group] * 10) / 10;
@@ -819,14 +816,14 @@
             });
             
             if (!hasVolume) {
-                 summaryHTML = '';
+                summaryHTML = '';
             } else {
                 summaryHTML += `</div>`;
             }
 
             sheetVolumeSummaryContainer.innerHTML = summaryHTML;
         }
-        
+
         function renderExercises() {
             const exerciseContainer = document.getElementById('exercise-list-container');
             exerciseContainer.innerHTML = '';
@@ -837,7 +834,7 @@
             }
             calculateAndRenderSheetVolume();
         }
-        
+
         function createExerciseCard(ex) {
             const card = document.createElement('div');
             card.id = `ex-card-${ex.id}`;
@@ -878,7 +875,7 @@
                     </div>`;
             }
             seriesHTML += '</div>';
-            
+
             let imagesHTML = '';
             if (ex.imageUrl || ex.imageUrl2) {
                 imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
@@ -900,9 +897,9 @@
                         <p class="text-sm text-red-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
                         <p class="text-xs text-secondary mt-1">
                             <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
-                            <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} | 
-                            <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
-                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s |
+                             <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} | 
+                             <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
+                             <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s | 
                             <i class="fas fa-clock mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
                         </p>
                         ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
@@ -1051,6 +1048,43 @@
                 await renderSheetSelector();
             }
         }
+        
+        // NUOVA FUNZIONE per aggiungere settimane
+        async function handleAddWeeks() {
+            if (!currentSheetId || !currentSheetData) {
+                showNotification("Seleziona una scheda per aggiungere settimane.", "warning");
+                return;
+            }
+
+            const weeksToAddStr = prompt("Quante settimane vuoi aggiungere?");
+            if (!weeksToAddStr) return; // L'utente ha annullato
+
+            const weeksToAdd = parseInt(weeksToAddStr, 10);
+            if (isNaN(weeksToAdd) || weeksToAdd <= 0) {
+                showNotification("Inserisci un numero di settimane valido e positivo.", "error");
+                return;
+            }
+
+            const currentWeeks = currentSheetData.numeroSettimane || 0;
+            const newTotalWeeks = currentWeeks + weeksToAdd;
+
+            try {
+                const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
+                await updateDoc(sheetRef, { numeroSettimane: newTotalWeeks });
+
+                // Aggiorna lo stato locale
+                currentSheetData.numeroSettimane = newTotalWeeks;
+
+                // Aggiorna la UI
+                renderWeekSelector();
+
+                showNotification(`${weeksToAdd} settimana(e) aggiunta(e) con successo! Totale: ${newTotalWeeks}.`, "success");
+
+            } catch (error) {
+                console.error("Errore durante l'aggiunta di settimane:", error);
+                showNotification("Si è verificato un errore durante l'aggiornamento.", "error");
+            }
+        }
 
         async function uploadImage(file) {
             if (!file) return null;
@@ -1121,8 +1155,8 @@
         }
 
         async function handleSaveToFavorites(exercise) {
-            const { datiSettimanali, id, ...favData } = exercise; 
-            await addDoc(getFavoriteExercisesRef(), favData);
+            const { datiSettimanali, id, ...favData } = exercise;
+             await addDoc(getFavoriteExercisesRef(), favData);
             showNotification(`"${favData.nomeEsercizio}" salvato nei preferiti!`);
         }
 
@@ -1212,7 +1246,7 @@
                 calculateAndRenderSheetVolume();
             }
         }
-        
+
         // --- MODIFICA, RIORDINO E PREFERITI (MODAL) ---
         function openEditExerciseModal(exId) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
@@ -1221,34 +1255,34 @@
              const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
              container.innerHTML = `
                   <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
-                        <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
-                        <select name="categoria" class="input-field" required>${categoryOptions}</select>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                            <input type="number" name="serie" class="input-field" value="${exercise.serie || ''}" placeholder="N° Serie" required>
-                            <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}" placeholder="Reps (es. 8-12)">
-                            <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}" placeholder="RIR (es. 1-2)">
-                            <input type="text" name="tut" class="input-field" value="${exercise.tut || ''}" placeholder="TUT (es. 2-1-1)">
-                            <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}" placeholder="Recupero (s)">
-                        </div>
-                        <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
-                        <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
-                        <textarea name="note" class="textarea-field" placeholder="Note (opzionale)">${exercise.note || ''}</textarea>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-secondary">Immagine 1</label>
-                                <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
-                                <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                            </div>
-                            <div>
-                                <label class="text-sm text-secondary">Immagine 2</label>
-                                <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
-                                <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                            </div>
-                        </div>
-                       <div class="flex justify-end gap-4 pt-4">
-                          <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
-                          <button type="submit" class="btn">Salva Modifiche</button>
-                       </div>
+                      <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
+                      <select name="categoria" class="input-field" required>${categoryOptions}</select>
+                      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                          <input type="number" name="serie" class="input-field" value="${exercise.serie || ''}" placeholder="N° Serie" required>
+                          <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}" placeholder="Reps (es. 8-12)">
+                          <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}" placeholder="RIR (es. 1-2)">
+                          <input type="text" name="tut" class="input-field" value="${exercise.tut || ''}" placeholder="TUT (es. 2-1-1)">
+                          <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}" placeholder="Recupero (s)">
+                      </div>
+                      <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
+                      <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
+                      <textarea name="note" class="textarea-field" placeholder="Note (opzionale)">${exercise.note || ''}</textarea>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                              <label class="text-sm text-secondary">Immagine 1</label>
+                              <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
+                              <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                          </div>
+                          <div>
+                              <label class="text-sm text-secondary">Immagine 2</label>
+                              <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
+                              <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                          </div>
+                      </div>
+                     <div class="flex justify-end gap-4 pt-4">
+                        <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
+                        <button type="submit" class="btn">Salva Modifiche</button>
+                     </div>
                   </form>`;
             const editForm = document.getElementById('edit-exercise-form');
             const seriesInput = editForm.elements.serie;
@@ -1472,24 +1506,24 @@
         });
 
         // --- ESPORTAZIONE ---
-        function previewAndExportPDF() { 
-             if (!currentSheetId) return;
-             let content = `<h2>Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}</h2>`;
-             exercisesCache.forEach(ex => {
-                 content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
-             });
-             document.getElementById('pdf-preview-container').innerHTML = content;
-             pdfPreviewModal.classList.remove('hidden');
-             setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
+        function previewAndExportPDF() {
+              if (!currentSheetId) return;
+              let content = `<h2>Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}</h2>`;
+              exercisesCache.forEach(ex => {
+                   content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
+              });
+              document.getElementById('pdf-preview-container').innerHTML = content;
+              pdfPreviewModal.classList.remove('hidden');
+              setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
         }
         document.getElementById('download-pdf-btn').addEventListener('click', async () => {
-             const { jsPDF } = window.jspdf;
-             const pdf = new jsPDF();
-             const content = document.getElementById('pdf-preview-container');
-             const canvas = await html2canvas(content);
-             const imgData = canvas.toDataURL('image/png');
-             pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
-             pdf.save(`${currentSheetData.nomeScheda}.pdf`);
+              const { jsPDF } = window.jspdf;
+              const pdf = new jsPDF();
+              const content = document.getElementById('pdf-preview-container');
+              const canvas = await html2canvas(content);
+              const imgData = canvas.toDataURL('image/png');
+              pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+              pdf.save(`${currentSheetData.nomeScheda}.pdf`);
         });
         document.getElementById('close-pdf-preview-btn').addEventListener('click', () => {
             pdfPreviewModal.classList.add('opacity-0');
@@ -1505,8 +1539,7 @@
             container.innerHTML = `
                 <div class="bg-gradient-main p-3 rounded-lg border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div id="workout-recap-specific" class="text-sm text-secondary flex-grow text-center sm:text-left">
-                        <!-- Lo specchietto verrà caricato qui -->
-                    </div>
+                        </div>
                      <button id="mark-week-complete-btn" class="btn btn-secondary flex-shrink-0"><i class="fas fa-check mr-2"></i> Segna come Completato</button>
                 </div>`;
 
@@ -1597,15 +1630,15 @@
                     const lastDate = new Date(lastWorkout.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' });
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                             <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
-                             <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
-                             <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
+                               <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
+                               <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
+                               <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
                         </div>`;
                 } else {
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                             <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
-                             <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
+                               <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
+                               <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
                         </div>`;
                 }
 
@@ -1647,7 +1680,7 @@
              const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
              if (repsInput.value && caricoInput && caricoInput.value) {
                  clearProcrastinationTimer(exId);
-                 const delay = exercise.recupero * 2.5 * 1000;
+                 const delay = exercise.recupero * 2.5 * 1000; 
                  procrastinationTimers[exId] = setTimeout(() => {
                      procrastinationModal.classList.remove('hidden');
                      setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
@@ -1707,7 +1740,6 @@
                 </div>
                 <div id="volume-results-container" class="mt-6"></div>
             `;
-
             document.getElementById('calculate-volume-btn').addEventListener('click', () => calculateAndDisplayProjectedVolume(sheets));
         }
 
@@ -1785,7 +1817,6 @@
                         </thead>
                         <tbody class="divide-y divide-stone-800">
                 `;
-
             const sortedGroups = Object.keys(rotationVolumeData).sort();
             sortedGroups.forEach(group => {
                 const rotationSets = rotationVolumeData[group].totalSets;
