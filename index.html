@@ -82,6 +82,9 @@
         .intensity-glow { border-color: var(--text-accent); box-shadow: 0 0 15px 4px rgba(220, 38, 38, 0.4), inset 0 0 8px 1px rgba(220, 38, 38, 0.3); }
         .recap-card { background: linear-gradient(135deg, #4a044e, #1e1b4b); border: 1px solid #7e22ce; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .circuit-card { border-color: #f59e0b; background: linear-gradient(135deg, rgba(120, 53, 15, 0.2), rgba(28, 25, 23, 0.2)); }
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+        .image-grid .exercise-image { width: 100%; height: auto; aspect-ratio: 1 / 1; }
     </style>
 </head>
 <body class="antialiased">
@@ -113,6 +116,7 @@
         <div id="main-view"></div>
     </div>
 
+    <!-- Modals -->
     <div id="auth-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
             <h3 id="auth-title" class="text-xl font-bold text-white mb-4 text-center">Area Personale</h3>
@@ -302,8 +306,6 @@
         const volumeAnalysisModal = document.getElementById('volume-analysis-modal');
 
         let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, isLoginMode = true, selectedUserId = null, favoritesCache = [];
-        
-        // Variabili di stato per il timer e il tracciamento
         let activeTimerInterval = null, timerSeconds = 0, timerPaused = false;
         let procrastinationTimers = {};
         let modifiedExercisesThisWeek = new Set();
@@ -374,16 +376,12 @@
                                 console.log('Admin creato con successo!');
                                 await signOut(auth);
                             } catch (createError) { console.error('Errore creazione admin:', createError); }
-                        } else {
-                             console.error('Errore durante il setup dell\'admin:', error);
-                        }
+                        } else {                             console.error('Errore durante il setup dell\'admin:', error);                        }
                     }
                 } else {
                     console.log('Admin già presente nel sistema');
                 }
-            } catch (error) {
-                 console.error('Errore verifica admin:', error);
-            }
+            } catch (error) {                 console.error('Errore verifica admin:', error);            }
         }
 
         // --- GESTIONE UTENTE SELEZIONATO (ADMIN) ---
@@ -401,7 +399,6 @@
             renderAppView();
         }
         backToAdminBtn.addEventListener('click', deselectUser);
-        
         function resetState() {
             currentMesoId = null;
             currentSheetId = null;
@@ -450,7 +447,7 @@
         async function renderAppView() {
             userControls.innerHTML = `<div class="flex items-center gap-2"><span class="text-sm text-secondary hidden sm:block">Ciao, ${currentUser.email}</span><button id="logout-btn" class="btn btn-secondary">Logout</button></div>`;
             document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-            
+
             const isAdmin = currentUserRole === 'admin';
             mainView.innerHTML = `
                 <div class="space-y-6">
@@ -492,7 +489,7 @@
                         </div>
                     </div>` : ''}
                 </div>`;
-            
+
             renderLastWorkoutRecap();
             if (isAdmin && !selectedUserId) {
                 renderUserSelector();
@@ -605,7 +602,7 @@
                 container.innerHTML = '<p class="text-red-400 text-center">Errore durante il caricamento degli utenti.</p>';
             }
         }
-        
+
         async function renderMesocycleSelector() {
             const mesocycleContainer = document.getElementById('mesocycle-container');
             if (!mesocycleContainer) return;
@@ -692,11 +689,11 @@
                     </form>
                 </div>` : ''}`;
             document.getElementById('sheet-selector').addEventListener('change', (e) => selectSheet(e.target.value));
-            
+
             if (currentUserRole === 'admin') {
                 document.getElementById('toggle-create-sheet-btn').addEventListener('click', () => document.getElementById('create-sheet-container').classList.toggle('open'));
                 document.getElementById('create-sheet-form').addEventListener('submit', handleCreateSheet);
-                document.getElementById('add-weeks-btn').addEventListener('click', handleAddWeeks); // NUOVO EVENT LISTENER
+                document.getElementById('add-weeks-btn').addEventListener('click', handleAddWeeks);
                 document.getElementById('duplicate-sheet-btn').addEventListener('click', handleDuplicateSheet);
                 document.getElementById('delete-sheet-btn').addEventListener('click', handleDeleteSheet);
             }
@@ -705,17 +702,17 @@
         async function selectSheet(sheetId) {
             Object.values(procrastinationTimers).forEach(clearTimeout);
             procrastinationTimers = {};
-            
+
             const sheetContent = document.getElementById('sheet-content');
             const initialMessage = document.getElementById('initial-message');
-            
+
             if (!sheetId) {
                 sheetContent.classList.add('hidden');
                 initialMessage.classList.remove('hidden');
                 currentSheetId = null;
                 return;
             }
-            
+
             initialMessage.classList.add('hidden');
             sheetContent.classList.remove('hidden');
             currentSheetId = sheetId;
@@ -738,7 +735,6 @@
             }
             await loadAndRenderExercises();
         }
-
         async function loadAndRenderExercises() {
             const exerciseContainer = document.getElementById('exercise-list-container');
             exerciseContainer.innerHTML = '<div class="loader"></div>';
@@ -750,7 +746,6 @@
         }
 
         // --- RENDERING UI SPECIFICA ---
-        
         function renderWeekSelector() {
             const weekSelectorContainer = document.getElementById('week-selector-container');
             const numWeeks = currentSheetData.numeroSettimane || 1;
@@ -791,7 +786,6 @@
 
                 for (const group in MACROCYCLE_RULES) {
                     const rule = MACROCYCLE_RULES[group];
-                    
                     if (rule.main === categoria) {
                         volumeByMuscleGroup[group] += serie;
                     } else {
@@ -804,7 +798,6 @@
             });
 
             let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Muscolare Totale</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
-            
             const sortedGroups = Object.keys(volumeByMuscleGroup).sort();
             let hasVolume = false;
             sortedGroups.forEach(group => {
@@ -814,7 +807,7 @@
                     summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-secondary">${group}:</span> <span class="text-red-400 font-bold">${volume} serie</span></div>`;
                 }
             });
-            
+
             if (!hasVolume) {
                 summaryHTML = '';
             } else {
@@ -838,13 +831,16 @@
         function createExerciseCard(ex) {
             const card = document.createElement('div');
             card.id = `ex-card-${ex.id}`;
-            card.className = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
             
-            if (ex.tecnicheIntensita && ex.tecnicheIntensita.trim() !== '') {
-                card.classList.add('intensity-glow');
+            let cardClasses = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
+            if (ex.isCircuit) {
+                cardClasses += ' circuit-card';
+            } else if (ex.tecnicheIntensita && ex.tecnicheIntensita.trim() !== '') {
+                cardClasses += ' intensity-glow';
             } else {
-                card.classList.add('border-stone-800');
+                cardClasses += ' border-stone-800';
             }
+            card.className = cardClasses;
 
             let seriesHTML = '<div class="space-y-2 mt-2">';
             const weeklyData = ex.datiSettimanali?.[currentWeek] || [];
@@ -877,30 +873,37 @@
             seriesHTML += '</div>';
 
             let imagesHTML = '';
-            if (ex.imageUrl || ex.imageUrl2) {
-                imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
-                if (ex.imageUrl) {
-                    imagesHTML += `<div class="${ex.imageUrl2 ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+            const imageUrls = [ex.imageUrl, ex.imageUrl2, ex.imageUrl3, ex.imageUrl4].filter(url => url);
+            if (imageUrls.length > 0) {
+                if (imageUrls.length > 2) { // Use grid for 3 or 4 images
+                    imagesHTML += `<div class="image-grid">`;
+                    imageUrls.forEach(url => {
+                        imagesHTML += `<div><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                    });
+                    imagesHTML += `</div>`;
+                } else { // Use flex for 1 or 2 images
+                    imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
+                    imageUrls.forEach(url => {
+                        imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                    });
+                    imagesHTML += '</div>';
                 }
-                if (ex.imageUrl2) {
-                    imagesHTML += `<div class="${ex.imageUrl ? 'w-1/2' : 'w-1/2 max-w-[200px]'}"><img src="${ex.imageUrl2}" alt="${ex.nomeEsercizio} 2" class="exercise-image"></div>`;
-                }
-                imagesHTML += '</div>';
             }
 
             const repsDisplay = ex.ripetizioniPerSerie && ex.ripetizioniPerSerie.length > 0 ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '');
-            
+
             card.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div class="flex-grow pr-4">
-                        <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio}</h4>
+                        <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio} ${ex.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
                         <p class="text-sm text-red-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
                         <p class="text-xs text-secondary mt-1">
-                            <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
-                             <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} | 
-                             <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
-                             <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s | 
-                            <i class="fas fa-clock mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
+                            <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} |
+                            <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} |
+                            ${ex.isCircuit && ex.circuitTime ? `<i class="fas fa-clock mr-1 ml-2"></i> T: ${ex.circuitTime}s |` : ''}
+                            <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} |
+                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s |
+                            <i class="fas fa-stopwatch-20 mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
                         </p>
                         ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
                         ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2">${ex.note}</p>` : ''}
@@ -982,7 +985,28 @@
                             <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
                         </div>
                     </div>
-                    <button type="submit" class="btn w-full">Aggiungi Esercizio</button>
+                    <div class="mt-4">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500">
+                            <span class="text-secondary">È un circuito?</span>
+                        </label>
+                    </div>
+                    <div id="add-circuit-fields" class="hidden space-y-4 pt-4 border-t border-stone-700">
+                        <input type="number" name="circuitTime" class="input-field" placeholder="Tempo per round (secondi)">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-secondary">Immagine 3</label>
+                                <input type="url" name="imageUrl3" class="input-field mb-2" placeholder="URL Immagine 3">
+                                <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            </div>
+                            <div>
+                                <label class="text-sm text-secondary">Immagine 4</label>
+                                <input type="url" name="imageUrl4" class="input-field mb-2" placeholder="URL Immagine 4">
+                                <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn w-full !mt-6">Aggiungi Esercizio</button>
                 </form>`;
             
             const addForm = document.getElementById('add-exercise-form');
@@ -990,6 +1014,9 @@
                 const numSeries = parseInt(e.target.value, 10) || 0;
                 const container = addForm.querySelector('#add-ripetizioni-per-serie-container');
                 generateRepInputs(container, numSeries);
+            });
+            addForm.elements.isCircuit.addEventListener('change', (e) => {
+                document.getElementById('add-circuit-fields').classList.toggle('hidden', !e.target.checked);
             });
             addForm.addEventListener('submit', handleAddExercise);
         }
@@ -1048,8 +1075,7 @@
                 await renderSheetSelector();
             }
         }
-        
-        // NUOVA FUNZIONE per aggiungere settimane
+
         async function handleAddWeeks() {
             if (!currentSheetId || !currentSheetData) {
                 showNotification("Seleziona una scheda per aggiungere settimane.", "warning");
@@ -1057,8 +1083,7 @@
             }
 
             const weeksToAddStr = prompt("Quante settimane vuoi aggiungere?");
-            if (!weeksToAddStr) return; // L'utente ha annullato
-
+            if (!weeksToAddStr) return; 
             const weeksToAdd = parseInt(weeksToAddStr, 10);
             if (isNaN(weeksToAdd) || weeksToAdd <= 0) {
                 showNotification("Inserisci un numero di settimane valido e positivo.", "error");
@@ -1071,15 +1096,9 @@
             try {
                 const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
                 await updateDoc(sheetRef, { numeroSettimane: newTotalWeeks });
-
-                // Aggiorna lo stato locale
                 currentSheetData.numeroSettimane = newTotalWeeks;
-
-                // Aggiorna la UI
                 renderWeekSelector();
-
                 showNotification(`${weeksToAdd} settimana(e) aggiunta(e) con successo! Totale: ${newTotalWeeks}.`, "success");
-
             } catch (error) {
                 console.error("Errore durante l'aggiunta di settimane:", error);
                 showNotification("Si è verificato un errore durante l'aggiornamento.", "error");
@@ -1099,7 +1118,7 @@
                 return null;
             }
         }
-        
+
         async function handleAddExercise(e) {
             e.preventDefault();
             const form = e.target;
@@ -1112,6 +1131,15 @@
             const imageUrl1 = await uploadImage(imageFile1);
             const imageUrl2 = await uploadImage(imageFile2);
             
+            const isCircuit = form.elements.isCircuit.checked;
+            let imageUrl3 = null, imageUrl4 = null;
+            if (isCircuit) {
+                const imageFile3 = form.elements.imageFile3.files[0];
+                const imageFile4 = form.elements.imageFile4.files[0];
+                imageUrl3 = await uploadImage(imageFile3);
+                imageUrl4 = await uploadImage(imageFile4);
+            }
+
             const newExercise = {
                 nomeEsercizio: form.elements.nomeEsercizio.value,
                 categoria: form.elements.categoria.value,
@@ -1126,12 +1154,18 @@
                 imageUrl: imageUrl1 || form.elements.imageUrl.value || "",
                 imageUrl2: imageUrl2 || form.elements.imageUrl2.value || "",
                 ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
-                datiSettimanali: {}
+                datiSettimanali: {},
+                isCircuit: isCircuit,
+                circuitTime: isCircuit ? (parseInt(form.elements.circuitTime.value, 10) || null) : null,
+                imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
+                imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
             };
+
             await addDoc(getExercisesRef(currentMesoId, currentSheetId), newExercise);
             form.reset();
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Aggiungi Esercizio';
+            document.getElementById('add-circuit-fields').classList.add('hidden');
             document.getElementById('add-exercise-container').classList.remove('open');
             await loadAndRenderExercises();
             showNotification("Esercizio aggiunto!");
@@ -1142,29 +1176,27 @@
             if (currentIndex === -1) return;
             const otherIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
             if (otherIndex < 0 || otherIndex >= exercisesCache.length) return;
-            
+
             const [currentExercise, otherExercise] = [exercisesCache[currentIndex], exercisesCache[otherIndex]];
             const [currentOrder, otherOrder] = [currentExercise.ordine, otherExercise.ordine];
 
             const batch = writeBatch(db);
             batch.update(doc(getExercisesRef(currentMesoId, currentSheetId), currentExercise.id), { ordine: otherOrder });
             batch.update(doc(getExercisesRef(currentMesoId, currentSheetId), otherExercise.id), { ordine: currentOrder });
-            
+
             await batch.commit();
             await loadAndRenderExercises();
         }
-
         async function handleSaveToFavorites(exercise) {
             const { datiSettimanali, id, ...favData } = exercise;
              await addDoc(getFavoriteExercisesRef(), favData);
             showNotification(`"${favData.nomeEsercizio}" salvato nei preferiti!`);
         }
-
         mainView.addEventListener('input', (e) => {
             if (e.target.matches('input[data-ex-id]')) {
                 const { exId, serieIndex, field } = e.target.dataset;
                 const value = e.target.value;
-                const weekForSave = currentWeek; // CORREZIONE: Cattura la settimana al momento dell'input
+                const weekForSave = currentWeek;
                 const key = `${exId}-${weekForSave}-${serieIndex}-${field}`;
                 clearTimeout(saveTimeouts[key]);
                 saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value, weekForSave), 800);
@@ -1220,7 +1252,6 @@
                 openUserManagementModal();
             }
         });
-
         async function saveWeeklyData(exId, serieIndex, field, value, week) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
             if (!exercise) return;
@@ -1231,7 +1262,7 @@
 
             const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
             const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
-            
+
             const batch = writeBatch(db);
             batch.update(exerciseRef, { datiSettimanali: updatedDati });
             batch.update(sheetRef, { lastModified: new Date().toISOString() });
@@ -1239,8 +1270,7 @@
 
             exercise.datiSettimanali = updatedDati;
             currentSheetData.lastModified = new Date().toISOString();
-            
-            // CORREZIONE: Esegui il re-rendering solo se la settimana salvata è quella attualmente visualizzata
+
             if (week === currentWeek) {
                 renderSpecificRecap();
                 calculateAndRenderSheetVolume();
@@ -1279,6 +1309,27 @@
                               <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
                           </div>
                       </div>
+                      <div class="mt-4">
+                          <label class="flex items-center space-x-3 cursor-pointer">
+                              <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500" ${exercise.isCircuit ? 'checked' : ''}>
+                              <span class="text-secondary">È un circuito?</span>
+                          </label>
+                      </div>
+                      <div id="edit-circuit-fields" class="${exercise.isCircuit ? '' : 'hidden'} space-y-4 pt-4 border-t border-stone-700">
+                          <input type="number" name="circuitTime" class="input-field" value="${exercise.circuitTime || ''}" placeholder="Tempo per round (secondi)">
+                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                  <label class="text-sm text-secondary">Immagine 3</label>
+                                  <input type="url" name="imageUrl3" class="input-field mb-2" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
+                                  <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                              </div>
+                              <div>
+                                  <label class="text-sm text-secondary">Immagine 4</label>
+                                  <input type="url" name="imageUrl4" class="input-field mb-2" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
+                                  <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                              </div>
+                          </div>
+                      </div>
                      <div class="flex justify-end gap-4 pt-4">
                         <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
                         <button type="submit" class="btn">Salva Modifiche</button>
@@ -1287,13 +1338,17 @@
             const editForm = document.getElementById('edit-exercise-form');
             const seriesInput = editForm.elements.serie;
             const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
-            
+
             generateRepInputs(repsContainer, exercise.serie, exercise.ripetizioniPerSerie);
 
             seriesInput.addEventListener('input', (e) => {
                 const numSeries = parseInt(e.target.value, 10) || 0;
                 const currentValues = Array.from(repsContainer.querySelectorAll('input')).map(input => input.value);
                 generateRepInputs(repsContainer, numSeries, currentValues);
+            });
+            
+            editForm.elements.isCircuit.addEventListener('change', (e) => {
+                document.getElementById('edit-circuit-fields').classList.toggle('hidden', !e.target.checked);
             });
 
              editExerciseModal.classList.remove('hidden');
@@ -1317,7 +1372,15 @@
              const imageFile2 = form.elements.imageFile2.files[0];
              const imageUrl1 = await uploadImage(imageFile1);
              const imageUrl2 = await uploadImage(imageFile2);
-             const exercise = exercisesCache.find(ex => ex.id === exId);
+             
+             const isCircuit = form.elements.isCircuit.checked;
+             let imageUrl3 = null, imageUrl4 = null;
+             if (isCircuit) {
+                const imageFile3 = form.elements.imageFile3.files[0];
+                const imageFile4 = form.elements.imageFile4.files[0];
+                imageUrl3 = await uploadImage(imageFile3);
+                imageUrl4 = await uploadImage(imageFile4);
+             }
 
              const updatedData = {
                   nomeEsercizio: form.elements.nomeEsercizio.value,
@@ -1331,7 +1394,11 @@
                   note: form.elements.note.value,
                   imageUrl: imageUrl1 || form.elements.imageUrl.value,
                   imageUrl2: imageUrl2 || form.elements.imageUrl2.value,
-                  ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value)
+                  ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
+                  isCircuit: isCircuit,
+                  circuitTime: isCircuit ? (parseInt(form.elements.circuitTime.value, 10) || null) : null,
+                  imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
+                  imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
              };
              await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
              closeEditExerciseModal();
@@ -1365,7 +1432,6 @@
 
                     let bestSetThisWeek = { e1rm: 0, text: 'N/D' };
                     let setsHTML = '';
-                    
                     weekData.forEach((set, index) => {
                         if (set && set.carico && set.reps) {
                             const e1rm = calculateE1RM(set.carico, set.reps);
@@ -1410,7 +1476,6 @@
             exerciseHistoryModal.classList.remove('hidden');
             setTimeout(() => exerciseHistoryModal.classList.remove('opacity-0'), 10);
         }
-        
         document.getElementById('close-history-modal').addEventListener('click', () => {
             exerciseHistoryModal.classList.add('opacity-0');
             setTimeout(() => exerciseHistoryModal.classList.add('hidden'), 250);
@@ -1422,7 +1487,7 @@
             }
         });
 
-        // --- GESTIONE PREFERITI (RIPRISTINATO) ---
+        // --- GESTIONE PREFERITI ---
         function openFavoritesModal() {
             favoritesModal.classList.remove('hidden');
             setTimeout(() => favoritesModal.classList.remove('opacity-0'), 10);
@@ -1440,7 +1505,7 @@
         function renderFilteredFavorites(category) {
             const listContainer = document.getElementById('favorites-container');
             const filteredFavorites = category === 'all' ? favoritesCache : favoritesCache.filter(fav => fav.categoria === category);
-            
+
             const categories = [...new Set(favoritesCache.map(fav => fav.categoria))].sort();
             let categoryOptions = '<option value="all">Tutte le Categorie</option>';
             categories.forEach(cat => categoryOptions += `<option value="${cat}" ${category === cat ? 'selected' : ''}>${cat}</option>`);
@@ -1448,9 +1513,9 @@
             let favoritesHTML = filteredFavorites.map(fav => `
                 <div class="bg-stone-800/50 p-4 rounded-lg flex flex-col">
                     <div class="flex-grow">
-                        <h4 class="font-bold text-white">${fav.nomeEsercizio}</h4>
+                        <h4 class="font-bold text-white">${fav.nomeEsercizio} ${fav.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
                         <p class="text-sm text-red-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
-                        <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
+                        <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} ${fav.isCircuit && fav.circuitTime ? `| Tempo: ${fav.circuitTime}s` : ''} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
                         ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">${fav.note}</p>` : ''}
                     </div>
                     <div class="flex justify-end gap-2 mt-auto pt-2">
@@ -1477,7 +1542,6 @@
                 renderFilteredFavorites(e.target.value);
             }
         });
-        
         favoritesModal.addEventListener('click', async (e) => {
              if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
                  favoritesModal.classList.add('opacity-0');
@@ -1487,7 +1551,7 @@
 
              const addBtn = e.target.closest('button[data-add-fav-ex-id]');
              const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
-             
+
              if (addBtn && currentSheetId) {
                  const fav = favoritesCache.find(f => f.id === addBtn.dataset.addFavExId);
                  if (fav) {
@@ -1530,12 +1594,10 @@
             setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
         });
 
-
         // --- NUOVE FUNZIONALITÀ ---
         function renderWorkoutControls() {
             const container = document.getElementById('workout-controls-container');
             if (!container || !currentSheetData) return;
-            
             container.innerHTML = `
                 <div class="bg-gradient-main p-3 rounded-lg border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div id="workout-recap-specific" class="text-sm text-secondary flex-grow text-center sm:text-left">
@@ -1573,10 +1635,8 @@
                 try {
                     const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
                     await updateDoc(sheetRef, { completedWeeks: updatedCompletedWeeks });
-                    
                     currentSheetData.completedWeeks = updatedCompletedWeeks;
                     showNotification(`Settimana ${currentWeek} completata!`, "success");
-                    
                     renderWeekSelector();
                     renderWorkoutControls();
                     renderLastWorkoutRecap();
@@ -1587,7 +1647,6 @@
                 }
             }
         }
-
 
         async function renderLastWorkoutRecap() {
             const container = document.getElementById('last-workout-container');
@@ -1600,7 +1659,6 @@
                 const mesocyclesSnapshot = await getDocs(mesocyclesRef);
 
                 let lastWorkout = null;
-
                 for (const mesoDoc of mesocyclesSnapshot.docs) {
                     const sheetsRef = collection(mesoDoc.ref, 'trainingSheets');
                     const sheetsSnapshot = await getDocs(sheetsRef);
@@ -1648,7 +1706,6 @@
             }
         }
 
-
         function renderSpecificRecap() {
             const container = document.getElementById('workout-recap-specific');
             if (!container) return;
@@ -1659,19 +1716,16 @@
                 container.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Nessuna modifica ancora registrata.';
             }
         }
-
         function calculate1RMEstimate(reps) {
             if (!reps || reps <= 0) return `~% 1RM`;
             const percentage = (1 / (1 + reps / 30)) * 100;
             if (percentage > 100) return `>100%`;
             return `~${Math.round(percentage)}%`;
         }
-        
         const calculateE1RM = (carico, reps) => {
             if (!carico || !reps) return 0;
             return parseFloat(carico) * (1 + parseInt(reps) / 30);
         }
-
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
              if (!exercise || !exercise.recupero || serieIndex >= exercise.serie - 1) return;
@@ -1680,8 +1734,8 @@
              const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
              if (repsInput.value && caricoInput && caricoInput.value) {
                  clearProcrastinationTimer(exId);
-                 const delay = exercise.recupero * 2.5 * 1000; 
-                 procrastinationTimers[exId] = setTimeout(() => {
+                 const delay = exercise.recupero * 2.5 * 1000;
+                  procrastinationTimers[exId] = setTimeout(() => {
                      procrastinationModal.classList.remove('hidden');
                      setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
                      delete procrastinationTimers[exId];
@@ -1710,7 +1764,6 @@
             container.innerHTML = '<div class="loader"></div>';
             volumeAnalysisModal.classList.remove('hidden');
             setTimeout(() => volumeAnalysisModal.classList.remove('opacity-0'), 10);
-            
             const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione")));
             const sheets = sheetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -1723,7 +1776,6 @@
                     </label>
                 `).join('');
             }
-            
             container.innerHTML = `
                 <div class="bg-stone-900/50 p-4 rounded-lg">
                     <h4 class="font-bold text-white mb-3">1. Imposta Frequenza Settimanale</h4>
@@ -1760,7 +1812,6 @@
             }
 
             const multiplier = workoutsPerWeek / selectedSheetIds.length;
-            
             const allExercisesPromises = selectedSheetIds.map(sheetId => getDocs(getExercisesRef(currentMesoId, sheetId)));
             const allExercisesSnapshots = await Promise.all(allExercisesPromises);
             const allExercises = allExercisesSnapshots.flatMap(snapshot => snapshot.docs.map(doc => doc.data()));
@@ -1823,7 +1874,6 @@
                 if (rotationSets > 0) {
                     const actualWeeklyVolume = rotationSets * multiplier;
                     const monthlySets = (actualWeeklyVolume * weeksInMonth).toFixed(1);
-                    
                     let compositionHTML = Object.entries(rotationVolumeData[group].composition).map(([cat, data]) => {
                         const contribution = (data.sets * (data.percentage / 100)).toFixed(1);
                         return `<div>${cat}: ${data.sets} serie (${data.percentage}%) = <b>${contribution}</b></div>`;
