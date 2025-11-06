@@ -188,16 +188,15 @@
         </div>
     </div>
 
+    <!-- Modified Timer Modal Structure -->
     <div id="timer-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
-            <h3 class="text-xl font-bold text-white mb-4 text-center">Timer Recupero</h3>
-            <div class="timer-display text-red-500 text-center mb-6" id="timer-display">00:00</div>
-            <div class="flex justify-center gap-4">
-                <button id="timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
-                <button id="timer-stop-btn" class="btn btn-danger"><i class="fas fa-stop"></i> Ferma</button>
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800" id="timer-modal-content-wrapper">
+            <div id="timer-modal-content">
+                <!-- Simple or Interval Timer Content is injected here -->
             </div>
         </div>
     </div>
+    <!-- End Modified Timer Modal Structure -->
 
     <div id="pdf-preview-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
@@ -247,6 +246,8 @@
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
         // --- CONFIGURAZIONE FIREBASE ---
+        // Le tue chiavi e config dovrebbero essere dinamiche o fornite dall'ambiente in un'app reale.
+        // Manteniamo questa configurazione per l'ambiente canvas:
         const firebaseConfig = {
             apiKey: "AIzaSyBpzZN8VmrRKW60rW1WprEzgXyhhATzaPs",
             authDomain: "apppalestrasuper.firebaseapp.com",
@@ -309,6 +310,19 @@
         let activeTimerInterval = null, timerSeconds = 0, timerPaused = false;
         let procrastinationTimers = {};
         let modifiedExercisesThisWeek = new Set();
+        
+        // Stato per il nuovo Interval Timer
+        let intervalTimer = {
+            interval: null,
+            totalSeconds: 0,
+            currentPhase: 'WORK',
+            workTime: 0,
+            restTime: 0,
+            currentRound: 0,
+            totalRounds: 0,
+            exerciseName: ''
+        };
+
 
         // --- GESTIONE TEMA ---
         function applyTheme(theme) {
@@ -320,40 +334,169 @@
         themeToggleBtn.addEventListener('click', () => applyTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light'));
         applyTheme(localStorage.getItem('theme') || 'dark');
 
-        // --- GESTIONE TIMER RECUPERO ---
+        // --- GESTIONE TIMER RECUPERO SEMPLICE ---
+        function renderSimpleTimerModal() {
+            document.getElementById('timer-modal-content').innerHTML = `
+                <h3 class="text-xl font-bold text-white mb-4 text-center">Timer Recupero</h3>
+                <div class="timer-display text-red-500 text-center mb-6" id="simple-timer-display">00:00</div>
+                <div class="flex justify-center gap-4">
+                    <button id="simple-timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
+                    <button id="simple-timer-stop-btn" class="btn btn-danger"><i class="fas fa-stop"></i> Ferma</button>
+                </div>
+            `;
+            // Rebind listeners
+            document.getElementById('simple-timer-pause-btn').addEventListener('click', toggleSimpleTimerPause);
+            document.getElementById('simple-timer-stop-btn').addEventListener('click', stopSimpleTimer);
+        }
+
         function startTimerModal(duration) {
+            renderSimpleTimerModal(); // Initialize simple timer UI
+            const display = document.getElementById('simple-timer-display');
+            if (!display) return; 
+
             timerSeconds = duration;
             timerPaused = false;
-            updateTimerDisplay();
+            display.textContent = `${Math.floor(duration / 60).toString().padStart(2, '0')}:${(duration % 60).toString().padStart(2, '0')}`;
+            
             timerModal.classList.remove('hidden');
             setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
+            
             if (activeTimerInterval) clearInterval(activeTimerInterval);
             activeTimerInterval = setInterval(() => {
                 if (!timerPaused && timerSeconds > 0) {
                     timerSeconds--;
-                    updateTimerDisplay();
+                    const minutes = Math.floor(timerSeconds / 60);
+                    const seconds = timerSeconds % 60;
+                    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 } else if (timerSeconds <= 0) {
-                    clearInterval(activeTimerInterval);
+                    stopSimpleTimer();
                     showNotification("Timer completato!");
-                    timerModal.classList.add('opacity-0');
-                    setTimeout(() => timerModal.classList.add('hidden'), 250);
                 }
             }, 1000);
         }
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            document.getElementById('timer-display').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-        document.getElementById('timer-pause-btn').addEventListener('click', () => {
+
+        function toggleSimpleTimerPause() {
             timerPaused = !timerPaused;
-            document.getElementById('timer-pause-btn').innerHTML = timerPaused ? '<i class="fas fa-play"></i> Riprendi' : '<i class="fas fa-pause"></i> Pausa';
-        });
-        document.getElementById('timer-stop-btn').addEventListener('click', () => {
+            document.getElementById('simple-timer-pause-btn').innerHTML = timerPaused ? '<i class="fas fa-play"></i> Riprendi' : '<i class="fas fa-pause"></i> Pausa';
+        }
+
+        function stopSimpleTimer() {
             clearInterval(activeTimerInterval);
             timerModal.classList.add('opacity-0');
             setTimeout(() => timerModal.classList.add('hidden'), 250);
-        });
+        }
+
+
+        // --- GESTIONE TIMER CIRCUITO A INTERVALLI ---
+        function startIntervalCircuitTimer(ex) {
+            if (!ex.circuitWorkTime || !ex.circuitRestTime || ex.serie === 0) {
+                showNotification("Dati circuito non validi. Controlla Tempo Lavoro e Tempo Rec tra Round.", "error");
+                return;
+            }
+            
+            intervalTimer.workTime = ex.circuitWorkTime;
+            intervalTimer.restTime = ex.circuitRestTime;
+            intervalTimer.totalRounds = ex.serie;
+            intervalTimer.currentRound = 1;
+            intervalTimer.exerciseName = ex.nomeEsercizio;
+
+            document.getElementById('timer-modal-content').innerHTML = `
+                <h3 class="text-xl font-bold text-white mb-4 text-center">Circuito: ${ex.nomeEsercizio}</h3>
+                <p class="text-stone-300 text-center mb-2" id="timer-phase-display"></p>
+                <div class="timer-display text-red-500 text-center mb-6" id="circuit-timer-display">00:00</div>
+                <p class="text-sm text-center text-secondary mb-4" id="timer-round-display">Round 1 / ${ex.serie}</p>
+                <div class="flex justify-center gap-4">
+                    <button id="circuit-timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
+                    <button id="circuit-timer-stop-btn" class="btn btn-danger"><i class="fas fa-stop"></i> Ferma</button>
+                </div>
+            `;
+
+            document.getElementById('circuit-timer-stop-btn').onclick = stopIntervalTimer;
+            document.getElementById('circuit-timer-pause-btn').onclick = toggleIntervalPause;
+
+            timerModal.classList.remove('hidden');
+            setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
+
+            if (intervalTimer.interval) clearInterval(intervalTimer.interval);
+            startPhase('WORK');
+        }
+
+        function stopIntervalTimer() {
+            clearInterval(intervalTimer.interval);
+            intervalTimer.interval = null; // Reset state
+            timerModal.classList.add('opacity-0');
+            setTimeout(() => timerModal.classList.add('hidden'), 250);
+        }
+
+        function toggleIntervalPause() {
+            const btn = document.getElementById('circuit-timer-pause-btn');
+            if (intervalTimer.interval) {
+                clearInterval(intervalTimer.interval);
+                intervalTimer.interval = null;
+                btn.innerHTML = '<i class="fas fa-play"></i> Riprendi';
+            } else {
+                runIntervalTimer();
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pausa';
+            }
+        }
+
+        function startPhase(phase) {
+            intervalTimer.currentPhase = phase;
+            const duration = phase === 'WORK' ? intervalTimer.workTime : intervalTimer.restTime;
+            intervalTimer.totalSeconds = duration;
+            
+            const display = document.getElementById('circuit-timer-display');
+            const phaseDisplay = document.getElementById('timer-phase-display');
+            
+            if (phase === 'WORK') {
+                display.classList.remove('text-green-500');
+                display.classList.add('text-red-500');
+                phaseDisplay.textContent = 'FASE DI LAVORO';
+            } else {
+                display.classList.remove('text-red-500');
+                display.classList.add('text-green-500');
+                phaseDisplay.textContent = 'RECUPERO TRA ROUND';
+            }
+            
+            if (intervalTimer.interval) clearInterval(intervalTimer.interval);
+            runIntervalTimer();
+        }
+
+        function runIntervalTimer() {
+            function updateDisplay() {
+                const minutes = Math.floor(intervalTimer.totalSeconds / 60);
+                const seconds = intervalTimer.totalSeconds % 60;
+                document.getElementById('circuit-timer-display').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (intervalTimer.totalSeconds <= 0) {
+                    handlePhaseEnd();
+                } else {
+                    intervalTimer.totalSeconds--;
+                }
+            }
+
+            intervalTimer.interval = setInterval(updateDisplay, 1000);
+        }
+
+        function handlePhaseEnd() {
+            clearInterval(intervalTimer.interval);
+            showNotification(intervalTimer.currentPhase === 'WORK' ? 'Tempo di lavoro scaduto!' : 'Recupero finito!');
+            
+            if (intervalTimer.currentPhase === 'WORK') {
+                if (intervalTimer.currentRound < intervalTimer.totalRounds) {
+                    startPhase('REST');
+                } else {
+                    showNotification(`Circuito ${intervalTimer.exerciseName} completato!`);
+                    stopIntervalTimer();
+                }
+            } else if (intervalTimer.currentPhase === 'REST') {
+                intervalTimer.currentRound++;
+                document.getElementById('timer-round-display').textContent = `Round ${intervalTimer.currentRound} / ${intervalTimer.totalRounds}`;
+                showNotification(`Inizia Round ${intervalTimer.currentRound}!`);
+                startPhase('WORK');
+            }
+        }
+        // --- FINE GESTIONE TIMER CIRCUITO A INTERVALLI ---
 
         // --- VERIFICA E IMPOSTAZIONE ADMIN ---
         async function setupAdminAccount() {
@@ -376,12 +519,16 @@
                                 console.log('Admin creato con successo!');
                                 await signOut(auth);
                             } catch (createError) { console.error('Errore creazione admin:', createError); }
-                        } else {                             console.error('Errore durante il setup dell\'admin:', error);                        }
+                        } else {
+                            console.error('Errore durante il setup dell\'admin:', error);
+                        }
                     }
                 } else {
                     console.log('Admin già presente nel sistema');
                 }
-            } catch (error) {                 console.error('Errore verifica admin:', error);            }
+            } catch (error) {
+                console.error('Errore verifica admin:', error);
+            }
         }
 
         // --- GESTIONE UTENTE SELEZIONATO (ADMIN) ---
@@ -489,7 +636,6 @@
                         </div>
                     </div>` : ''}
                 </div>`;
-
             renderLastWorkoutRecap();
             if (isAdmin && !selectedUserId) {
                 renderUserSelector();
@@ -615,8 +761,8 @@
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
                      <div class="flex items-center gap-2">
-                        ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
-                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
+                         ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
+                         ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
                     </div>
                 </div>
                 <select id="mesocycle-selector" class="input-field w-full">${options}</select>
@@ -831,7 +977,7 @@
         function createExerciseCard(ex) {
             const card = document.createElement('div');
             card.id = `ex-card-${ex.id}`;
-            
+                         
             let cardClasses = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
             if (ex.isCircuit) {
                 cardClasses += ' circuit-card';
@@ -843,14 +989,29 @@
             card.className = cardClasses;
 
             let seriesHTML = '<div class="space-y-2 mt-2">';
-            const weeklyData = ex.datiSettimanali?.[currentWeek] || [];
-            const prevWeeklyData = ex.datiSettimanali?.[currentWeek - 1] || [];
+            
+            // Check if it's the old format (just an array) or new format (object)
+            let weeklyData = ex.datiSettimanali?.[currentWeek] || {};
+            if (Array.isArray(weeklyData)) {
+                // Migrate old array structure to new object structure (in memory for reading)
+                weeklyData = { userNote: '', sets: weeklyData };
+            }
+
+            const setDataArray = weeklyData.sets || [];
+            const userNoteContent = weeklyData.userNote || ''; // Get user note
+
+            const prevWeeklyDataRaw = ex.datiSettimanali?.[currentWeek - 1] || {};
+            const prevSetDataArray = (Array.isArray(prevWeeklyDataRaw) ? prevWeeklyDataRaw : prevWeeklyDataRaw.sets) || []; // Handle previous week format
+
             const targetReps = ex.ripetizioniPerSerie || [];
+            
             for (let i = 0; i < ex.serie; i++) {
-                let setData = weeklyData[i] || { carico: '', reps: '' };
-                const prevSetData = prevWeeklyData[i] || null;
+                let setData = setDataArray[i] || { carico: '', reps: '' };
+                const prevSetData = prevSetDataArray[i] || null;
                 const targetRep = targetReps[i] || ex.ripetizioni || '';
-                if (currentWeek > 1 && !setData.carico && prevSetData?.carico && prevSetData?.reps) {
+                
+                // Logic for progressive overload suggestion (only for non-circuit)
+                if (!ex.isCircuit && currentWeek > 1 && !setData.carico && prevSetData?.carico && prevSetData?.reps) {
                     const repRange = (targetRep.toString() || "").split('-').map(Number);
                     const maxReps = repRange.length > 1 ? repRange[1] : repRange[0];
                     if (parseInt(prevSetData.reps, 10) >= maxReps) {
@@ -859,16 +1020,26 @@
                         setData.carico = prevSetData.carico;
                     }
                 }
+                
                 let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
+                
+                // Determine timer button action
+                let timerButton;
+                if (ex.isCircuit) {
+                    timerButton = `<button class="btn btn-secondary !p-2 text-xs" data-circuit-ex-id="${ex.id}" title="Avvia Timer Circuito"><i class="fas fa-stopwatch-20"></i></button>`;
+                } else {
+                    timerButton = `<button class="btn btn-secondary !p-2 text-xs" data-timer="${ex.recupero}" title="Avvia timer recupero"><i class="fas fa-stopwatch"></i></button>`;
+                }
+
                 seriesHTML += `
-                    ${prevWeekHint}
-                    <div class="grid grid-cols-5 items-center gap-2">
-                        <span class="font-semibold text-secondary text-sm">S ${i + 1} (${targetRep})</span>
-                        <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
-                        <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
-                        <span class="text-xs text-center text-red-400 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
-                        <button class="btn btn-secondary !p-2 text-xs" data-timer="${ex.recupero}" title="Avvia timer"><i class="fas fa-stopwatch"></i></button>
-                    </div>`;
+                        ${prevWeekHint}
+                        <div class="grid grid-cols-5 items-center gap-2">
+                            <span class="font-semibold text-secondary text-sm">S ${i + 1} (${targetRep})</span>
+                            <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
+                            <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
+                            <span class="text-xs text-center text-red-400 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
+                            ${timerButton}
+                        </div>`;
             }
             seriesHTML += '</div>';
 
@@ -878,13 +1049,13 @@
                 if (imageUrls.length > 2) { // Use grid for 3 or 4 images
                     imagesHTML += `<div class="image-grid">`;
                     imageUrls.forEach(url => {
-                        imagesHTML += `<div><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                        imagesHTML += `<div><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
                     });
                     imagesHTML += `</div>`;
                 } else { // Use flex for 1 or 2 images
                     imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
                     imageUrls.forEach(url => {
-                        imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image"></div>`;
+                        imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
                     });
                     imagesHTML += '</div>';
                 }
@@ -898,18 +1069,19 @@
                         <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio} ${ex.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
                         <p class="text-sm text-red-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
                         <p class="text-xs text-secondary mt-1">
-                            <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} |
+                            <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
                             <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} |
-                            ${ex.isCircuit && ex.circuitTime ? `<i class="fas fa-clock mr-1 ml-2"></i> T: ${ex.circuitTime}s |` : ''}
-                            <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} |
-                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s |
+                            ${ex.isCircuit ? `<i class="fas fa-clock mr-1 ml-2"></i> Lavoro: ${ex.circuitWorkTime || '-'}s | Rec Round: ${ex.circuitRestTime || '-'}s |` : ''}
+                            <i class="fas fa-fire mr-1 ml-2"></i> RIR: ${ex.rir || '-'} | 
+                            <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s | 
                             <i class="fas fa-stopwatch-20 mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
                         </p>
                         ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
-                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2">${ex.note}</p>` : ''}
+                        
+                        <!-- Coach Note (Persistent) -->
+                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2"><i class="fas fa-comment-dots mr-1 text-red-400"></i><span class="font-semibold text-red-400">Nota Coach (Persistente):</span> ${ex.note}</p>` : ''}
                     </div>
                     <div class="flex items-start gap-2">
-                        ${currentUserRole === 'admin' ? `
                         <div class="flex flex-col gap-1">
                             <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="up" title="Sposta su"><i class="fas fa-arrow-up"></i></button>
                             <button class="btn btn-secondary !p-1 reorder-btn" data-reorder-ex-id="${ex.id}" data-direction="down" title="Sposta giù"><i class="fas fa-arrow-down"></i></button>
@@ -919,12 +1091,18 @@
                             <button class="btn btn-secondary !p-2" data-edit-ex-id="${ex.id}" title="Modifica"><i class="fas fa-edit"></i></button>
                             <button class="btn btn-secondary !p-2" data-history-ex-id="${ex.id}" title="Storico"><i class="fas fa-chart-line"></i></button>
                             <button class="btn btn-danger !p-2" data-delete-ex-id="${ex.id}" title="Elimina"><i class="fas fa-trash"></i></button>
-                        </div>` : ''}
+                        </div>
                     </div>
                 </div>
                 ${imagesHTML}
-                ${seriesHTML}`;
-            
+                ${seriesHTML}
+                <!-- User Note (Weekly) -->
+                <div class="mt-4 pt-3 border-t border-stone-800">
+                    <label for="user-note-${ex.id}" class="text-xs text-secondary mb-1 block font-semibold">La tua Nota (Settimana ${currentWeek}, privata):</label>
+                    <textarea id="user-note-${ex.id}" class="textarea-field !p-2 text-sm" data-ex-id="${ex.id}" data-field="userNote" placeholder="Es. Sentito bene, aumento il carico prossima settimana">${userNoteContent}</textarea>
+                </div>
+                `;
+                         
             const repsInputs = card.querySelectorAll('input[data-field="reps"]');
             repsInputs.forEach(input => {
                 const reps = parseInt(input.value, 10);
@@ -972,7 +1150,7 @@
                     </div>
                     <div id="add-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
                     <input type="text" name="tecnicheIntensita" class="input-field" placeholder="Tecnica di Intensità (es. Dropset)">
-                    <textarea name="note" class="textarea-field" placeholder="Note (opzionale)"></textarea>
+                    <textarea name="note" class="textarea-field" placeholder="Nota Coach (Opzionale - persistente ogni settimana)"></textarea>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="text-sm text-secondary">Immagine 1</label>
@@ -991,8 +1169,12 @@
                             <span class="text-secondary">È un circuito?</span>
                         </label>
                     </div>
+                    <!-- Nuovi campi per Circuito -->
                     <div id="add-circuit-fields" class="hidden space-y-4 pt-4 border-t border-stone-700">
-                        <input type="number" name="circuitTime" class="input-field" placeholder="Tempo per round (secondi)">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="number" name="circuitWorkTime" class="input-field" placeholder="Tempo Lavoro per round (secondi)">
+                            <input type="number" name="circuitRestTime" class="input-field" placeholder="Recupero tra Round (secondi)">
+                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-sm text-secondary">Immagine 3</label>
@@ -1083,7 +1265,7 @@
             }
 
             const weeksToAddStr = prompt("Quante settimane vuoi aggiungere?");
-            if (!weeksToAddStr) return; 
+            if (!weeksToAddStr) return;
             const weeksToAdd = parseInt(weeksToAddStr, 10);
             if (isNaN(weeksToAdd) || weeksToAdd <= 0) {
                 showNotification("Inserisci un numero di settimane valido e positivo.", "error");
@@ -1130,14 +1312,19 @@
             const imageFile2 = form.elements.imageFile2.files[0];
             const imageUrl1 = await uploadImage(imageFile1);
             const imageUrl2 = await uploadImage(imageFile2);
-            
+                          
             const isCircuit = form.elements.isCircuit.checked;
             let imageUrl3 = null, imageUrl4 = null;
+            let circuitWorkTime = null, circuitRestTime = null;
+
             if (isCircuit) {
                 const imageFile3 = form.elements.imageFile3.files[0];
                 const imageFile4 = form.elements.imageFile4.files[0];
                 imageUrl3 = await uploadImage(imageFile3);
                 imageUrl4 = await uploadImage(imageFile4);
+                
+                circuitWorkTime = parseInt(form.elements.circuitWorkTime.value, 10) || null;
+                circuitRestTime = parseInt(form.elements.circuitRestTime.value, 10) || null;
             }
 
             const newExercise = {
@@ -1150,19 +1337,21 @@
                 tut: form.elements.tut.value || "",
                 recupero: parseInt(form.elements.recupero.value, 10) || null,
                 tecnicheIntensita: form.elements.tecnicheIntensita.value || "",
-                note: form.elements.note.value || "",
+                note: form.elements.note.value || "", // Coach/Persistent Note
                 imageUrl: imageUrl1 || form.elements.imageUrl.value || "",
                 imageUrl2: imageUrl2 || form.elements.imageUrl2.value || "",
                 ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
                 datiSettimanali: {},
                 isCircuit: isCircuit,
-                circuitTime: isCircuit ? (parseInt(form.elements.circuitTime.value, 10) || null) : null,
+                circuitWorkTime: circuitWorkTime, // New circuit field
+                circuitRestTime: circuitRestTime, // New circuit field
                 imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
                 imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
             };
 
             await addDoc(getExercisesRef(currentMesoId, currentSheetId), newExercise);
             form.reset();
+            document.getElementById('add-ripetizioni-per-serie-container').innerHTML = ''; // Clear reps per series
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Aggiungi Esercizio';
             document.getElementById('add-circuit-fields').classList.add('hidden');
@@ -1192,14 +1381,17 @@
              await addDoc(getFavoriteExercisesRef(), favData);
             showNotification(`"${favData.nomeEsercizio}" salvato nei preferiti!`);
         }
+        
         mainView.addEventListener('input', (e) => {
             if (e.target.matches('input[data-ex-id]')) {
                 const { exId, serieIndex, field } = e.target.dataset;
                 const value = e.target.value;
                 const weekForSave = currentWeek;
+                
+                // Clear set-specific timeout
                 const key = `${exId}-${weekForSave}-${serieIndex}-${field}`;
                 clearTimeout(saveTimeouts[key]);
-                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, serieIndex, field, value, weekForSave), 800);
+                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, parseInt(serieIndex, 10), field, value, weekForSave), 800);
 
                 if (field === 'reps') {
                     const card = e.target.closest('.bg-gradient-main');
@@ -1211,6 +1403,15 @@
                 } else if (field === 'carico') {
                     clearProcrastinationTimer(exId);
                 }
+            } else if (e.target.matches('textarea[data-ex-id][data-field="userNote"]')) {
+                const { exId, field } = e.target.dataset;
+                const value = e.target.value;
+                const weekForSave = currentWeek;
+
+                // Clear userNote timeout (no serieIndex here)
+                const key = `${exId}-${weekForSave}-userNote`;
+                clearTimeout(saveTimeouts[key]);
+                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, null, field, value, weekForSave), 800);
             }
         });
 
@@ -1219,6 +1420,7 @@
             const editBtn = e.target.closest('button[data-edit-ex-id]');
             const deleteBtn = e.target.closest('button[data-delete-ex-id]');
             const timerBtn = e.target.closest('button[data-timer]');
+            const circuitTimerBtn = e.target.closest('button[data-circuit-ex-id]');
             const saveFavBtn = e.target.closest('button[data-save-fav-ex-id]');
             const historyBtn = e.target.closest('button[data-history-ex-id]');
 
@@ -1237,6 +1439,9 @@
             } else if (timerBtn) {
                 const time = parseInt(timerBtn.dataset.timer, 10);
                 if (time) startTimerModal(time);
+            } else if (circuitTimerBtn) {
+                const exercise = exercisesCache.find(ex => ex.id === circuitTimerBtn.dataset.circuitExId);
+                if (exercise) startIntervalCircuitTimer(exercise);
             } else if (saveFavBtn) {
                 const exerciseToSave = exercisesCache.find(ex => ex.id === saveFavBtn.dataset.saveFavExId);
                 if (exerciseToSave) await handleSaveToFavorites(exerciseToSave);
@@ -1252,13 +1457,28 @@
                 openUserManagementModal();
             }
         });
+
         async function saveWeeklyData(exId, serieIndex, field, value, week) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
             if (!exercise) return;
+
             const updatedDati = JSON.parse(JSON.stringify(exercise.datiSettimanali || {}));
-            if (!updatedDati[week]) updatedDati[week] = [];
-            while (updatedDati[week].length <= serieIndex) updatedDati[week].push({ carico: '', reps: '' });
-            updatedDati[week][serieIndex][field] = value;
+            
+            // Handle old array format by normalizing
+            if (Array.isArray(updatedDati[week])) {
+                updatedDati[week] = { userNote: '', sets: updatedDati[week] };
+            }
+            if (!updatedDati[week]) updatedDati[week] = { userNote: '', sets: [] };
+
+            if (field === 'carico' || field === 'reps') {
+                const setArray = updatedDati[week].sets;
+                while (setArray.length <= serieIndex) setArray.push({ carico: '', reps: '' });
+                setArray[serieIndex][field] = value;
+            } else if (field === 'userNote') {
+                updatedDati[week].userNote = value;
+            } else {
+                return; // Non-handled field
+            }
 
             const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
             const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
@@ -1284,82 +1504,86 @@
              const container = document.getElementById('edit-exercise-container');
              const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
              container.innerHTML = `
-                  <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
-                      <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
-                      <select name="categoria" class="input-field" required>${categoryOptions}</select>
-                      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                          <input type="number" name="serie" class="input-field" value="${exercise.serie || ''}" placeholder="N° Serie" required>
-                          <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}" placeholder="Reps (es. 8-12)">
-                          <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}" placeholder="RIR (es. 1-2)">
-                          <input type="text" name="tut" class="input-field" value="${exercise.tut || ''}" placeholder="TUT (es. 2-1-1)">
-                          <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}" placeholder="Recupero (s)">
-                      </div>
-                      <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
-                      <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
-                      <textarea name="note" class="textarea-field" placeholder="Note (opzionale)">${exercise.note || ''}</textarea>
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                              <label class="text-sm text-secondary">Immagine 1</label>
-                              <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
-                              <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                          </div>
-                          <div>
-                              <label class="text-sm text-secondary">Immagine 2</label>
-                              <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
-                              <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                          </div>
-                      </div>
-                      <div class="mt-4">
-                          <label class="flex items-center space-x-3 cursor-pointer">
-                              <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500" ${exercise.isCircuit ? 'checked' : ''}>
-                              <span class="text-secondary">È un circuito?</span>
-                          </label>
-                      </div>
-                      <div id="edit-circuit-fields" class="${exercise.isCircuit ? '' : 'hidden'} space-y-4 pt-4 border-t border-stone-700">
-                          <input type="number" name="circuitTime" class="input-field" value="${exercise.circuitTime || ''}" placeholder="Tempo per round (secondi)">
-                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div>
-                                  <label class="text-sm text-secondary">Immagine 3</label>
-                                  <input type="url" name="imageUrl3" class="input-field mb-2" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
-                                  <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                              </div>
-                              <div>
-                                  <label class="text-sm text-secondary">Immagine 4</label>
-                                  <input type="url" name="imageUrl4" class="input-field mb-2" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
-                                  <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
-                              </div>
-                          </div>
-                      </div>
-                     <div class="flex justify-end gap-4 pt-4">
-                        <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
-                        <button type="submit" class="btn">Salva Modifiche</button>
+                 <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
+                     <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
+                     <select name="categoria" class="input-field" required>${categoryOptions}</select>
+                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                         <input type="number" name="serie" class="input-field" value="${exercise.serie || ''}" placeholder="N° Serie" required>
+                         <input type="text" name="ripetizioni" class="input-field" value="${exercise.ripetizioni || ''}" placeholder="Reps (es. 8-12)">
+                         <input type="text" name="rir" class="input-field" value="${exercise.rir || ''}" placeholder="RIR (es. 1-2)">
+                         <input type="text" name="tut" class="input-field" value="${exercise.tut || ''}" placeholder="TUT (es. 2-1-1)">
+                         <input type="number" name="recupero" class="input-field" value="${exercise.recupero || ''}" placeholder="Recupero (s)">
                      </div>
-                  </form>`;
-            const editForm = document.getElementById('edit-exercise-form');
-            const seriesInput = editForm.elements.serie;
-            const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
+                     <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
+                     <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
+                     <textarea name="note" class="textarea-field" placeholder="Nota Coach (Opzionale - persistente ogni settimana)">${exercise.note || ''}</textarea>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                         <div>
+                             <label class="text-sm text-secondary">Immagine 1</label>
+                             <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
+                             <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                         </div>
+                         <div>
+                             <label class="text-sm text-secondary">Immagine 2</label>
+                             <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
+                             <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                         </div>
+                     </div>
+                     <div class="mt-4">
+                         <label class="flex items-center space-x-3 cursor-pointer">
+                             <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500" ${exercise.isCircuit ? 'checked' : ''}>
+                             <span class="text-secondary">È un circuito?</span>
+                         </label>
+                     </div>
+                     <!-- Nuovi campi per Circuito in Edit -->
+                     <div id="edit-circuit-fields" class="${exercise.isCircuit ? '' : 'hidden'} space-y-4 pt-4 border-t border-stone-700">
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <input type="number" name="circuitWorkTime" class="input-field" value="${exercise.circuitWorkTime || ''}" placeholder="Tempo Lavoro per round (secondi)">
+                             <input type="number" name="circuitRestTime" class="input-field" value="${exercise.circuitRestTime || ''}" placeholder="Recupero tra Round (secondi)">
+                         </div>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <div>
+                                 <label class="text-sm text-secondary">Immagine 3</label>
+                                 <input type="url" name="imageUrl3" class="input-field mb-2" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
+                                 <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                             </div>
+                             <div>
+                                 <label class="text-sm text-secondary">Immagine 4</label>
+                                 <input type="url" name="imageUrl4" class="input-field mb-2" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
+                                 <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flex justify-end gap-4 pt-4">
+                         <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Annulla</button>
+                         <button type="submit" class="btn">Salva Modifiche</button>
+                     </div>
+                 </form>`;
+             const editForm = document.getElementById('edit-exercise-form');
+             const seriesInput = editForm.elements.serie;
+             const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
 
-            generateRepInputs(repsContainer, exercise.serie, exercise.ripetizioniPerSerie);
+             generateRepInputs(repsContainer, exercise.serie, exercise.ripetizioniPerSerie);
 
-            seriesInput.addEventListener('input', (e) => {
-                const numSeries = parseInt(e.target.value, 10) || 0;
-                const currentValues = Array.from(repsContainer.querySelectorAll('input')).map(input => input.value);
-                generateRepInputs(repsContainer, numSeries, currentValues);
-            });
-            
-            editForm.elements.isCircuit.addEventListener('change', (e) => {
-                document.getElementById('edit-circuit-fields').classList.toggle('hidden', !e.target.checked);
-            });
+             seriesInput.addEventListener('input', (e) => {
+                 const numSeries = parseInt(e.target.value, 10) || 0;
+                 const currentValues = Array.from(repsContainer.querySelectorAll('input')).map(input => input.value);
+                 generateRepInputs(repsContainer, numSeries, currentValues);
+             });
+                          
+             editForm.elements.isCircuit.addEventListener('change', (e) => {
+                 document.getElementById('edit-circuit-fields').classList.toggle('hidden', !e.target.checked);
+             });
 
              editExerciseModal.classList.remove('hidden');
              setTimeout(() => editExerciseModal.classList.remove('opacity-0'), 10);
              editForm.addEventListener('submit', handleUpdateExercise);
              document.getElementById('cancel-edit-btn').addEventListener('click', closeEditExerciseModal);
-        }
+         }
         function closeEditExerciseModal() {
              editExerciseModal.classList.add('opacity-0');
              setTimeout(() => editExerciseModal.classList.add('hidden'), 250);
-        }
+         }
         async function handleUpdateExercise(e) {
              e.preventDefault();
              const form = e.target;
@@ -1372,39 +1596,45 @@
              const imageFile2 = form.elements.imageFile2.files[0];
              const imageUrl1 = await uploadImage(imageFile1);
              const imageUrl2 = await uploadImage(imageFile2);
-             
+                          
              const isCircuit = form.elements.isCircuit.checked;
              let imageUrl3 = null, imageUrl4 = null;
+             let circuitWorkTime = null, circuitRestTime = null;
+             
              if (isCircuit) {
-                const imageFile3 = form.elements.imageFile3.files[0];
-                const imageFile4 = form.elements.imageFile4.files[0];
-                imageUrl3 = await uploadImage(imageFile3);
-                imageUrl4 = await uploadImage(imageFile4);
+                 const imageFile3 = form.elements.imageFile3.files[0];
+                 const imageFile4 = form.elements.imageFile4.files[0];
+                 imageUrl3 = await uploadImage(imageFile3);
+                 imageUrl4 = await uploadImage(imageFile4);
+                 
+                 circuitWorkTime = parseInt(form.elements.circuitWorkTime.value, 10) || null;
+                 circuitRestTime = parseInt(form.elements.circuitRestTime.value, 10) || null;
              }
 
              const updatedData = {
-                  nomeEsercizio: form.elements.nomeEsercizio.value,
-                  categoria: form.elements.categoria.value,
-                  serie: parseInt(form.elements.serie.value, 10),
-                  ripetizioni: form.elements.ripetizioni.value,
-                  rir: form.elements.rir.value,
-                  tut: form.elements.tut.value,
-                  recupero: parseInt(form.elements.recupero.value, 10) || null,
-                  tecnicheIntensita: form.elements.tecnicheIntensita.value,
-                  note: form.elements.note.value,
-                  imageUrl: imageUrl1 || form.elements.imageUrl.value,
-                  imageUrl2: imageUrl2 || form.elements.imageUrl2.value,
-                  ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
-                  isCircuit: isCircuit,
-                  circuitTime: isCircuit ? (parseInt(form.elements.circuitTime.value, 10) || null) : null,
-                  imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
-                  imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
+                 nomeEsercizio: form.elements.nomeEsercizio.value,
+                 categoria: form.elements.categoria.value,
+                 serie: parseInt(form.elements.serie.value, 10),
+                 ripetizioni: form.elements.ripetizioni.value,
+                 rir: form.elements.rir.value,
+                 tut: form.elements.tut.value,
+                 recupero: parseInt(form.elements.recupero.value, 10) || null,
+                 tecnicheIntensita: form.elements.tecnicheIntensita.value,
+                 note: form.elements.note.value, // Coach/Persistent Note
+                 imageUrl: imageUrl1 || form.elements.imageUrl.value,
+                 imageUrl2: imageUrl2 || form.elements.imageUrl2.value,
+                 ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
+                 isCircuit: isCircuit,
+                 circuitWorkTime: circuitWorkTime, // New circuit field
+                 circuitRestTime: circuitRestTime, // New circuit field
+                 imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
+                 imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
              };
              await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
              closeEditExerciseModal();
              await loadAndRenderExercises();
              showNotification("Esercizio aggiornato!");
-        }
+         }
 
         function openExerciseHistoryModal(exId) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
@@ -1427,7 +1657,14 @@
                 let lastBestE1RM = 0;
 
                 weeks.forEach(week => {
-                    const weekData = historyData[week];
+                    let weekDataRaw = historyData[week];
+                    if (Array.isArray(weekDataRaw)) {
+                        // Handle old format
+                        weekDataRaw = { userNote: '', sets: weekDataRaw };
+                    }
+                    const weekData = weekDataRaw.sets;
+                    const userNote = weekDataRaw.userNote;
+
                     if (!weekData || weekData.length === 0) return;
 
                     let bestSetThisWeek = { e1rm: 0, text: 'N/D' };
@@ -1464,6 +1701,7 @@
                                 <span class="font-bold text-red-400">${bestSetThisWeek.text}</span>
                                 ${progressIndicator}
                             </div>
+                            ${userNote ? `<p class="text-sm text-stone-300 mb-3"><i class="fas fa-user-edit mr-1"></i><span class="font-semibold text-secondary"> Tua Nota:</span> ${userNote}</p>` : ''}
                             <div class="space-y-1">${setsHTML || '<p class="text-sm text-stone-400">Nessun dato completo per questa settimana.</p>'}</div>
                         </div>
                     `;
@@ -1515,8 +1753,8 @@
                     <div class="flex-grow">
                         <h4 class="font-bold text-white">${fav.nomeEsercizio} ${fav.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
                         <p class="text-sm text-red-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
-                        <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} ${fav.isCircuit && fav.circuitTime ? `| Tempo: ${fav.circuitTime}s` : ''} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
-                        ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">${fav.note}</p>` : ''}
+                        <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} ${fav.isCircuit ? `| Lav: ${fav.circuitWorkTime || '-'}s | Rec: ${fav.circuitRestTime || '-'}s` : ''} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
+                        ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">Nota Coach: ${fav.note}</p>` : ''}
                     </div>
                     <div class="flex justify-end gap-2 mt-auto pt-2">
                         <button class="btn btn-secondary !p-2 text-xs" data-add-fav-ex-id="${fav.id}" title="Aggiungi alla scheda"><i class="fas fa-plus"></i></button>
@@ -1571,23 +1809,23 @@
 
         // --- ESPORTAZIONE ---
         function previewAndExportPDF() {
-              if (!currentSheetId) return;
-              let content = `<h2>Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}</h2>`;
-              exercisesCache.forEach(ex => {
-                   content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
-              });
-              document.getElementById('pdf-preview-container').innerHTML = content;
-              pdfPreviewModal.classList.remove('hidden');
-              setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
+             if (!currentSheetId) return;
+             let content = `<h2>Scheda: ${currentSheetData.nomeScheda} - Settimana ${currentWeek}</h2>`;
+             exercisesCache.forEach(ex => {
+                 content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
+             });
+             document.getElementById('pdf-preview-container').innerHTML = content;
+             pdfPreviewModal.classList.remove('hidden');
+             setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
         }
         document.getElementById('download-pdf-btn').addEventListener('click', async () => {
-              const { jsPDF } = window.jspdf;
-              const pdf = new jsPDF();
-              const content = document.getElementById('pdf-preview-container');
-              const canvas = await html2canvas(content);
-              const imgData = canvas.toDataURL('image/png');
-              pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
-              pdf.save(`${currentSheetData.nomeScheda}.pdf`);
+             const { jsPDF } = window.jspdf;
+             const pdf = new jsPDF();
+             const content = document.getElementById('pdf-preview-container');
+             const canvas = await html2canvas(content);
+             const imgData = canvas.toDataURL('image/png');
+             pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+             pdf.save(`${currentSheetData.nomeScheda}.pdf`);
         });
         document.getElementById('close-pdf-preview-btn').addEventListener('click', () => {
             pdfPreviewModal.classList.add('opacity-0');
@@ -1688,15 +1926,15 @@
                     const lastDate = new Date(lastWorkout.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' });
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                               <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
-                               <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
-                               <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
+                                <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
+                                <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
+                                <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
                         </div>`;
                 } else {
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                               <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
-                               <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
+                                <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
+                                <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
                         </div>`;
                 }
 
@@ -1728,17 +1966,17 @@
         }
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
-             if (!exercise || !exercise.recupero || serieIndex >= exercise.serie - 1) return;
+             if (!exercise || !exercise.recupero || exercise.isCircuit || serieIndex >= exercise.serie - 1) return; // Ignore for circuits
              const card = document.getElementById(`ex-card-${exId}`);
              if (!card) return;
              const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
              if (repsInput.value && caricoInput && caricoInput.value) {
                  clearProcrastinationTimer(exId);
                  const delay = exercise.recupero * 2.5 * 1000;
-                  procrastinationTimers[exId] = setTimeout(() => {
-                     procrastinationModal.classList.remove('hidden');
-                     setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
-                     delete procrastinationTimers[exId];
+                 procrastinationTimers[exId] = setTimeout(() => {
+                      procrastinationModal.classList.remove('hidden');
+                      setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
+                      delete procrastinationTimers[exId];
                  }, delay);
              }
         }
