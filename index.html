@@ -3,58 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Schede Palestra - Versione Migliorata</title>
+    <title>App Schede Palestra - Versione Migliorata Blue</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Variabili di Colore - TEMA SCURO (predominante) */
         :root {
-            --bg-primary: #0c0a09;
-            --bg-secondary: #1c1917;
-            --bg-gradient-from: #1f2937;
-            --bg-gradient-to: #0c0a09;
-            --text-primary: #e2e8f0;
-            --text-secondary: #a8a29e;
-            --text-accent: #dc2626; /* Red-600 */
-            --text-accent-hover: #b91c1c; /* Red-700 */
-            --text-accent-dark: #fef2f2; /* Red-50 */
-            --border-color: #44403c;
-            --btn-secondary-bg: #262626;
-            --btn-secondary-hover: #404040;
+            --bg-primary: #0f172a; /* Slate-900 */
+            --bg-secondary: #1e293b; /* Slate-800 */
+            --bg-gradient-from: #1e3a8a; /* Blue-800 for the cool dark sheen */
+            --bg-gradient-to: #0f172a; /* Slate-900 */
+            --text-primary: #f1f5f9; /* Slate-100 */
+            --text-secondary: #94a3b8; /* Slate-400 */
+            --text-accent: #4f46e5; /* Indigo-600 (Main Accent Blue) */
+            --text-accent-hover: #4338ca; /* Indigo-700 */
+            --text-accent-dark: #eef2ff; /* Indigo-50 (for button text) */
+            --border-color: #334155; /* Slate-700 */
+            --btn-secondary-bg: #334155; /* Slate-700 */
+            --btn-secondary-hover: #475569; /* Slate-600 */
         }
+        /* Variabili di Colore - TEMA CHIARO */
         html.light {
             --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-gradient-from: #f3f4f6;
-            --bg-gradient-to: #e5e7eb;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-accent: #dc2626;
-            --text-accent-hover: #b91c1c;
+            --bg-secondary: #f1f5f9; /* Slate-100 */
+            --bg-gradient-from: #e2e8f0; /* Slate-200 */
+            --bg-gradient-to: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569; /* Slate-600 */
+            --text-accent: #3b82f6; /* Blue-500 */
+            --text-accent-hover: #2563eb; /* Blue-600 */
             --text-accent-dark: #ffffff;
-            --border-color: #d1d5db;
-            --btn-secondary-bg: #e5e7eb;
-            --btn-secondary-hover: #d1d5db;
+            --border-color: #cbd5e1; /* Slate-300 */
+            --btn-secondary-bg: #e2e8f0;
+            --btn-secondary-hover: #cbd5e1;
         }
+
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
         .bg-gradient-main { background-image: linear-gradient(to bottom right, var(--bg-gradient-from), var(--bg-gradient-to)); }
+        
         .input-field { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 10px 12px; width: 100%; transition: all 0.2s; color: var(--text-primary); }
         .input-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
-        html.dark .input-field:focus { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3); }
+        html.dark .input-field:focus { box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4); /* Indigo-600 glow */ }
+        
         .textarea-field { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 10px 12px; width: 100%; transition: all 0.2s; color: var(--text-primary); resize: vertical; min-height: 80px; }
         .textarea-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
-        html.dark .textarea-field:focus { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3); }
+        html.dark .textarea-field:focus { box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4); }
+
         .btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; background-color: var(--text-accent); color: var(--text-accent-dark); font-weight: 700; padding: 10px 16px; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; border: none; }
-        .btn:hover { background-color: var(--text-accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+        .btn:hover { background-color: var(--text-accent-hover); transform: translateY(-1px); box-shadow: 0 4px 15px -1px rgba(79, 70, 229, 0.3); /* Stronger blue shadow */ }
         .btn:disabled { cursor: not-allowed; filter: grayscale(50%); opacity: 0.7; }
+        
         .btn-secondary { background-color: var(--btn-secondary-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background-color: var(--btn-secondary-hover); }
+        .btn-secondary:hover { background-color: var(--btn-secondary-hover); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-danger { background-color: #be123c; color: #fff1f2; }
         .btn-danger:hover { background-color: #9f1239; }
+
         .loader { border: 4px solid var(--border-color); border-top: 4px solid var(--text-accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 2rem auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .week-btn { flex-shrink: 0; background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); }
         .week-btn.active { background-color: var(--text-accent); color: var(--text-accent-dark); font-weight: 700; border-color: var(--text-accent); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -63,25 +72,38 @@
         .modal-content { transition: transform 0.25s ease; }
         .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
         .collapsible-content.open { max-height: 2000px; }
+        
         .notification { position: fixed; bottom: 20px; right: 20px; background-color: var(--text-accent); color: var(--text-accent-dark); padding: 16px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; animation: slideIn 0.3s ease-out; }
         .notification.warning { background-color: #be123c; color: #fff1f2; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
         .reward-badge { display: inline-block; background-color: #f59e0b; color: #431407; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 8px; }
         .progress-bar { height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background-color: var(--text-accent); }
         .timer-display { font-family: monospace; font-size: 1.5rem; font-weight: bold; }
+        
         .user-indicator { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 8px 16px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .exercise-image { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border: 2px solid var(--border-color); border-radius: 0.5rem; display: block; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .pdf-preview { border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; background-color: var(--bg-secondary); }
+        
         .macrocycle-card { background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); border: 1px solid #3b82f6; }
+        
         .accordion-header { cursor: pointer; user-select: none; transition: background-color 0.2s; }
         .accordion-header:hover { background-color: rgba(59, 130, 246, 0.2); }
         .accordion-icon { transition: transform 0.3s; }
         .accordion-icon.open { transform: rotate(180deg); }
-        .intensity-active { border-color: var(--text-accent); background-color: rgba(220, 38, 38, 0.1); }
-        .intensity-glow { border-color: var(--text-accent); box-shadow: 0 0 15px 4px rgba(220, 38, 38, 0.4), inset 0 0 8px 1px rgba(220, 38, 38, 0.3); }
-        .recap-card { background: linear-gradient(135deg, #4a044e, #1e1b4b); border: 1px solid #7e22ce; animation: fadeIn 0.5s ease-out; }
+        
+        /* Blue-specific styles for accents */
+        .intensity-active { border-color: var(--text-accent); background-color: rgba(79, 70, 229, 0.1); }
+        .intensity-glow { border-color: var(--text-accent); box-shadow: 0 0 15px 4px rgba(79, 70, 229, 0.4), inset 0 0 8px 1px rgba(79, 70, 229, 0.3); }
+        
+        .recap-card { 
+            background: linear-gradient(135deg, #0c4a6e, #1e40af); /* Dark Cyan to Dark Blue Glossy */
+            border: 1px solid #38bdf8; /* Sky Blue for border */
+            animation: fadeIn 0.5s ease-out; 
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .circuit-card { border-color: #f59e0b; background: linear-gradient(135deg, rgba(120, 53, 15, 0.2), rgba(28, 25, 23, 0.2)); }
         .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
         .image-grid .exercise-image { width: 100%; height: auto; aspect-ratio: 1 / 1; }
@@ -91,7 +113,7 @@
     <div id="app-container" class="container mx-auto p-4 max-w-3xl">
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center space-x-3">
-                <i class="fas fa-dumbbell text-red-500 text-2xl"></i>
+                <i class="fas fa-dumbbell text-indigo-500 text-2xl"></i>
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Gym App</h1>
             </div>
             <div class="flex items-center gap-4">
@@ -105,9 +127,9 @@
 
         <div id="user-indicator" class="user-indicator hidden">
             <div class="flex items-center gap-2">
-                <i class="fas fa-user text-red-500"></i>
+                <i class="fas fa-user-shield text-indigo-500"></i>
                 <span id="selected-user-name" class="text-sm font-medium"></span>
-                <button id="back-to-admin-btn" class="btn btn-secondary !p-1 text-xs">
+                <button id="back-to-admin-btn" class="btn btn-danger !p-1 text-xs">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -115,7 +137,7 @@
 
         <div id="main-view"></div>
     </div>
-
+    
     <!-- Modals -->
     <div id="auth-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
@@ -125,7 +147,7 @@
                 <input type="email" name="email" class="input-field" placeholder="Email" required>
                 <input type="password" name="password" class="input-field" placeholder="Password (min. 6 caratteri)" required>
                 <button type="submit" id="auth-submit-btn" class="btn w-full">Accedi</button>
-                <button type="button" id="toggle-auth-mode-btn" class="text-center w-full mt-4 text-sm text-red-500 hover:text-red-400">Non hai un account? Registrati</button>
+                <button type="button" id="toggle-auth-mode-btn" class="text-center w-full mt-4 text-sm text-indigo-500 hover:text-indigo-400">Non hai un account? Registrati</button>
             </form>
         </div>
     </div>
@@ -138,6 +160,52 @@
                 <button id="confirm-cancel-btn" class="btn btn-secondary">Annulla</button>
                 <button id="confirm-ok-btn" class="btn btn-danger">Conferma</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- NEW MODAL: Admin Manual Log -->
+    <div id="admin-manual-log-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-lg m-4 transform scale-95 border border-stone-800">
+            <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-clock mr-2 text-indigo-500"></i> Log Manuale Allenamento</h3>
+            <p id="admin-manual-log-info" class="text-sm text-secondary mb-4"></p>
+            
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label for="admin-log-mesocycle-selector" class="text-sm text-secondary mb-1 block">Mesociclo</label>
+                    <select id="admin-log-mesocycle-selector" class="input-field w-full"></select>
+                </div>
+                <div>
+                    <label for="admin-log-sheet-selector" class="text-sm text-secondary mb-1 block">Scheda</label>
+                    <select id="admin-log-sheet-selector" class="input-field w-full"></select>
+                </div>
+                <div>
+                    <label for="admin-log-week-input" class="text-sm text-secondary mb-1 block">Settimana</label>
+                    <input type="number" id="admin-log-week-input" class="input-field" min="1" placeholder="Settimana" required>
+                </div>
+                <div>
+                    <label for="admin-log-date-input" class="text-sm text-secondary mb-1 block">Data e Ora Allenamento</label>
+                    <input type="datetime-local" id="admin-log-date-input" class="input-field" required>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-4 pt-2">
+                <button type="button" id="close-admin-manual-log-btn" class="btn btn-secondary">Annulla</button>
+                <button type="button" id="submit-admin-manual-log-btn" class="btn" disabled>Registra Allenamento</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-workout-date-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-stone-800">
+            <h3 class="text-xl font-bold text-white mb-4">Modifica Data Log</h3>
+            <form id="edit-workout-date-form" class="space-y-4">
+                <p id="edit-workout-date-info" class="text-sm text-secondary"></p>
+                <input type="datetime-local" id="new-workout-date" class="input-field" required>
+                <div class="flex justify-end gap-4 pt-2">
+                    <button type="button" id="cancel-edit-date-btn" class="btn btn-secondary">Annulla</button>
+                    <button type="submit" class="btn">Salva Data</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -161,9 +229,9 @@
     <div id="user-management-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-4xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white"><i class="fas fa-users-cog mr-2 text-red-500"></i> Gestione Utenti</h3>
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-users-cog mr-2 text-indigo-500"></i> Gestione Utenti</h3>
                 <div class="flex gap-2">
-                    <button id="refresh-users-btn" class="btn btn-secondary !p-2" title="Aggiorna lista"><i class="fas fa-sync-alt"></i></button>
+                    <button id="refresh-users-btn" class="btn btn-secondary !p-2" title="Aggiorna lista" onclick="renderUserManagementContent()"><i class="fas fa-sync-alt"></i></button>
                     <button id="close-user-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
                 </div>
             </div>
@@ -182,7 +250,10 @@
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white">Dettagli Utente</h3>
-                <button id="close-user-details-btn" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
+                <div class="flex gap-2">
+                    <button id="open-admin-manual-log-btn" class="btn btn-secondary"><i class="fas fa-plus-square mr-2"></i> Log Man. </button>
+                    <button id="close-user-details-btn" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
+                </div>
             </div>
             <div id="user-details-container"></div>
         </div>
@@ -196,7 +267,7 @@
             </div>
         </div>
     </div>
-    <!-- End Modified Timer Modal Structure -->
+    <!-- End Modified Timer Structure -->
 
     <div id="pdf-preview-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-2xl m-4 transform scale-95 border border-stone-800">
@@ -212,8 +283,8 @@
     </div>
 
     <div id="procrastination-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
-        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-red-500 text-center">
-            <h3 class="text-3xl font-bold text-red-500 mb-4 animate-pulse">Ci stai mettendo troppo!</h3>
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-sm m-4 transform scale-95 border border-indigo-500 text-center">
+            <h3 class="text-3xl font-bold text-indigo-500 mb-4 animate-pulse">Ci stai mettendo troppo!</h3>
             <p class="text-stone-300 mb-6">Mantieni alta l'intensità. È ora della prossima serie!</p>
             <button id="procrastination-ok-btn" class="btn">Ho capito!</button>
         </div>
@@ -232,10 +303,21 @@
     <div id="volume-analysis-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 overflow-y-auto p-4">
         <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-5xl m-4 transform scale-95 border border-stone-800">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white"><i class="fas fa-calculator mr-2 text-red-500"></i> Analisi Volume Mesociclo</h3>
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-calculator mr-2 text-indigo-500"></i> Analisi Volume Mesociclo</h3>
                 <button id="close-volume-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
             </div>
             <div id="volume-analysis-container" class="space-y-6"></div>
+        </div>
+    </div>
+    
+    <!-- Nuovo Modal per Messaggio Admin (Ora Alert Settimanale) -->
+    <div id="admin-alert-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0">
+        <div class="modal-content bg-gradient-main p-8 rounded-lg shadow-xl w-full max-w-md m-4 transform scale-95 border border-indigo-500">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-indigo-400"><i class="fas fa-exclamation-triangle mr-2"></i> Memo Alert Settimanale</h3>
+                <button id="close-admin-alert-modal" class="btn btn-secondary !p-2"><i class="fas fa-times"></i></button>
+            </div>
+            <p id="admin-alert-message" class="text-white mb-6 whitespace-pre-wrap"></p>
         </div>
     </div>
 
@@ -246,8 +328,6 @@
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
         // --- CONFIGURAZIONE FIREBASE ---
-        // Le tue chiavi e config dovrebbero essere dinamiche o fornite dall'ambiente in un'app reale.
-        // Manteniamo questa configurazione per l'ambiente canvas:
         const firebaseConfig = {
             apiKey: "AIzaSyBpzZN8VmrRKW60rW1WprEzgXyhhATzaPs",
             authDomain: "apppalestrasuper.firebaseapp.com",
@@ -305,12 +385,17 @@
         const procrastinationModal = document.getElementById('procrastination-modal');
         const exerciseHistoryModal = document.getElementById('exercise-history-modal');
         const volumeAnalysisModal = document.getElementById('volume-analysis-modal');
+        const adminAlertModal = document.getElementById('admin-alert-modal');
+        const editWorkoutDateModal = document.getElementById('edit-workout-date-modal');
+        const adminManualLogModal = document.getElementById('admin-manual-log-modal'); // NEW
 
         let currentUser = null, currentUserRole = 'user', currentMesoId = null, currentSheetId = null, currentSheetData = null, currentWeek = 1, exercisesCache = [], saveTimeouts = {}, isLoginMode = true, selectedUserId = null, favoritesCache = [];
         let activeTimerInterval = null, timerSeconds = 0, timerPaused = false;
         let procrastinationTimers = {};
         let modifiedExercisesThisWeek = new Set();
-        
+        let currentSheetName = '';
+        let adminUsersCache = []; // Cache for user list in admin modals
+
         // Stato per il nuovo Interval Timer
         let intervalTimer = {
             interval: null,
@@ -322,7 +407,10 @@
             totalRounds: 0,
             exerciseName: ''
         };
-
+        
+        // La data manuale non è più globale, ma viene gestita solo nella modal admin per il log manuale.
+        // Lascio la variabile qui per non rompere il codice esistente che ci faceva riferimento, ma la disabilito
+        let manualWorkoutDate = null; 
 
         // --- GESTIONE TEMA ---
         function applyTheme(theme) {
@@ -334,33 +422,65 @@
         themeToggleBtn.addEventListener('click', () => applyTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light'));
         applyTheme(localStorage.getItem('theme') || 'dark');
 
+        // --- GESTIONE CHIUSURA MODALI ---
+        function setupModalClosing(modalElement) {
+            modalElement.addEventListener('click', (e) => {
+                if (e.target === modalElement) {
+                    closeModal(modalElement);
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modalElement.classList.contains('hidden')) {
+                    closeModal(modalElement);
+                }
+            });
+            const closeBtn = modalElement.querySelector('button[id^="close-"], button[id$="-cancel-btn"]');
+            if (closeBtn) {
+                 closeBtn.addEventListener('click', () => closeModal(modalElement));
+            }
+        }
+        
+        function closeModal(modalElement) {
+            modalElement.classList.add('opacity-0');
+            setTimeout(() => modalElement.classList.add('hidden'), 250);
+            if (modalElement.id === 'timer-modal') {
+                stopSimpleTimer();
+                stopIntervalTimer();
+            }
+            if (modalElement.id === 'procrastination-modal') {
+                // No cleanup needed here
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            [authModal, confirmModal, editExerciseModal, favoritesModal, userManagementModal, editUserModal, userDetailsModal, timerModal, pdfPreviewModal, procrastinationModal, exerciseHistoryModal, volumeAnalysisModal, adminAlertModal, editWorkoutDateModal, adminManualLogModal].forEach(setupModalClosing);
+        });
+
         // --- GESTIONE TIMER RECUPERO SEMPLICE ---
         function renderSimpleTimerModal() {
             document.getElementById('timer-modal-content').innerHTML = `
                 <h3 class="text-xl font-bold text-white mb-4 text-center">Timer Recupero</h3>
-                <div class="timer-display text-red-500 text-center mb-6" id="simple-timer-display">00:00</div>
+                <div class="timer-display text-indigo-500 text-center mb-6" id="simple-timer-display">00:00</div>
                 <div class="flex justify-center gap-4">
                     <button id="simple-timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
                     <button id="simple-timer-stop-btn" class="btn btn-danger"><i class="fas fa-stop"></i> Ferma</button>
                 </div>
             `;
-            // Rebind listeners
             document.getElementById('simple-timer-pause-btn').addEventListener('click', toggleSimpleTimerPause);
-            document.getElementById('simple-timer-stop-btn').addEventListener('click', stopSimpleTimer);
+            document.getElementById('simple-timer-stop-btn').addEventListener('click', () => closeModal(timerModal));
         }
 
         function startTimerModal(duration) {
-            renderSimpleTimerModal(); // Initialize simple timer UI
+            renderSimpleTimerModal();
             const display = document.getElementById('simple-timer-display');
             if (!display) return; 
 
             timerSeconds = duration;
             timerPaused = false;
             display.textContent = `${Math.floor(duration / 60).toString().padStart(2, '0')}:${(duration % 60).toString().padStart(2, '0')}`;
-            
-            timerModal.classList.remove('hidden');
-            setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
-            
+
+            timerModal.classList.remove('hidden', 'opacity-0');
+
             if (activeTimerInterval) clearInterval(activeTimerInterval);
             activeTimerInterval = setInterval(() => {
                 if (!timerPaused && timerSeconds > 0) {
@@ -369,7 +489,7 @@
                     const seconds = timerSeconds % 60;
                     display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 } else if (timerSeconds <= 0) {
-                    stopSimpleTimer();
+                    closeModal(timerModal);
                     showNotification("Timer completato!");
                 }
             }, 1000);
@@ -381,11 +501,9 @@
         }
 
         function stopSimpleTimer() {
-            clearInterval(activeTimerInterval);
-            timerModal.classList.add('opacity-0');
-            setTimeout(() => timerModal.classList.add('hidden'), 250);
+            if (activeTimerInterval) clearInterval(activeTimerInterval);
+            activeTimerInterval = null;
         }
-
 
         // --- GESTIONE TIMER CIRCUITO A INTERVALLI ---
         function startIntervalCircuitTimer(ex) {
@@ -393,7 +511,7 @@
                 showNotification("Dati circuito non validi. Controlla Tempo Lavoro e Tempo Rec tra Round.", "error");
                 return;
             }
-            
+
             intervalTimer.workTime = ex.circuitWorkTime;
             intervalTimer.restTime = ex.circuitRestTime;
             intervalTimer.totalRounds = ex.serie;
@@ -403,7 +521,7 @@
             document.getElementById('timer-modal-content').innerHTML = `
                 <h3 class="text-xl font-bold text-white mb-4 text-center">Circuito: ${ex.nomeEsercizio}</h3>
                 <p class="text-stone-300 text-center mb-2" id="timer-phase-display"></p>
-                <div class="timer-display text-red-500 text-center mb-6" id="circuit-timer-display">00:00</div>
+                <div class="timer-display text-indigo-500 text-center mb-6" id="circuit-timer-display">00:00</div>
                 <p class="text-sm text-center text-secondary mb-4" id="timer-round-display">Round 1 / ${ex.serie}</p>
                 <div class="flex justify-center gap-4">
                     <button id="circuit-timer-pause-btn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
@@ -411,21 +529,18 @@
                 </div>
             `;
 
-            document.getElementById('circuit-timer-stop-btn').onclick = stopIntervalTimer;
+            document.getElementById('circuit-timer-stop-btn').onclick = () => closeModal(timerModal);
             document.getElementById('circuit-timer-pause-btn').onclick = toggleIntervalPause;
 
-            timerModal.classList.remove('hidden');
-            setTimeout(() => timerModal.classList.remove('opacity-0'), 10);
+            timerModal.classList.remove('hidden', 'opacity-0');
 
             if (intervalTimer.interval) clearInterval(intervalTimer.interval);
             startPhase('WORK');
         }
 
         function stopIntervalTimer() {
-            clearInterval(intervalTimer.interval);
-            intervalTimer.interval = null; // Reset state
-            timerModal.classList.add('opacity-0');
-            setTimeout(() => timerModal.classList.add('hidden'), 250);
+            if (intervalTimer.interval) clearInterval(intervalTimer.interval);
+            intervalTimer.interval = null;
         }
 
         function toggleIntervalPause() {
@@ -444,20 +559,20 @@
             intervalTimer.currentPhase = phase;
             const duration = phase === 'WORK' ? intervalTimer.workTime : intervalTimer.restTime;
             intervalTimer.totalSeconds = duration;
-            
+
             const display = document.getElementById('circuit-timer-display');
             const phaseDisplay = document.getElementById('timer-phase-display');
-            
+
             if (phase === 'WORK') {
                 display.classList.remove('text-green-500');
-                display.classList.add('text-red-500');
+                display.classList.add('text-indigo-500');
                 phaseDisplay.textContent = 'FASE DI LAVORO';
             } else {
-                display.classList.remove('text-red-500');
+                display.classList.remove('text-indigo-500');
                 display.classList.add('text-green-500');
                 phaseDisplay.textContent = 'RECUPERO TRA ROUND';
             }
-            
+
             if (intervalTimer.interval) clearInterval(intervalTimer.interval);
             runIntervalTimer();
         }
@@ -467,7 +582,7 @@
                 const minutes = Math.floor(intervalTimer.totalSeconds / 60);
                 const seconds = intervalTimer.totalSeconds % 60;
                 document.getElementById('circuit-timer-display').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
+
                 if (intervalTimer.totalSeconds <= 0) {
                     handlePhaseEnd();
                 } else {
@@ -481,13 +596,13 @@
         function handlePhaseEnd() {
             clearInterval(intervalTimer.interval);
             showNotification(intervalTimer.currentPhase === 'WORK' ? 'Tempo di lavoro scaduto!' : 'Recupero finito!');
-            
+
             if (intervalTimer.currentPhase === 'WORK') {
                 if (intervalTimer.currentRound < intervalTimer.totalRounds) {
                     startPhase('REST');
                 } else {
                     showNotification(`Circuito ${intervalTimer.exerciseName} completato!`);
-                    stopIntervalTimer();
+                    closeModal(timerModal);
                 }
             } else if (intervalTimer.currentPhase === 'REST') {
                 intervalTimer.currentRound++;
@@ -500,7 +615,8 @@
 
         // --- VERIFICA E IMPOSTAZIONE ADMIN ---
         async function setupAdminAccount() {
-            try {
+            // ... (setupAdminAccount logic remains the same)
+             try {
                 const adminQuery = query(collection(db, 'users'), where('role', '==', 'admin'));
                 const adminSnapshot = await getDocs(adminQuery);
                 if (adminSnapshot.empty) {
@@ -539,6 +655,7 @@
             resetState();
             renderAppView();
         }
+
         function deselectUser() {
             selectedUserId = null;
             userIndicator.classList.add('hidden');
@@ -546,12 +663,16 @@
             renderAppView();
         }
         backToAdminBtn.addEventListener('click', deselectUser);
+
         function resetState() {
             currentMesoId = null;
             currentSheetId = null;
             currentSheetData = null;
+            currentSheetName = '';
             currentWeek = 1;
             exercisesCache = [];
+            // manualWorkoutDate = null; // Rimosso reset qui, non viene più usato in questo modo
+            // localStorage.removeItem('manualWorkoutDate'); // Rimosso, non più gestito dal client
         }
 
         // --- GESTIONE AUTENTICAZIONE E UI PRINCIPALE ---
@@ -583,12 +704,14 @@
         function renderLoginView() {
             mainView.innerHTML = `
                 <div class="text-center py-12">
-                    <i class="fas fa-dumbbell text-red-500 text-5xl mb-6"></i>
+                    <i class="fas fa-dumbbell text-indigo-500 text-5xl mb-6"></i>
                     <h2 class="text-2xl font-bold mb-4">Benvenuto in Gym App</h2>
                     <p class="text-secondary mb-8">Effettua il login per accedere alla tua area personale.</p>
                 </div>`;
             userControls.innerHTML = `<button id="login-btn" class="btn">Accedi / Registrati</button>`;
-            document.getElementById('login-btn').addEventListener('click', openAuthModal);
+            document.getElementById('login-btn').addEventListener('click', () => {
+                authModal.classList.remove('hidden', 'opacity-0');
+            });
         }
 
         async function renderAppView() {
@@ -601,7 +724,7 @@
                     <div id="last-workout-container" class="mb-6"></div>
                     ${isAdmin && !selectedUserId ? `
                     <div class="bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg">
-                        <h3 class="text-lg font-bold text-white mb-3"><i class="fas fa-users mr-2 text-red-500"></i> Seleziona Utente</h3>
+                        <h3 class="text-lg font-bold text-white mb-3"><i class="fas fa-users mr-2 text-indigo-500"></i> Seleziona Utente</h3>
                         <div id="user-selector-container"></div>
                     </div>` : ''}
                     <div id="mesocycle-container" class="bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg"></div>
@@ -624,21 +747,23 @@
                         </div>
                     </div>
                     <div id="initial-message" class="text-center p-8 text-secondary">
-                        <i class="fas fa-clipboard-list text-4xl mb-4 text-stone-600"></i>
+                        <i class="fas fa-clipboard-list text-4xl mb-4 text-slate-600"></i>
                         <p>Seleziona o crea un mesociclo per iniziare.</p>
                     </div>
                     ${isAdmin && !selectedUserId ? `
                     <div class="mt-6 bg-gradient-main p-4 rounded-xl border border-stone-800 shadow-lg">
-                        <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-shield mr-2 text-red-500"></i> Area Amministratore</h3>
+                        <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-shield mr-2 text-indigo-500"></i> Area Amministratore</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button id="manage-favorites-btn" class="btn btn-secondary"><i class="fas fa-star mr-2"></i> Gestisci Preferiti</button>
                             <button id="manage-users-btn" class="btn btn-secondary"><i class="fas fa-users-cog mr-2"></i> Gestisci Utenti</button>
+                            <button id="backup-all-data-btn" class="btn btn-danger"><i class="fas fa-database mr-2"></i> Backup Dati (JSON)</button>
                         </div>
                     </div>` : ''}
                 </div>`;
             renderLastWorkoutRecap();
             if (isAdmin && !selectedUserId) {
                 renderUserSelector();
+                document.getElementById('backup-all-data-btn')?.addEventListener('click', handleBackupAllData);
             }
             renderMesocycleSelector();
         }
@@ -649,7 +774,7 @@
         const getExercisesRef = (mesoId, sheetId) => collection(db, 'users', selectedUserId || currentUser.uid, 'mesocycles', mesoId, 'trainingSheets', sheetId, 'exercises');
         const getFavoriteExercisesRef = () => collection(db, 'favoriteExercises');
         const getUsersRef = () => collection(db, 'users');
-        const getWorkoutHistoryRef = () => collection(db, 'users', selectedUserId || currentUser.uid, 'workoutHistory');
+        const getWorkoutHistoryRef = (userId) => collection(db, 'users', userId || currentUser.uid, 'workoutHistory');
 
         // --- FUNZIONI MODAL E UTILITY ---
         function showNotification(message, type = "success") {
@@ -662,33 +787,22 @@
 
         function showConfirmModal(message) {
             return new Promise(resolve => {
-                confirmModal.classList.remove('hidden');
+                confirmModal.classList.remove('hidden', 'opacity-0');
                 document.getElementById('confirm-message').textContent = message;
-                setTimeout(() => confirmModal.classList.remove('opacity-0'), 10);
                 const okBtn = document.getElementById('confirm-ok-btn');
                 const cancelBtn = document.getElementById('confirm-cancel-btn');
+
                 const cleanup = (result) => {
-                    confirmModal.classList.add('opacity-0');
-                    setTimeout(() => confirmModal.classList.add('hidden'), 250);
+                    closeModal(confirmModal);
                     okBtn.onclick = null;
                     cancelBtn.onclick = null;
                     resolve(result);
                 };
+
                 okBtn.onclick = () => cleanup(true);
                 cancelBtn.onclick = () => cleanup(false);
             });
         }
-
-        function openAuthModal() {
-            authModal.classList.remove('hidden');
-            setTimeout(() => authModal.classList.remove('opacity-0'), 10);
-        }
-
-        function closeAuthModal() {
-            authModal.classList.add('opacity-0');
-            setTimeout(() => authModal.classList.add('hidden'), 250);
-        }
-        authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
 
         document.getElementById('toggle-auth-mode-btn').addEventListener('click', () => {
             isLoginMode = !isLoginMode;
@@ -706,6 +820,7 @@
             authError.textContent = '';
             authSubmitBtn.disabled = true;
             authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Elaborazione...';
+
             try {
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, password);
@@ -713,7 +828,7 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await setDoc(doc(db, 'users', userCredential.user.uid), { email, role: 'user', createdAt: new Date().toISOString() });
                 }
-                closeAuthModal();
+                closeModal(authModal);
             } catch (error) {
                 console.error("Authentication error:", error.code, error.message);
                 authError.textContent = "Credenziali non valide o utente già esistente.";
@@ -729,12 +844,16 @@
             if (!container) return;
             container.innerHTML = '<div class="loader"></div>';
             try {
-                const usersSnapshot = await getDocs(getUsersRef());
+                const usersQuery = query(getUsersRef(), orderBy('email'));
+                const usersSnapshot = await getDocs(usersQuery);
                 const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                adminUsersCache = users; // Cache users
+
                 let options = '<option value="">-- Seleziona un utente --</option>';
                 users.forEach(user => {
-                    options += `<option value="${user.id}">${user.email}</option>`;
+                    options += `<option value="${user.id}">${user.email}${user.role === 'admin' ? ' (Admin)' : ''}</option>`;
                 });
+
                 container.innerHTML = `<select id="user-selector" class="input-field w-full">${options}</select>`;
                 document.getElementById('user-selector').addEventListener('change', (e) => {
                     const userId = e.target.value;
@@ -752,17 +871,19 @@
         async function renderMesocycleSelector() {
             const mesocycleContainer = document.getElementById('mesocycle-container');
             if (!mesocycleContainer) return;
+
             const mesocyclesSnapshot = await getDocs(query(getMesocyclesRef(), orderBy("dataCreazione", "desc")));
             let options = '<option value="">-- Seleziona un mesociclo --</option>';
             mesocyclesSnapshot.forEach(doc => {
                 options += `<option value="${doc.id}">${doc.data().nome}</option>`;
             });
+
             mesocycleContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-red-500"></i> Mesociclo</h3>
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-calendar-alt mr-2 text-indigo-500"></i> Mesociclo</h3>
                      <div class="flex items-center gap-2">
-                         ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
-                         ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
+                        ${currentUserRole === 'admin' ? `<button id="analyze-volume-btn" class="btn btn-secondary !p-2 text-xs" title="Analisi Volume Mesociclo"><i class="fas fa-calculator"></i></button>` : ''}
+                        ${currentUserRole === 'admin' ? `<button id="toggle-create-meso-btn" class="btn btn-secondary !p-2 text-xs" title="Crea Nuovo Mesociclo"><i class="fas fa-plus"></i></button>` : ''}
                     </div>
                 </div>
                 <select id="mesocycle-selector" class="input-field w-full">${options}</select>
@@ -773,13 +894,16 @@
                         <button type="submit" class="btn w-full"><i class="fas fa-plus mr-2"></i> Crea</button>
                     </form>
                 </div>` : ''}`;
+
             const mesoSelector = document.getElementById('mesocycle-selector');
             mesoSelector.addEventListener('change', (e) => selectMesocycle(e.target.value));
+
             if (currentUserRole === 'admin') {
-                document.getElementById('create-meso-form').addEventListener('submit', handleCreateMeso);
-                document.getElementById('toggle-create-meso-btn').addEventListener('click', () => document.getElementById('create-meso-container').classList.toggle('open'));
-                document.getElementById('analyze-volume-btn').addEventListener('click', openVolumeAnalysisModal);
+                document.getElementById('create-meso-form')?.addEventListener('submit', handleCreateMeso);
+                document.getElementById('toggle-create-meso-btn')?.addEventListener('click', () => document.getElementById('create-meso-container')?.classList.toggle('open'));
+                document.getElementById('analyze-volume-btn')?.addEventListener('click', openVolumeAnalysisModal);
             }
+
             const effectiveUserId = selectedUserId || currentUser.uid;
             const lastMesoId = localStorage.getItem(`lastMesoId_${effectiveUserId}`);
             if (lastMesoId && mesoSelector.querySelector(`option[value="${lastMesoId}"]`)) {
@@ -795,8 +919,10 @@
             const sheetContent = document.getElementById('sheet-content');
             const initialMessage = document.getElementById('initial-message');
             const sheetContainer = document.getElementById('sheet-container');
+
             sheetContent.classList.add('hidden');
             initialMessage.classList.remove('hidden');
+
             if (!mesoId) {
                 sheetContainer.classList.add('hidden');
                 return;
@@ -808,21 +934,24 @@
         async function renderSheetSelector() {
             const sheetContainer = document.getElementById('sheet-container');
             const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione", "desc")));
+
             let options = '<option value="">-- Seleziona una scheda --</option>';
             sheetsSnapshot.forEach(doc => {
                 const sheet = doc.data();
                 options += `<option value="${doc.id}">${sheet.nomeScheda}${sheet.isCompleta ? ' (Completata)' : ''}</option>`;
             });
+
             sheetContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-clipboard-list mr-2 text-red-500"></i> Scheda di Allenamento</h3>
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-clipboard-list mr-2 text-indigo-500"></i> Scheda di Allenamento</h3>
                     ${currentUserRole === 'admin' ? `<button id="toggle-create-sheet-btn" class="btn btn-secondary !p-2 text-xs"><i class="fas fa-plus"></i></button>` : ''}
                 </div>
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <select id="sheet-selector" class="input-field flex-grow">${options}</select>
                     <div class="flex items-center gap-3">
                         ${currentUserRole === 'admin' ? `
-                        <button id="add-weeks-btn" class="btn btn-secondary" title="Aggiungi Settimane"><i class="fas fa-calendar-plus"></i></button> <button id="duplicate-sheet-btn" class="btn btn-secondary" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
+                        <button id="add-weeks-btn" class="btn btn-secondary" title="Aggiungi Settimane"><i class="fas fa-calendar-plus"></i></button> 
+                        <button id="duplicate-sheet-btn" class="btn btn-secondary" title="Duplica Scheda"><i class="fas fa-copy"></i></button>
                         <button id="delete-sheet-btn" class="btn btn-danger" title="Elimina Scheda"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
                 </div>
@@ -834,14 +963,15 @@
                         <button type="submit" class="btn !w-full sm:!w-auto"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
                     </form>
                 </div>` : ''}`;
+
             document.getElementById('sheet-selector').addEventListener('change', (e) => selectSheet(e.target.value));
 
             if (currentUserRole === 'admin') {
-                document.getElementById('toggle-create-sheet-btn').addEventListener('click', () => document.getElementById('create-sheet-container').classList.toggle('open'));
-                document.getElementById('create-sheet-form').addEventListener('submit', handleCreateSheet);
-                document.getElementById('add-weeks-btn').addEventListener('click', handleAddWeeks);
-                document.getElementById('duplicate-sheet-btn').addEventListener('click', handleDuplicateSheet);
-                document.getElementById('delete-sheet-btn').addEventListener('click', handleDeleteSheet);
+                document.getElementById('toggle-create-sheet-btn')?.addEventListener('click', () => document.getElementById('create-sheet-container')?.classList.toggle('open'));
+                document.getElementById('create-sheet-form')?.addEventListener('submit', handleCreateSheet);
+                document.getElementById('add-weeks-btn')?.addEventListener('click', handleAddWeeks);
+                document.getElementById('duplicate-sheet-btn')?.addEventListener('click', handleDuplicateSheet);
+                document.getElementById('delete-sheet-btn')?.addEventListener('click', handleDeleteSheet);
             }
         }
 
@@ -856,6 +986,8 @@
                 sheetContent.classList.add('hidden');
                 initialMessage.classList.remove('hidden');
                 currentSheetId = null;
+                currentSheetName = '';
+                // Non resettare manualWorkoutDate, è gestito solo da Admin Log
                 return;
             }
 
@@ -872,7 +1004,8 @@
                 return;
             }
             currentSheetData = sheetDocSnap.data();
-
+            currentSheetName = currentSheetData.nomeScheda;
+            
             renderWeekSelector();
             renderWorkoutControls();
             renderSpecificRecap();
@@ -881,6 +1014,7 @@
             }
             await loadAndRenderExercises();
         }
+
         async function loadAndRenderExercises() {
             const exerciseContainer = document.getElementById('exercise-list-container');
             exerciseContainer.innerHTML = '<div class="loader"></div>';
@@ -897,6 +1031,7 @@
             const numWeeks = currentSheetData.numeroSettimane || 1;
             weekSelectorContainer.innerHTML = `<div class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar"></div>`;
             const container = weekSelectorContainer.firstElementChild;
+
             for (let i = 1; i <= numWeeks; i++) {
                 const isCompleted = currentSheetData.completedWeeks?.some(w => (w.week || w) === i);
                 const btn = document.createElement('button');
@@ -907,12 +1042,14 @@
                     btn.classList.add('opacity-70', 'border-green-500/50');
                 }
                 btn.className = classes;
+
                 btn.onclick = () => {
-                     currentWeek = i;
-                     modifiedExercisesThisWeek = new Set();
+                    currentWeek = i;
+                    modifiedExercisesThisWeek = new Set();
                     renderWeekSelector();
-                     renderExercises();
+                    renderExercises();
                     renderWorkoutControls();
+                    renderSpecificRecap();
                 };
                 container.appendChild(btn);
             }
@@ -943,14 +1080,15 @@
                 }
             });
 
-            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-red-500"></i> Volume Muscolare Totale</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
+            let summaryHTML = `<h3 class="text-lg font-bold mb-2 text-white"><i class="fas fa-chart-pie mr-2 text-indigo-500"></i> Volume Muscolare Totale</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">`;
             const sortedGroups = Object.keys(volumeByMuscleGroup).sort();
             let hasVolume = false;
+
             sortedGroups.forEach(group => {
                 const volume = Math.round(volumeByMuscleGroup[group] * 10) / 10;
                 if (volume > 0) {
                     hasVolume = true;
-                    summaryHTML += `<div class="bg-stone-800/50 p-2 rounded"><span class="font-semibold text-secondary">${group}:</span> <span class="text-red-400 font-bold">${volume} serie</span></div>`;
+                    summaryHTML += `<div class="bg-slate-800/50 p-2 rounded"><span class="font-semibold text-secondary">${group}:</span> <span class="text-indigo-400 font-bold">${volume} serie</span></div>`;
                 }
             });
 
@@ -967,7 +1105,7 @@
             const exerciseContainer = document.getElementById('exercise-list-container');
             exerciseContainer.innerHTML = '';
             if (exercisesCache.length === 0) {
-                exerciseContainer.innerHTML = `<div class="text-center py-8"><i class="fas fa-dumbbell text-4xl text-stone-600 mb-4"></i><p class="text-secondary">Nessun esercizio. Aggiungine uno.</p></div>`;
+                exerciseContainer.innerHTML = `<div class="text-center py-8"><i class="fas fa-dumbbell text-4xl text-slate-600 mb-4"></i><p class="text-secondary">Nessun esercizio. Aggiungine uno.</p></div>`;
             } else {
                 exercisesCache.forEach(ex => exerciseContainer.appendChild(createExerciseCard(ex)));
             }
@@ -977,7 +1115,7 @@
         function createExerciseCard(ex) {
             const card = document.createElement('div');
             card.id = `ex-card-${ex.id}`;
-                         
+
             let cardClasses = 'bg-gradient-main p-3 rounded-lg border shadow-md transition-all duration-300';
             if (ex.isCircuit) {
                 cardClasses += ' circuit-card';
@@ -989,27 +1127,26 @@
             card.className = cardClasses;
 
             let seriesHTML = '<div class="space-y-2 mt-2">';
-            
-            // Check if it's the old format (just an array) or new format (object)
+
+            // 1. Dati Settimanali (Nuovo formato con userNote e adminMemo)
             let weeklyData = ex.datiSettimanali?.[currentWeek] || {};
             if (Array.isArray(weeklyData)) {
-                // Migrate old array structure to new object structure (in memory for reading)
-                weeklyData = { userNote: '', sets: weeklyData };
+                // Migrazione formato vecchio (in-memory per questa settimana)
+                weeklyData = { userNote: '', sets: weeklyData, adminMemo: '' };
             }
-
             const setDataArray = weeklyData.sets || [];
-            const userNoteContent = weeklyData.userNote || ''; // Get user note
+            const weeklyUserNoteContent = weeklyData.userNote || ''; // Nota Atleta (Settimanale)
+            const weeklyAdminMemo = weeklyData.adminMemo || ''; // Memo Alert (Settimanale)
 
             const prevWeeklyDataRaw = ex.datiSettimanali?.[currentWeek - 1] || {};
             const prevSetDataArray = (Array.isArray(prevWeeklyDataRaw) ? prevWeeklyDataRaw : prevWeeklyDataRaw.sets) || []; // Handle previous week format
-
             const targetReps = ex.ripetizioniPerSerie || [];
-            
+
             for (let i = 0; i < ex.serie; i++) {
                 let setData = setDataArray[i] || { carico: '', reps: '' };
                 const prevSetData = prevSetDataArray[i] || null;
                 const targetRep = targetReps[i] || ex.ripetizioni || '';
-                
+
                 // Logic for progressive overload suggestion (only for non-circuit)
                 if (!ex.isCircuit && currentWeek > 1 && !setData.carico && prevSetData?.carico && prevSetData?.reps) {
                     const repRange = (targetRep.toString() || "").split('-').map(Number);
@@ -1019,10 +1156,12 @@
                     } else {
                         setData.carico = prevSetData.carico;
                     }
+                    // IMPORTANT: The auto-fill value here is ONLY in the DOM (setData). It is NOT saved to Firestore
+                    // and should NOT trigger automatic log if it is the first set. Log triggers only on manual input save.
                 }
-                
-                let prevWeekHint = prevSetData ? `<p class="text-xs text-stone-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
-                
+
+                let prevWeekHint = prevSetData ? `<p class="text-xs text-slate-500 text-right col-span-5 mb-1"><i class="fas fa-history mr-1"></i> Sett. prec: ${prevSetData.carico || '-'}kg x ${prevSetData.reps || '-'}</p>` : '';
+
                 // Determine timer button action
                 let timerButton;
                 if (ex.isCircuit) {
@@ -1032,14 +1171,14 @@
                 }
 
                 seriesHTML += `
-                        ${prevWeekHint}
-                        <div class="grid grid-cols-5 items-center gap-2">
-                            <span class="font-semibold text-secondary text-sm">S ${i + 1} (${targetRep})</span>
-                            <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
-                            <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
-                            <span class="text-xs text-center text-red-400 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
-                            ${timerButton}
-                        </div>`;
+                    ${prevWeekHint}
+                    <div class="grid grid-cols-5 items-center gap-2">
+                        <span class="font-semibold text-secondary text-sm">S ${i + 1} (${targetRep})</span>
+                        <input type="number" step="0.5" placeholder="kg" class="input-field !p-2 text-center" value="${setData.carico}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="carico">
+                        <input type="number" placeholder="reps" class="input-field !p-2 text-center" value="${setData.reps}" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="reps">
+                        <span class="text-xs text-indigo-400 font-mono" data-ex-id="${ex.id}" data-serie-index="${i}" data-field="1rm">~% 1RM</span>
+                        ${timerButton}
+                    </div>`;
             }
             seriesHTML += '</div>';
 
@@ -1055,19 +1194,26 @@
                 } else { // Use flex for 1 or 2 images
                     imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
                     imageUrls.forEach(url => {
-                        imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
+                        imageUrls.forEach(url => {
+                            imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
+                        });
                     });
                     imagesHTML += '</div>';
                 }
             }
 
             const repsDisplay = ex.ripetizioniPerSerie && ex.ripetizioniPerSerie.length > 0 ? ex.ripetizioniPerSerie.join(' / ') : (ex.ripetizioni || '');
+            
+            // Weekly Admin Alert (Visible if the user has written a memo OR if the Admin is viewing)
+            const adminAlertIndicator = (currentUserRole === 'admin' && weeklyAdminMemo) ? 
+                                           `<button class="btn btn-danger !p-1 text-xs ml-2" data-admin-alert-memo="${weeklyAdminMemo}" title="Memo Alert Settimanale!"><i class="fas fa-exclamation-triangle"></i></button>` :
+                                           (weeklyAdminMemo ? `<span class="text-red-400 text-xs ml-2" title="Memo in attesa di revisione"><i class="fas fa-exclamation-triangle"></i></span>` : '');
 
             card.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div class="flex-grow pr-4">
                         <h4 class="text-lg font-bold text-white">${ex.nomeEsercizio} ${ex.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
-                        <p class="text-sm text-red-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
+                        <p class="text-sm text-indigo-500"><i class="fas fa-tag mr-1"></i> ${ex.categoria}</p>
                         <p class="text-xs text-secondary mt-1">
                             <i class="fas fa-list-ol mr-1"></i> S: ${ex.serie} | 
                             <i class="fas fa-redo mr-1 ml-2"></i> R: ${repsDisplay} |
@@ -1076,10 +1222,10 @@
                             <i class="fas fa-hourglass-half mr-1 ml-2"></i> Rec: ${ex.recupero || '-'}s | 
                             <i class="fas fa-stopwatch-20 mr-1 ml-2"></i> TUT: ${ex.tut || '-'}
                         </p>
-                        ${ex.tecnicheIntensita ? `<p class="text-sm text-red-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
+                        ${ex.tecnicheIntensita ? `<p class="text-sm text-indigo-400 mt-2 font-semibold"><i class="fas fa-bolt mr-2"></i> ${ex.tecnicheIntensita}</p>` : ''}
                         
                         <!-- Coach Note (Persistent) -->
-                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2"><i class="fas fa-comment-dots mr-1 text-red-400"></i><span class="font-semibold text-red-400">Nota Coach (Persistente):</span> ${ex.note}</p>` : ''}
+                        ${ex.note ? `<p class="text-sm text-stone-300 mt-2 border-t border-stone-700/50 pt-2"><i class="fas fa-comment-dots mr-1 text-indigo-400"></i><span class="font-semibold text-indigo-400">Nota Coach (Persistente):</span> ${ex.note}</p>` : ''}
                     </div>
                     <div class="flex items-start gap-2">
                         <div class="flex flex-col gap-1">
@@ -1096,13 +1242,31 @@
                 </div>
                 ${imagesHTML}
                 ${seriesHTML}
-                <!-- User Note (Weekly) -->
-                <div class="mt-4 pt-3 border-t border-stone-800">
-                    <label for="user-note-${ex.id}" class="text-xs text-secondary mb-1 block font-semibold">La tua Nota (Settimana ${currentWeek}, privata):</label>
-                    <textarea id="user-note-${ex.id}" class="textarea-field !p-2 text-sm" data-ex-id="${ex.id}" data-field="userNote" placeholder="Es. Sentito bene, aumento il carico prossima settimana">${userNoteContent}</textarea>
+                
+                <div class="mt-4 pt-3 border-t border-stone-800 space-y-3">
+                    <!-- Nota Atleta (Persistente - Editabile) -->
+                    <div>
+                        <label for="persistent-user-note-${ex.id}" class="text-xs text-secondary mb-1 block font-semibold">Tua Nota (Persistente, per te stesso):</label>
+                        <textarea id="persistent-user-note-${ex.id}" class="textarea-field !p-2 text-sm" data-ex-id="${ex.id}" data-field="persistentUserNote" placeholder="Es. Ricorda di usare il bilanciere EZ, non il dritto">${ex.persistentUserNote || ''}</textarea>
+                    </div>
+
+                    <!-- Nota Atleta (Settimanale) -->
+                    <div>
+                        <label for="weekly-user-note-${ex.id}" class="text-xs text-secondary mb-1 block font-semibold">Tua Nota (Settimana ${currentWeek}, privata):</label>
+                        <textarea id="weekly-user-note-${ex.id}" class="textarea-field !p-2 text-sm" data-ex-id="${ex.id}" data-field="userNote" placeholder="Es. Sentito bene, aumento il carico prossima settimana">${weeklyUserNoteContent}</textarea>
+                    </div>
+
+                    <!-- Memo Alert (Settimanale - per Coach/Admin) -->
+                    <div>
+                        <label for="weekly-admin-memo-${ex.id}" class="text-xs text-secondary mb-1 block font-semibold flex items-center">
+                            Memo Alert (Problema Sett. ${currentWeek} per Coach) 
+                            ${adminAlertIndicator}
+                        </label>
+                        <textarea id="weekly-admin-memo-${ex.id}" class="textarea-field !p-2 text-sm ${weeklyAdminMemo ? '!border-red-500' : ''}" data-ex-id="${ex.id}" data-field="adminMemo" placeholder="Es. Ho avuto dolore al gomito nella terza serie, carichi ridotti.">${weeklyAdminMemo}</textarea>
+                    </div>
                 </div>
                 `;
-                         
+
             const repsInputs = card.querySelectorAll('input[data-field="reps"]');
             repsInputs.forEach(input => {
                 const reps = parseInt(input.value, 10);
@@ -1150,27 +1314,33 @@
                     </div>
                     <div id="add-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
                     <input type="text" name="tecnicheIntensita" class="input-field" placeholder="Tecnica di Intensità (es. Dropset)">
+                    
+                    <!-- Nota Coach (Opzionale - persistente ogni settimana) -->
                     <textarea name="note" class="textarea-field" placeholder="Nota Coach (Opzionale - persistente ogni settimana)"></textarea>
+                    
+                    <!-- Nota Atleta (Persistente - Iniziale) -->
+                    <textarea name="persistentUserNote" class="textarea-field" placeholder="Nota Atleta (Persistente - per l'atleta)"></textarea>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="text-sm text-secondary">Immagine 1</label>
                             <input type="url" name="imageUrl" class="input-field mb-2" placeholder="URL Immagine 1">
-                            <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                         </div>
                         <div>
                             <label class="text-sm text-secondary">Immagine 2</label>
                             <input type="url" name="imageUrl2" class="input-field mb-2" placeholder="URL Immagine 2">
-                            <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                            <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                         </div>
                     </div>
                     <div class="mt-4">
                         <label class="flex items-center space-x-3 cursor-pointer">
-                            <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500">
+                            <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-slate-700 border-slate-600 text-indigo-600 focus:ring-indigo-500">
                             <span class="text-secondary">È un circuito?</span>
                         </label>
                     </div>
                     <!-- Nuovi campi per Circuito -->
-                    <div id="add-circuit-fields" class="hidden space-y-4 pt-4 border-t border-stone-700">
+                    <div id="add-circuit-fields" class="hidden space-y-4 pt-4 border-t border-slate-700">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <input type="number" name="circuitWorkTime" class="input-field" placeholder="Tempo Lavoro per round (secondi)">
                             <input type="number" name="circuitRestTime" class="input-field" placeholder="Recupero tra Round (secondi)">
@@ -1179,18 +1349,18 @@
                             <div>
                                 <label class="text-sm text-secondary">Immagine 3</label>
                                 <input type="url" name="imageUrl3" class="input-field mb-2" placeholder="URL Immagine 3">
-                                <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                                <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                             </div>
                             <div>
                                 <label class="text-sm text-secondary">Immagine 4</label>
                                 <input type="url" name="imageUrl4" class="input-field mb-2" placeholder="URL Immagine 4">
-                                <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                                <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                             </div>
                         </div>
                     </div>
                     <button type="submit" class="btn w-full !mt-6">Aggiungi Esercizio</button>
                 </form>`;
-            
+
             const addForm = document.getElementById('add-exercise-form');
             addForm.elements.serie.addEventListener('input', (e) => {
                 const numSeries = parseInt(e.target.value, 10) || 0;
@@ -1209,6 +1379,7 @@
             const form = e.target;
             const mesoName = form.elements['name'].value.trim();
             if (!mesoName) return;
+
             await addDoc(getMesocyclesRef(), { nome: mesoName, dataCreazione: new Date().toISOString() });
             await renderMesocycleSelector();
             showNotification("Mesociclo creato con successo!");
@@ -1220,6 +1391,7 @@
             const sheetName = form.elements['new-sheet-name'].value.trim();
             const numWeeks = parseInt(form.elements['new-sheet-weeks'].value, 10);
             if (!sheetName || !numWeeks) return;
+
             await addDoc(getSheetsRef(currentMesoId), { nomeScheda: sheetName, numeroSettimane: numWeeks, dataCreazione: new Date().toISOString(), isCompleta: false, completedWeeks: [] });
             await renderSheetSelector();
             showNotification("Scheda creata con successo!");
@@ -1227,8 +1399,10 @@
 
         async function handleDuplicateSheet() {
             if (!currentSheetId) { showNotification("Seleziona una scheda da duplicare.", "warning"); return; }
+
             const newName = prompt("Nuovo nome per la scheda:", `${currentSheetData.nomeScheda} (Copia)`);
             if (!newName) return;
+
             const newSheetRef = await addDoc(getSheetsRef(currentMesoId), { ...currentSheetData, nomeScheda: newName, dataCreazione: new Date().toISOString(), isCompleta: false });
             const exercisesSnapshot = await getDocs(getExercisesRef(currentMesoId, currentSheetId));
             const batch = writeBatch(db);
@@ -1237,6 +1411,7 @@
                 batch.set(newExerciseRef, exDoc.data());
             });
             await batch.commit();
+
             showNotification(`Scheda "${newName}" creata!`);
             await renderSheetSelector();
         }
@@ -1249,6 +1424,7 @@
                 const batch = writeBatch(db);
                 exercisesSnapshot.forEach(doc => batch.delete(doc.ref));
                 await batch.commit();
+
                 await deleteDoc(doc(getSheetsRef(currentMesoId), currentSheetId));
                 showNotification("Scheda eliminata.");
                 currentSheetId = null;
@@ -1312,7 +1488,7 @@
             const imageFile2 = form.elements.imageFile2.files[0];
             const imageUrl1 = await uploadImage(imageFile1);
             const imageUrl2 = await uploadImage(imageFile2);
-                          
+
             const isCircuit = form.elements.isCircuit.checked;
             let imageUrl3 = null, imageUrl4 = null;
             let circuitWorkTime = null, circuitRestTime = null;
@@ -1322,7 +1498,7 @@
                 const imageFile4 = form.elements.imageFile4.files[0];
                 imageUrl3 = await uploadImage(imageFile3);
                 imageUrl4 = await uploadImage(imageFile4);
-                
+
                 circuitWorkTime = parseInt(form.elements.circuitWorkTime.value, 10) || null;
                 circuitRestTime = parseInt(form.elements.circuitRestTime.value, 10) || null;
             }
@@ -1338,6 +1514,7 @@
                 recupero: parseInt(form.elements.recupero.value, 10) || null,
                 tecnicheIntensita: form.elements.tecnicheIntensita.value || "",
                 note: form.elements.note.value || "", // Coach/Persistent Note
+                persistentUserNote: form.elements.persistentUserNote.value || "", // NEW Persistent Athlete Note
                 imageUrl: imageUrl1 || form.elements.imageUrl.value || "",
                 imageUrl2: imageUrl2 || form.elements.imageUrl2.value || "",
                 ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
@@ -1376,18 +1553,19 @@
             await batch.commit();
             await loadAndRenderExercises();
         }
+
         async function handleSaveToFavorites(exercise) {
             const { datiSettimanali, id, ...favData } = exercise;
              await addDoc(getFavoriteExercisesRef(), favData);
             showNotification(`"${favData.nomeEsercizio}" salvato nei preferiti!`);
         }
-        
+
         mainView.addEventListener('input', (e) => {
             if (e.target.matches('input[data-ex-id]')) {
                 const { exId, serieIndex, field } = e.target.dataset;
                 const value = e.target.value;
                 const weekForSave = currentWeek;
-                
+
                 // Clear set-specific timeout
                 const key = `${exId}-${weekForSave}-${serieIndex}-${field}`;
                 clearTimeout(saveTimeouts[key]);
@@ -1403,15 +1581,30 @@
                 } else if (field === 'carico') {
                     clearProcrastinationTimer(exId);
                 }
-            } else if (e.target.matches('textarea[data-ex-id][data-field="userNote"]')) {
-                const { exId, field } = e.target.dataset;
-                const value = e.target.value;
-                const weekForSave = currentWeek;
+            } else if (e.target.matches('textarea[data-ex-id]')) {
+                 const { exId, field } = e.target.dataset;
+                 const value = e.target.value;
+                 const weekForSave = currentWeek;
 
-                // Clear userNote timeout (no serieIndex here)
-                const key = `${exId}-${weekForSave}-userNote`;
-                clearTimeout(saveTimeouts[key]);
-                saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, null, field, value, weekForSave), 800);
+                 if (field === 'persistentUserNote') {
+                      // Persistent Note save logic
+                      const key = `${exId}-persistentUserNote`;
+                      clearTimeout(saveTimeouts[key]);
+                      saveTimeouts[key] = setTimeout(() => savePersistentUserData(exId, value), 800);
+                 } else if (field === 'userNote' || field === 'adminMemo') {
+                      // Weekly Note/Memo save logic
+                      const key = `${exId}-${weekForSave}-${field}`;
+                      clearTimeout(saveTimeouts[key]);
+                      saveTimeouts[key] = setTimeout(() => saveWeeklyData(exId, null, field, value, weekForSave), 800);
+                      
+                      // Visual feedback for adminMemo
+                      if (field === 'adminMemo') {
+                          const textarea = e.target;
+                          const label = textarea.previousElementSibling;
+                          const indicator = label.querySelector('.fa-exclamation-triangle');
+                          textarea.classList.toggle('!border-red-500', value.trim() !== '');
+                      }
+                 }
             }
         });
 
@@ -1423,6 +1616,8 @@
             const circuitTimerBtn = e.target.closest('button[data-circuit-ex-id]');
             const saveFavBtn = e.target.closest('button[data-save-fav-ex-id]');
             const historyBtn = e.target.closest('button[data-history-ex-id]');
+            const adminAlertBtn = e.target.closest('button[data-admin-alert-memo]');
+            const resetMemoBtn = e.target.closest('#reset-memo-btn');
 
             if (reorderBtn) {
                 await handleReorderExercise(reorderBtn.dataset.reorderExId, reorderBtn.dataset.direction);
@@ -1445,6 +1640,10 @@
             } else if (saveFavBtn) {
                 const exerciseToSave = exercisesCache.find(ex => ex.id === saveFavBtn.dataset.saveFavExId);
                 if (exerciseToSave) await handleSaveToFavorites(exerciseToSave);
+            } else if (adminAlertBtn) {
+                openAdminAlertModal(adminAlertBtn.dataset.adminAlertMemo);
+            } else if (resetMemoBtn) {
+                handleResetAllAdminMemosForWeek();
             } else if (e.target.id === 'toggle-add-exercise-btn') {
                 document.getElementById('add-exercise-container').classList.toggle('open');
             } else if (e.target.id === 'add-from-favorites-btn') {
@@ -1457,43 +1656,161 @@
                 openUserManagementModal();
             }
         });
+        
+        // NEW EVENT HANDLER: Open Admin Manual Log from User Details Modal
+        userDetailsModal.addEventListener('click', (e) => {
+            if (e.target.id === 'open-admin-manual-log-btn' && selectedUserId && currentUserRole === 'admin') {
+                openAdminManualLogModal(selectedUserId);
+            }
+        });
 
+        // NEW FUNCTION: Log Workout Session (automatic or manual override)
+        async function logWorkoutSession(sheetId, week, sheetName, isManualOverride = false, workoutDateOverride = null) {
+            const userId = selectedUserId || currentUser.uid;
+            
+            // Use override date if provided, otherwise default to current time
+            const workoutDate = workoutDateOverride || new Date().toISOString(); 
+            
+            // Formattiamo la data per il controllo "una volta al giorno"
+            const logDateOnly = new Date(workoutDate).toISOString().split('T')[0];
+            const startOfDay = new Date(logDateOnly).toISOString();
+            const endOfDay = new Date(logDateOnly);
+            endOfDay.setDate(endOfDay.getDate() + 1);
+            const endOfDayISO = endOfDay.toISOString();
+
+
+            const checkLogQuery = query(getWorkoutHistoryRef(userId),
+                where('sheetId', '==', sheetId),
+                where('week', '==', week),
+                where('completedAt', '>=', startOfDay),
+                where('completedAt', '<', endOfDayISO), // Check if a log exists for this sheet/week/day
+                limit(1)
+            );
+            
+            const checkLogSnapshot = await getDocs(checkLogQuery);
+
+            if (!checkLogSnapshot.empty) {
+                 // Log for this sheet/week/day already exists. 
+                 if (isManualOverride) {
+                     showNotification(`Attenzione: Allenamento Sett. ${week} per il ${logDateOnly} già loggato.`, "warning");
+                 }
+                 return; 
+            }
+            
+            try {
+                // Se non c'è un log per questa scheda/settimana in questo giorno specifico, lo creiamo
+                await addDoc(getWorkoutHistoryRef(userId), {
+                    sheetId: sheetId,
+                    sheetName: sheetName,
+                    week: week,
+                    completedAt: workoutDate, // Use the determined date/time (manual or current)
+                    userId: userId, 
+                    mesoId: currentMesoId
+                });
+                showNotification(`Allenamento loggato: ${sheetName}, Sett. ${week} (${logDateOnly})`, "success");
+                
+                if (selectedUserId) {
+                     renderWorkoutHistory(selectedUserId);
+                }
+
+            } catch (error) {
+                console.error("Errore nel log dell'allenamento:", error);
+            }
+        }
+
+
+        // NEW FUNCTION: Save Persistent User Data
+        async function savePersistentUserData(exId, value) {
+            try {
+                const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
+                await updateDoc(exerciseRef, { persistentUserNote: value });
+
+                // Aggiorna la cache
+                const exercise = exercisesCache.find(ex => ex.id === exId);
+                if (exercise) exercise.persistentUserNote = value;
+                
+            } catch(error) {
+                console.error("Errore nel salvataggio della nota persistente:", error);
+                showNotification("Errore di salvataggio nota persistente.", "error");
+            }
+        }
+
+        // CORREZIONE CRITICA: Uso di updateDoc con datiSettimanali correttamente formattato
         async function saveWeeklyData(exId, serieIndex, field, value, week) {
             const exercise = exercisesCache.find(ex => ex.id === exId);
             if (!exercise) return;
 
             const updatedDati = JSON.parse(JSON.stringify(exercise.datiSettimanali || {}));
-            
-            // Handle old array format by normalizing
-            if (Array.isArray(updatedDati[week])) {
-                updatedDati[week] = { userNote: '', sets: updatedDati[week] };
+
+            let weeklyData = updatedDati[week] || { userNote: '', sets: [], adminMemo: '' };
+            if (Array.isArray(weeklyData)) {
+                weeklyData = { userNote: '', sets: weeklyData, adminMemo: '' };
             }
-            if (!updatedDati[week]) updatedDati[week] = { userNote: '', sets: [] };
+            if (!weeklyData.sets) weeklyData.sets = [];
+
+            let isLogTriggered = false;
 
             if (field === 'carico' || field === 'reps') {
-                const setArray = updatedDati[week].sets;
-                while (setArray.length <= serieIndex) setArray.push({ carico: '', reps: '' });
-                setArray[serieIndex][field] = value;
+                const setArray = weeklyData.sets;
+                const numSets = exercise.serie;
+                
+                while (setArray.length < numSets) {
+                    setArray.push({ carico: '', reps: '' });
+                }
+                
+                const actualSerieIndex = Math.min(serieIndex, numSets - 1);
+                if (actualSerieIndex >= 0) {
+                    
+                    const isFirstExercise = exercisesCache.indexOf(exercise) === 0;
+                    const isFirstSet = actualSerieIndex === 0;
+                    
+                    // Trigger log ONLY if it's the first set/exercise AND we are saving a non-empty value for the first time this week.
+                    // This handles the user typing over an auto-filled value. The auto-filled value is NOT saved in Firestore yet,
+                    // so the DB value (weeklyData.sets[actualSerieIndex][field] in the next line) will be empty.
+                    if (isFirstExercise && isFirstSet && (field === 'carico' || field === 'reps') && (setArray[actualSerieIndex][field] || '').trim() === '' && value.trim() !== '') {
+                        isLogTriggered = true;
+                    }
+                    
+                    setArray[actualSerieIndex][field] = value;
+                }
             } else if (field === 'userNote') {
-                updatedDati[week].userNote = value;
+                weeklyData.userNote = value;
+            } else if (field === 'adminMemo') {
+                weeklyData.adminMemo = value;
             } else {
-                return; // Non-handled field
+                return;
             }
+            
+            updatedDati[week] = weeklyData;
 
-            const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
-            const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
+            try {
+                const sheetRef = doc(getSheetsRef(currentMesoId), currentSheetId);
+                const exerciseRef = doc(getExercisesRef(currentMesoId, currentSheetId), exId);
 
-            const batch = writeBatch(db);
-            batch.update(exerciseRef, { datiSettimanali: updatedDati });
-            batch.update(sheetRef, { lastModified: new Date().toISOString() });
-            await batch.commit();
+                const batch = writeBatch(db);
+                batch.update(exerciseRef, { datiSettimanali: updatedDati });
+                batch.update(sheetRef, { lastModified: new Date().toISOString() });
+                await batch.commit();
 
-            exercise.datiSettimanali = updatedDati;
-            currentSheetData.lastModified = new Date().toISOString();
+                // Log workout session if triggered (FIX: logWorkoutSession checks for duplicates, so it's safe to call here)
+                if (isLogTriggered && currentSheetName) {
+                    // Log with current time as default
+                    logWorkoutSession(currentSheetId, week, currentSheetName);
+                }
 
-            if (week === currentWeek) {
-                renderSpecificRecap();
-                calculateAndRenderSheetVolume();
+                // Aggiorna la cache solo dopo il successo del commit
+                exercise.datiSettimanali = updatedDati;
+                currentSheetData.lastModified = new Date().toISOString();
+
+                if (week === currentWeek) {
+                    renderSpecificRecap();
+                    if (field === 'adminMemo') {
+                        renderExercises();
+                    }
+                }
+            } catch(error) {
+                console.error("Errore nel salvataggio dei dati settimanali:", error);
+                showNotification("Errore di salvataggio dati. Controlla la console.", "error");
             }
         }
 
@@ -1501,8 +1818,10 @@
         function openEditExerciseModal(exId) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
              if (!exercise) return;
+             
              const container = document.getElementById('edit-exercise-container');
              const categoryOptions = CATEGORIES.map(cat => `<option value="${cat}" ${exercise.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('');
+
              container.innerHTML = `
                  <form id="edit-exercise-form" class="space-y-4" data-ex-id="${exId}">
                      <input type="text" name="nomeEsercizio" class="input-field" value="${exercise.nomeEsercizio || ''}" required>
@@ -1516,27 +1835,33 @@
                      </div>
                      <div id="edit-ripetizioni-per-serie-container" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2"></div>
                      <input type="text" name="tecnicheIntensita" class="input-field" value="${exercise.tecnicheIntensita || ''}" placeholder="Tecnica di Intensità (es. Dropset)">
+                     
+                     <!-- Nota Coach (Persistente - visibile all'utente) -->
                      <textarea name="note" class="textarea-field" placeholder="Nota Coach (Opzionale - persistente ogni settimana)">${exercise.note || ''}</textarea>
+                     
+                     <!-- Nota Atleta (Persistente - SOLO ADMIN MODIFICA/VISUALIZZA QUI) -->
+                     <textarea name="persistentUserNote" class="textarea-field" placeholder="Nota Atleta (Persistente)">${exercise.persistentUserNote || ''}</textarea>
+
                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div>
                              <label class="text-sm text-secondary">Immagine 1</label>
                              <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
-                             <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                             <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                          </div>
                          <div>
                              <label class="text-sm text-secondary">Immagine 2</label>
                              <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
-                             <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                             <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                          </div>
                      </div>
                      <div class="mt-4">
                          <label class="flex items-center space-x-3 cursor-pointer">
-                             <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500" ${exercise.isCircuit ? 'checked' : ''}>
+                             <input type="checkbox" name="isCircuit" class="h-4 w-4 rounded bg-slate-700 border-slate-600 text-indigo-600 focus:ring-indigo-500" ${exercise.isCircuit ? 'checked' : ''}>
                              <span class="text-secondary">È un circuito?</span>
                          </label>
                      </div>
                      <!-- Nuovi campi per Circuito in Edit -->
-                     <div id="edit-circuit-fields" class="${exercise.isCircuit ? '' : 'hidden'} space-y-4 pt-4 border-t border-stone-700">
+                     <div id="edit-circuit-fields" class="${exercise.isCircuit ? '' : 'hidden'} space-y-4 pt-4 border-t border-slate-700">
                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                              <input type="number" name="circuitWorkTime" class="input-field" value="${exercise.circuitWorkTime || ''}" placeholder="Tempo Lavoro per round (secondi)">
                              <input type="number" name="circuitRestTime" class="input-field" value="${exercise.circuitRestTime || ''}" placeholder="Recupero tra Round (secondi)">
@@ -1545,12 +1870,12 @@
                              <div>
                                  <label class="text-sm text-secondary">Immagine 3</label>
                                  <input type="url" name="imageUrl3" class="input-field mb-2" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
-                                 <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                                 <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                              </div>
                              <div>
                                  <label class="text-sm text-secondary">Immagine 4</label>
                                  <input type="url" name="imageUrl4" class="input-field mb-2" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
-                                 <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-stone-700 file:text-stone-300 hover:file:bg-stone-600">
+                                 <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                              </div>
                          </div>
                      </div>
@@ -1559,6 +1884,7 @@
                          <button type="submit" class="btn">Salva Modifiche</button>
                      </div>
                  </form>`;
+
              const editForm = document.getElementById('edit-exercise-form');
              const seriesInput = editForm.elements.serie;
              const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
@@ -1570,20 +1896,16 @@
                  const currentValues = Array.from(repsContainer.querySelectorAll('input')).map(input => input.value);
                  generateRepInputs(repsContainer, numSeries, currentValues);
              });
-                          
+
              editForm.elements.isCircuit.addEventListener('change', (e) => {
                  document.getElementById('edit-circuit-fields').classList.toggle('hidden', !e.target.checked);
              });
 
-             editExerciseModal.classList.remove('hidden');
-             setTimeout(() => editExerciseModal.classList.remove('opacity-0'), 10);
+             editExerciseModal.classList.remove('hidden', 'opacity-0');
              editForm.addEventListener('submit', handleUpdateExercise);
-             document.getElementById('cancel-edit-btn').addEventListener('click', closeEditExerciseModal);
-         }
-        function closeEditExerciseModal() {
-             editExerciseModal.classList.add('opacity-0');
-             setTimeout(() => editExerciseModal.classList.add('hidden'), 250);
-         }
+             document.getElementById('cancel-edit-btn').addEventListener('click', () => closeModal(editExerciseModal));
+        }
+
         async function handleUpdateExercise(e) {
              e.preventDefault();
              const form = e.target;
@@ -1592,21 +1914,20 @@
              submitBtn.disabled = true;
              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvataggio...';
 
-             const imageFile1 = form.elements.imageFile1.files[0];
-             const imageFile2 = form.elements.imageFile2.files[0];
-             const imageUrl1 = await uploadImage(imageFile1);
-             const imageUrl2 = await uploadImage(imageFile2);
-                          
+             const exerciseInCache = exercisesCache.find(ex => ex.id === exId);
+             
+             // Reuse existing URLs if no new file is uploaded
+             const imageUrl1 = form.elements.imageFile1.files[0] ? await uploadImage(form.elements.imageFile1.files[0]) : (form.elements.imageUrl.value || exerciseInCache.imageUrl);
+             const imageUrl2 = form.elements.imageFile2.files[0] ? await uploadImage(form.elements.imageFile2.files[0]) : (form.elements.imageUrl2.value || exerciseInCache.imageUrl2);
+
              const isCircuit = form.elements.isCircuit.checked;
              let imageUrl3 = null, imageUrl4 = null;
              let circuitWorkTime = null, circuitRestTime = null;
-             
+
              if (isCircuit) {
-                 const imageFile3 = form.elements.imageFile3.files[0];
-                 const imageFile4 = form.elements.imageFile4.files[0];
-                 imageUrl3 = await uploadImage(imageFile3);
-                 imageUrl4 = await uploadImage(imageFile4);
-                 
+                 imageUrl3 = form.elements.imageFile3?.files[0] ? await uploadImage(form.elements.imageFile3.files[0]) : (form.elements.imageUrl3.value || exerciseInCache.imageUrl3);
+                 imageUrl4 = form.elements.imageFile4?.files[0] ? await uploadImage(form.elements.imageFile4.files[0]) : (form.elements.imageUrl4.value || exerciseInCache.imageUrl4);
+
                  circuitWorkTime = parseInt(form.elements.circuitWorkTime.value, 10) || null;
                  circuitRestTime = parseInt(form.elements.circuitRestTime.value, 10) || null;
              }
@@ -1620,18 +1941,20 @@
                  tut: form.elements.tut.value,
                  recupero: parseInt(form.elements.recupero.value, 10) || null,
                  tecnicheIntensita: form.elements.tecnicheIntensita.value,
-                 note: form.elements.note.value, // Coach/Persistent Note
-                 imageUrl: imageUrl1 || form.elements.imageUrl.value,
-                 imageUrl2: imageUrl2 || form.elements.imageUrl2.value,
+                 note: form.elements.note.value,
+                 persistentUserNote: form.elements.persistentUserNote.value,
+                 imageUrl: imageUrl1,
+                 imageUrl2: imageUrl2,
                  ripetizioniPerSerie: Array.from(form.querySelectorAll('input[name="ripetizioniPerSerie"]')).map(input => input.value),
                  isCircuit: isCircuit,
-                 circuitWorkTime: circuitWorkTime, // New circuit field
-                 circuitRestTime: circuitRestTime, // New circuit field
-                 imageUrl3: isCircuit ? (imageUrl3 || form.elements.imageUrl3.value || "") : "",
-                 imageUrl4: isCircuit ? (imageUrl4 || form.elements.imageUrl4.value || "") : ""
+                 circuitWorkTime: circuitWorkTime,
+                 circuitRestTime: circuitRestTime,
+                 imageUrl3: isCircuit ? imageUrl3 : "",
+                 imageUrl4: isCircuit ? imageUrl4 : ""
              };
+
              await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
-             closeEditExerciseModal();
+             closeModal(editExerciseModal);
              await loadAndRenderExercises();
              showNotification("Esercizio aggiornato!");
          }
@@ -1659,11 +1982,11 @@
                 weeks.forEach(week => {
                     let weekDataRaw = historyData[week];
                     if (Array.isArray(weekDataRaw)) {
-                        // Handle old format
-                        weekDataRaw = { userNote: '', sets: weekDataRaw };
+                        weekDataRaw = { userNote: '', sets: weekDataRaw, adminMemo: '' };
                     }
                     const weekData = weekDataRaw.sets;
                     const userNote = weekDataRaw.userNote;
+                    const adminMemo = weekDataRaw.adminMemo;
 
                     if (!weekData || weekData.length === 0) return;
 
@@ -1698,10 +2021,11 @@
                             <h4 class="font-bold text-white text-lg mb-2">Settimana ${week}</h4>
                             <div class="mb-3 p-2 bg-stone-900/50 rounded">
                                 <span class="font-semibold text-secondary">Miglior Set: </span>
-                                <span class="font-bold text-red-400">${bestSetThisWeek.text}</span>
+                                <span class="font-bold text-indigo-400">${bestSetThisWeek.text}</span>
                                 ${progressIndicator}
                             </div>
-                            ${userNote ? `<p class="text-sm text-stone-300 mb-3"><i class="fas fa-user-edit mr-1"></i><span class="font-semibold text-secondary"> Tua Nota:</span> ${userNote}</p>` : ''}
+                            ${userNote ? `<p class="text-sm text-stone-300 mb-3"><i class="fas fa-user-edit mr-1"></i><span class="font-semibold text-secondary"> Tua Nota (Settimanale):</span> ${userNote}</p>` : ''}
+                            ${adminMemo ? `<p class="text-sm text-red-400 mb-3"><i class="fas fa-exclamation-triangle mr-1"></i><span class="font-semibold text-red-400"> Memo Alert:</span> ${adminMemo}</p>` : ''}
                             <div class="space-y-1">${setsHTML || '<p class="text-sm text-stone-400">Nessun dato completo per questa settimana.</p>'}</div>
                         </div>
                     `;
@@ -1711,24 +2035,12 @@
                 container.innerHTML = historyHTML;
             }
 
-            exerciseHistoryModal.classList.remove('hidden');
-            setTimeout(() => exerciseHistoryModal.classList.remove('opacity-0'), 10);
+            exerciseHistoryModal.classList.remove('hidden', 'opacity-0');
         }
-        document.getElementById('close-history-modal').addEventListener('click', () => {
-            exerciseHistoryModal.classList.add('opacity-0');
-            setTimeout(() => exerciseHistoryModal.classList.add('hidden'), 250);
-        });
-        exerciseHistoryModal.addEventListener('click', (e) => {
-            if(e.target === exerciseHistoryModal) {
-                exerciseHistoryModal.classList.add('opacity-0');
-                setTimeout(() => exerciseHistoryModal.classList.add('hidden'), 250);
-            }
-        });
 
         // --- GESTIONE PREFERITI ---
         function openFavoritesModal() {
-            favoritesModal.classList.remove('hidden');
-            setTimeout(() => favoritesModal.classList.remove('opacity-0'), 10);
+            favoritesModal.classList.remove('hidden', 'opacity-0');
             loadAndRenderFavorites();
         }
 
@@ -1752,9 +2064,10 @@
                 <div class="bg-stone-800/50 p-4 rounded-lg flex flex-col">
                     <div class="flex-grow">
                         <h4 class="font-bold text-white">${fav.nomeEsercizio} ${fav.isCircuit ? '<span class="reward-badge !bg-amber-500 !text-amber-900">CIRCUITO</span>' : ''}</h4>
-                        <p class="text-sm text-red-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
+                        <p class="text-sm text-indigo-400 mb-2"><i class="fas fa-tag mr-1"></i> ${fav.categoria}</p>
                         <p class="text-xs text-secondary mb-3">Serie: ${fav.serie} | Reps: ${fav.ripetizioniPerSerie ? fav.ripetizioniPerSerie.join(' / ') : (fav.ripetizioni || '')} ${fav.isCircuit ? `| Lav: ${fav.circuitWorkTime || '-'}s | Rec: ${fav.circuitRestTime || '-'}s` : ''} | RIR: ${fav.rir || '-'} | Recupero: ${fav.recupero || '-'}s</p>
                         ${fav.note ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">Nota Coach: ${fav.note}</p>` : ''}
+                        ${fav.persistentUserNote ? `<p class="text-sm text-stone-300 border-t border-stone-700/50 pt-2 mt-2">Nota Atleta (Pers.): ${fav.persistentUserNote}</p>` : ''}
                     </div>
                     <div class="flex justify-end gap-2 mt-auto pt-2">
                         <button class="btn btn-secondary !p-2 text-xs" data-add-fav-ex-id="${fav.id}" title="Aggiungi alla scheda"><i class="fas fa-plus"></i></button>
@@ -1764,7 +2077,7 @@
             ).join('');
 
             if(filteredFavorites.length === 0) {
-                 favoritesHTML = `<div class="text-center py-8"><i class="fas fa-star text-4xl text-stone-600 mb-4"></i><p class="text-secondary">Nessun esercizio preferito in questa categoria.</p></div>`;
+                 favoritesHTML = `<div class="text-center py-8"><i class="fas fa-star text-4xl text-slate-600 mb-4"></i><p class="text-secondary">Nessun esercizio preferito in questa categoria.</p></div>`;
             }
 
             listContainer.innerHTML = `
@@ -1780,13 +2093,8 @@
                 renderFilteredFavorites(e.target.value);
             }
         });
-        favoritesModal.addEventListener('click', async (e) => {
-             if (e.target.id === 'close-favorites-modal' || e.target.closest('#close-favorites-modal') || e.target === favoritesModal) {
-                 favoritesModal.classList.add('opacity-0');
-                 setTimeout(() => favoritesModal.classList.add('hidden'), 250);
-                 return;
-             }
 
+        favoritesModal.addEventListener('click', async (e) => {
              const addBtn = e.target.closest('button[data-add-fav-ex-id]');
              const deleteBtn = e.target.closest('button[data-delete-fav-ex-id]');
 
@@ -1815,33 +2123,176 @@
                  content += `<p><b>${ex.nomeEsercizio}</b>: ${ex.serie}x${ex.ripetizioni || ''}</p>`;
              });
              document.getElementById('pdf-preview-container').innerHTML = content;
-             pdfPreviewModal.classList.remove('hidden');
-             setTimeout(() => pdfPreviewModal.classList.remove('opacity-0'), 10);
+
+             pdfPreviewModal.classList.remove('hidden', 'opacity-0');
         }
+
         document.getElementById('download-pdf-btn').addEventListener('click', async () => {
              const { jsPDF } = window.jspdf;
              const pdf = new jsPDF();
              const content = document.getElementById('pdf-preview-container');
+             
+             // Use a specific CSS class for PDF content styling if needed
+             content.style.backgroundColor = 'white';
+             content.style.color = 'black';
+             
              const canvas = await html2canvas(content);
              const imgData = canvas.toDataURL('image/png');
              pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
              pdf.save(`${currentSheetData.nomeScheda}.pdf`);
-        });
-        document.getElementById('close-pdf-preview-btn').addEventListener('click', () => {
-            pdfPreviewModal.classList.add('opacity-0');
-            setTimeout(() => pdfPreviewModal.classList.add('hidden'), 250);
+             
+             // Restore original styles
+             content.style.backgroundColor = '';
+             content.style.color = '';
         });
 
-        // --- NUOVE FUNZIONALITÀ ---
+        
+        // NEW FUNCTION: Backup All Data to JSON
+        async function handleBackupAllData() {
+            if (currentUserRole !== 'admin') {
+                showNotification("Solo gli amministratori possono eseguire il backup.", "error");
+                return;
+            }
+
+            const confirmBackup = await showConfirmModal("Sei sicuro di voler scaricare un backup JSON di TUTTI i dati degli utenti (esclusi i preferiti globali)?");
+            if (!confirmBackup) return;
+
+            showNotification("Avvio backup dati...", "info");
+            
+            try {
+                const usersSnapshot = await getDocs(getUsersRef());
+                const backupData = {};
+                
+                for (const userDoc of usersSnapshot.docs) {
+                    const userId = userDoc.id;
+                    const userData = { email: userDoc.data().email, role: userDoc.data().role, mesocycles: [], workoutHistory: [] };
+                    
+                    // 1. Fetch Workout History
+                    const historySnapshot = await getDocs(getWorkoutHistoryRef(userId));
+                    userData.workoutHistory = historySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                    // 2. Fetch Mesocycles
+                    const mesocyclesRef = collection(db, 'users', userId, 'mesocycles');
+                    const mesocyclesSnapshot = await getDocs(mesocyclesRef);
+
+                    for (const mesoDoc of mesocyclesSnapshot.docs) {
+                        const mesoData = { id: mesoDoc.id, ...mesoDoc.data(), trainingSheets: [] };
+                        
+                        // 3. Fetch Training Sheets
+                        const sheetsRef = collection(mesoDoc.ref, 'trainingSheets');
+                        const sheetsSnapshot = await getDocs(sheetsRef);
+
+                        for (const sheetDoc of sheetsSnapshot.docs) {
+                            const sheetData = { id: sheetDoc.id, ...sheetDoc.data(), exercises: [] };
+                            
+                            // 4. Fetch Exercises
+                            const exercisesRef = collection(sheetDoc.ref, 'exercises');
+                            const exercisesSnapshot = await getDocs(exercisesRef);
+                            sheetData.exercises = exercisesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                            mesoData.trainingSheets.push(sheetData);
+                        }
+                        userData.mesocycles.push(mesoData);
+                    }
+                    backupData[userId] = userData;
+                }
+
+                // Create and download the JSON file
+                const jsonString = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `gym_app_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification("Backup completato con successo!", "success");
+
+            } catch (error) {
+                console.error("Errore durante il backup dei dati:", error);
+                showNotification("Errore critico durante il backup. Controlla la console.", "error");
+            }
+        }
+        
+
+        // --- NUOVE FUNZIONI ADMIN (MEMO & HISTORY) ---
+        
+        async function handleResetAllAdminMemosForWeek() {
+            if (currentUserRole !== 'admin') {
+                showNotification("Solo gli amministratori possono resettare i memo.", "error");
+                return;
+            }
+            if (!currentMesoId || !currentSheetId) return;
+
+            const confirmed = await showConfirmModal(`Sei sicuro di voler resettare tutti i Memo Alert per la Scheda corrente, Settimana ${currentWeek}?`);
+            if (!confirmed) return;
+
+            const exercisesRef = getExercisesRef(currentMesoId, currentSheetId);
+            const exercisesSnapshot = await getDocs(query(exercisesRef));
+            const batch = writeBatch(db);
+            const weekKey = currentWeek.toString();
+
+            let memosCleared = 0;
+            exercisesSnapshot.forEach(exDoc => {
+                const exData = exDoc.data();
+                const datiSettimanali = exData.datiSettimanali || {};
+                
+                if (datiSettimanali[weekKey] && datiSettimanali[weekKey].adminMemo) {
+                    // Crea una copia profonda per l'aggiornamento
+                    const updatedDati = JSON.parse(JSON.stringify(datiSettimanali));
+                    updatedDati[weekKey].adminMemo = "";
+                    
+                    const exRef = doc(exercisesRef, exDoc.id);
+                    batch.update(exRef, { datiSettimanali: updatedDati });
+                    memosCleared++;
+                }
+            });
+
+            if (memosCleared > 0) {
+                await batch.commit();
+                // Forza il ricaricamento della cache e del rendering per rimuovere gli indicatori
+                await loadAndRenderExercises(); 
+                // E anche l'aggiornamento della UI dei controlli per rimuovere il pulsante Reset Memo Alert
+                renderWorkoutControls();
+                showNotification(`Resettati ${memosCleared} Memo Alert per la Settimana ${currentWeek}!`, "success");
+            } else {
+                showNotification("Nessun Memo Alert trovato per questa settimana.", "warning");
+            }
+        }
+
         function renderWorkoutControls() {
             const container = document.getElementById('workout-controls-container');
             if (!container || !currentSheetData) return;
+            
+            // Check if any memo is pending for this week to show the reset button
+            const hasPendingMemo = exercisesCache.some(ex => {
+                const weeklyData = ex.datiSettimanali?.[currentWeek] || {};
+                const memoContent = (Array.isArray(weeklyData) ? '' : (weeklyData.adminMemo || '')).trim();
+                return memoContent.length > 0;
+            });
+            
+            const memoResetButton = currentUserRole === 'admin' && hasPendingMemo ? 
+                `<button id="reset-memo-btn" class="btn btn-danger flex-shrink-0 !py-2 !px-4"><i class="fas fa-trash-alt mr-2"></i> Reset Memo Alert</button>` : '';
+
+            // Rimosso il blocco del log manuale
             container.innerHTML = `
-                <div class="bg-gradient-main p-3 rounded-lg border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div id="workout-recap-specific" class="text-sm text-secondary flex-grow text-center sm:text-left">
+                <div class="bg-gradient-main p-3 rounded-lg border border-stone-700 space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div id="workout-recap-specific" class="text-sm text-secondary flex-grow text-center sm:text-left">
                         </div>
-                     <button id="mark-week-complete-btn" class="btn btn-secondary flex-shrink-0"><i class="fas fa-check mr-2"></i> Segna come Completato</button>
+                       <button id="mark-week-complete-btn" class="btn btn-secondary flex-shrink-0"><i class="fas fa-check mr-2"></i> Segna come Completato</button>
+                    </div>
+                    
+                    ${memoResetButton ? `
+                    <div class="border-t border-stone-800 pt-3 flex justify-end">
+                        ${memoResetButton}
+                    </div>` : ''}
                 </div>`;
+            
+            // Non ci sono più listener per la data manuale qui.
 
             const markBtn = document.getElementById('mark-week-complete-btn');
             const isWeekCompleted = currentSheetData.completedWeeks?.some(w => (w.week || w) === currentWeek);
@@ -1921,20 +2372,41 @@
                         }
                     }
                 }
+                
+                // Secondary check: Find the most recent log in workoutHistory (for automatic logs)
+                const historyQuery = query(getWorkoutHistoryRef(userId), orderBy('completedAt', 'desc'), limit(1));
+                const historySnapshot = await getDocs(historyQuery);
+                const lastLog = historySnapshot.docs.length > 0 ? historySnapshot.docs[0].data() : null;
+
+                if (lastLog) {
+                    // Normalize lastWorkout to compare with lastLog (logs auto-capture when first set is done, weeks are manual marks)
+                    if (!lastWorkout || new Date(lastLog.completedAt) > new Date(lastWorkout.completedAt)) {
+                         // Prefer the actual log entry if it's newer than the last manually marked week.
+                         lastWorkout = {
+                             week: lastLog.week,
+                             completedAt: lastLog.completedAt,
+                             sheetName: lastLog.sheetName,
+                             mesoName: lastLog.mesoName,
+                             isAutoLog: true
+                         };
+                    }
+                }
+
 
                 if (lastWorkout) {
-                    const lastDate = new Date(lastWorkout.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' });
+                    const logType = lastWorkout.isAutoLog ? 'Ultimo Allenamento Loggato' : 'Ultima Settimana Completata';
+                    const lastDate = new Date(lastWorkout.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'});
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                                <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">ULTIMO ALLENAMENTO COMPLETATO</h3>
+                                <h3 class="text-sm font-bold text-cyan-300 mb-1 tracking-wider uppercase">${logType}</h3>
                                 <p class="text-lg text-white font-semibold">${lastWorkout.sheetName} (Sett. ${lastWorkout.week})</p>
-                                <p class="text-sm text-stone-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
+                                <p class="text-sm text-slate-300"><i class="fas fa-calendar-check mr-2"></i>${lastDate}</p>
                         </div>`;
                 } else {
                     container.innerHTML = `
                         <div class="recap-card p-4 rounded-xl text-center shadow-lg">
-                                <h3 class="text-sm font-bold text-purple-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
-                                <p class="text-lg text-white font-semibold">Nessun allenamento ancora completato. Dai il massimo!</p>
+                                <h3 class="text-sm font-bold text-cyan-300 mb-1 tracking-wider uppercase">BENVENUTO</h3>
+                                <p class="text-lg text-white font-semibold">Nessun allenamento ancora loggato. Dai il massimo!</p>
                         </div>`;
                 }
 
@@ -1947,6 +2419,7 @@
         function renderSpecificRecap() {
             const container = document.getElementById('workout-recap-specific');
             if (!container) return;
+
             if (currentSheetData && currentSheetData.lastModified) {
                 const lastDate = new Date(currentSheetData.lastModified).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
                 container.innerHTML = `<i class="fas fa-pencil-alt mr-2 text-yellow-400"></i>Ultima modifica a questa scheda: <b>${lastDate}</b>`;
@@ -1954,99 +2427,470 @@
                 container.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Nessuna modifica ancora registrata.';
             }
         }
+
         function calculate1RMEstimate(reps) {
             if (!reps || reps <= 0) return `~% 1RM`;
             const percentage = (1 / (1 + reps / 30)) * 100;
             if (percentage > 100) return `>100%`;
             return `~${Math.round(percentage)}%`;
         }
+
         const calculateE1RM = (carico, reps) => {
             if (!carico || !reps) return 0;
             return parseFloat(carico) * (1 + parseInt(reps) / 30);
         }
+
         function handleProcrastinationCheck(exId, serieIndex, repsInput) {
              const exercise = exercisesCache.find(ex => ex.id === exId);
-             if (!exercise || !exercise.recupero || exercise.isCircuit || serieIndex >= exercise.serie - 1) return; // Ignore for circuits
+             if (!exercise || !exercise.recupero || exercise.isCircuit || serieIndex >= exercise.serie - 1) return;
+             
              const card = document.getElementById(`ex-card-${exId}`);
              if (!card) return;
+             
              const caricoInput = card.querySelector(`input[data-serie-index="${serieIndex}"][data-field="carico"]`);
+             
              if (repsInput.value && caricoInput && caricoInput.value) {
                  clearProcrastinationTimer(exId);
                  const delay = exercise.recupero * 2.5 * 1000;
                  procrastinationTimers[exId] = setTimeout(() => {
-                      procrastinationModal.classList.remove('hidden');
-                      setTimeout(() => procrastinationModal.classList.remove('opacity-0'), 10);
+                      procrastinationModal.classList.remove('hidden', 'opacity-0');
                       delete procrastinationTimers[exId];
                  }, delay);
              }
         }
+
         function clearProcrastinationTimer(exId) {
             if (procrastinationTimers[exId]) {
                 clearTimeout(procrastinationTimers[exId]);
                 delete procrastinationTimers[exId];
             }
         }
-        function closeProcrastinationModal() {
-            procrastinationModal.classList.add('opacity-0');
-            setTimeout(() => procrastinationModal.classList.add('hidden'), 250);
-        }
-        document.getElementById('procrastination-ok-btn').addEventListener('click', closeProcrastinationModal);
+        document.getElementById('procrastination-ok-btn').addEventListener('click', () => closeModal(procrastinationModal));
 
-        async function openVolumeAnalysisModal() {
-            if (!currentMesoId) {
-                showNotification("Seleziona prima un mesociclo.", "warning");
-                return;
+
+        // --- NUOVE FUNZIONI ADMIN (MEMO & HISTORY) ---
+
+        // Utility: Check if a single user has any non-empty adminMemo in ANY week/sheet/mesocycle
+        async function checkForPendingMemos(userId) {
+            try {
+                const mesocyclesRef = collection(db, 'users', userId, 'mesocycles');
+                const mesocyclesSnapshot = await getDocs(mesocyclesRef);
+
+                for (const mesoDoc of mesocyclesSnapshot.docs) {
+                    const sheetsRef = collection(mesoDoc.ref, 'trainingSheets');
+                    const sheetsSnapshot = await getDocs(sheetsRef);
+
+                    for (const sheetDoc of sheetsSnapshot.docs) {
+                        const exercisesRef = collection(sheetDoc.ref, 'exercises');
+                        const exercisesSnapshot = await getDocs(exercisesRef);
+
+                        for (const exDoc of exercisesSnapshot.docs) {
+                            const datiSettimanali = exDoc.data().datiSettimanali || {};
+                            for (const week in datiSettimanali) {
+                                const weeklyData = datiSettimanali[week];
+                                const adminMemo = (Array.isArray(weeklyData) ? '' : (weeklyData.adminMemo || '')).trim();
+
+                                if (adminMemo.length > 0) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Errore durante il check memo per utente ${userId}:`, error);
             }
+            return false;
+        }
 
-            const container = document.getElementById('volume-analysis-container');
+        async function renderUserManagementContent() {
+            const container = document.getElementById('user-management-container');
             container.innerHTML = '<div class="loader"></div>';
-            volumeAnalysisModal.classList.remove('hidden');
-            setTimeout(() => volumeAnalysisModal.classList.remove('opacity-0'), 10);
-            const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione")));
-            const sheets = sheetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            let sheetSelectionHTML = '<p class="text-secondary">Nessuna scheda trovata in questo mesociclo.</p>';
-            if (sheets.length > 0) {
-                sheetSelectionHTML = sheets.map(sheet => `
-                    <label class="flex items-center space-x-3 bg-stone-800/50 p-3 rounded-lg">
-                        <input type="checkbox" name="sheet" value="${sheet.id}" class="h-4 w-4 rounded bg-stone-700 border-stone-600 text-red-600 focus:ring-red-500">
-                        <span>${sheet.nomeScheda}</span>
-                    </label>
-                `).join('');
+            try {
+                const usersQuery = query(getUsersRef(), orderBy('email'));
+                const usersSnapshot = await getDocs(usersQuery);
+                const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                adminUsersCache = allUsers; // Cache users for edit modal
+
+                let tableHTML = `
+                    <div class="max-h-[70vh] overflow-y-auto pr-2">
+                    <table class="min-w-full divide-y divide-slate-700">
+                        <thead class="bg-slate-800 sticky top-0">
+                            <tr>
+                                <th class="p-3 text-left text-xs font-semibold uppercase tracking-wider text-secondary">Email</th>
+                                <th class="p-3 text-left text-xs font-semibold uppercase tracking-wider text-secondary">Ruolo</th>
+                                <th class="p-3 text-center text-xs font-semibold uppercase tracking-wider text-secondary">Memo</th>
+                                <th class="p-3 text-right text-xs font-semibold uppercase tracking-wider text-secondary">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                `;
+
+                for (const user of allUsers) {
+                    const userHasMemo = await checkForPendingMemos(user.id);
+                    const memoBadge = userHasMemo ? '<span class="reward-badge !bg-red-600 !text-white" title="Memo Alert in Attesa"><i class="fas fa-exclamation-triangle"></i></span>' : '';
+                    
+                    tableHTML += `
+                        <tr class="hover:bg-slate-800/30">
+                            <td class="p-3 text-sm font-medium text-white">${user.email}</td>
+                            <td class="p-3 text-sm text-secondary">${user.role}</td>
+                            <td class="p-3 text-center">${memoBadge}</td>
+                            <td class="p-3 text-right space-x-2">
+                                <button class="btn btn-secondary !p-2 text-xs" data-view-user-id="${user.id}" data-user-email="${user.email}" title="Vedi Dettagli/Storico"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-secondary !p-2 text-xs" data-edit-user-id="${user.id}" title="Modifica Ruolo"><i class="fas fa-user-edit"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                tableHTML += `</tbody></table></div>`;
+                container.innerHTML = tableHTML;
+
+                // Rebind click listeners for view buttons
+                container.querySelectorAll('[data-view-user-id]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const userId = e.currentTarget.dataset.viewUserId;
+                        const userEmail = e.currentTarget.dataset.userEmail;
+                        openUserDetailsModal(userId, userEmail);
+                    });
+                });
+                container.querySelectorAll('[data-edit-user-id]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        openEditUserModal(e.currentTarget.dataset.editUserId);
+                    });
+                });
+
+            } catch (error) {
+                console.error("Errore gestione utenti:", error);
+                container.innerHTML = '<p class="text-red-400 text-center">Errore durante il caricamento degli utenti.</p>';
             }
+        }
+        
+        function openUserManagementModal() {
+            userManagementModal.classList.remove('hidden', 'opacity-0');
+            renderUserManagementContent();
+        }
+        
+        // NEW FUNCTION: Placeholder for Edit User Modal (only role)
+        async function openEditUserModal(userId) {
+            const user = adminUsersCache.find(u => u.id === userId);
+            if (!user) { showNotification("Utente non trovato.", "error"); return; }
+            
+            const container = document.getElementById('edit-user-container');
             container.innerHTML = `
-                <div class="bg-stone-900/50 p-4 rounded-lg">
-                    <h4 class="font-bold text-white mb-3">1. Imposta Frequenza Settimanale</h4>
-                    <p class="text-xs text-secondary mb-2">Quante volte a settimana si allena l'utente?</p>
-                    <input type="number" id="workouts-per-week" class="input-field w-full sm:w-1/3" placeholder="Es: 4" min="1">
-                </div>
-                <div class="bg-stone-900/50 p-4 rounded-lg">
-                     <h4 class="font-bold text-white mb-3">2. Seleziona le Schede della Rotazione</h4>
-                     <p class="text-xs text-secondary mb-2">Quali schede vengono eseguite nella settimana? (Es. Scheda A e Scheda B per una frequenza di 4 volte/sett)</p>
-                     <div id="sheet-selection-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">${sheetSelectionHTML}</div>
-                </div>
-                <div class="text-center">
-                    <button id="calculate-volume-btn" class="btn"><i class="fas fa-calculator mr-2"></i> Calcola Volume Mensile</button>
-                </div>
-                <div id="volume-results-container" class="mt-6"></div>
+                <form id="edit-user-form" data-user-id="${userId}" class="space-y-4">
+                    <p class="text-lg font-bold text-indigo-400">Modifica Ruolo per: ${user.email}</p>
+                    <div>
+                        <label for="user-role" class="text-sm text-secondary mb-1 block">Ruolo</label>
+                        <select id="user-role" name="role" class="input-field" required>
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-4 pt-2">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal(editUserModal)">Annulla</button>
+                        <button type="submit" class="btn">Salva Ruolo</button>
+                    </div>
+                </form>
             `;
-            document.getElementById('calculate-volume-btn').addEventListener('click', () => calculateAndDisplayProjectedVolume(sheets));
+            document.getElementById('edit-user-form').addEventListener('submit', handleUpdateUser);
+            editUserModal.classList.remove('hidden', 'opacity-0');
         }
 
-        async function calculateAndDisplayProjectedVolume(sheets) {
-            const workoutsPerWeek = parseInt(document.getElementById('workouts-per-week').value, 10);
+        async function handleUpdateUser(e) {
+            e.preventDefault();
+            const form = e.target;
+            const userId = form.dataset.userId;
+            const newRole = form.elements.role.value;
+
+            try {
+                await updateDoc(doc(getUsersRef(), userId), { role: newRole });
+                showNotification(`Ruolo utente aggiornato a ${newRole}!`, "success");
+                closeModal(editUserModal);
+                renderUserManagementContent(); // Refresh user list
+            } catch (error) {
+                console.error("Errore aggiornamento ruolo:", error);
+                showNotification("Errore nell'aggiornamento del ruolo.", "error");
+            }
+        }
+        
+        async function openUserDetailsModal(userId, userEmail) {
+            const userDetailsContainer = document.getElementById('user-details-container');
+            userDetailsContainer.innerHTML = '<div class="loader"></div>';
+            
+            document.getElementById('user-details-modal').classList.remove('hidden', 'opacity-0');
+
+            userDetailsContainer.innerHTML = `
+                <div class="bg-slate-800/50 p-4 rounded-lg mb-4">
+                    <p class="text-lg font-bold text-indigo-400 mb-1">${userEmail}</p>
+                    <p class="text-sm text-secondary">ID Utente: <span class="text-xs font-mono text-white">${userId}</span></p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button id="select-user-from-details-btn" class="btn w-full"><i class="fas fa-arrow-right mr-2"></i> Passa a questa Scheda</button>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="font-bold text-white mb-3 flex items-center"><i class="fas fa-history mr-2 text-indigo-400"></i> Storico Allenamenti Loggati (Ultimi 30)</h4>
+                    <div id="user-details-history-container"></div>
+                </div>
+            `;
+
+            document.getElementById('select-user-from-details-btn').addEventListener('click', () => {
+                selectUser(userId, userEmail);
+                closeModal(userDetailsModal);
+                closeModal(userManagementModal);
+            });
+
+            renderWorkoutHistory(userId);
+        }
+
+        // NEW FUNCTION: Admin Manual Log Modal Handler
+        async function openAdminManualLogModal(userId) {
+            const user = adminUsersCache.find(u => u.id === userId);
+            if (!user) { showNotification("Utente non trovato.", "error"); return; }
+            
+            document.getElementById('admin-manual-log-info').textContent = `Log manuale per l'utente: ${user.email}`;
+
+            const mesoSelector = document.getElementById('admin-log-mesocycle-selector');
+            const sheetSelector = document.getElementById('admin-log-sheet-selector');
+            const submitBtn = document.getElementById('submit-admin-manual-log-btn');
+            
+            submitBtn.disabled = true;
+
+            // Load Mesocycles for the selected user
+            const mesocyclesSnapshot = await getDocs(query(collection(db, 'users', userId, 'mesocycles'), orderBy("dataCreazione", "desc")));
+            let mesoOptions = '<option value="">Seleziona Mesociclo</option>';
+            mesocyclesSnapshot.forEach(doc => {
+                mesoOptions += `<option value="${doc.id}">${doc.data().nome}</option>`;
+            });
+            mesoSelector.innerHTML = mesoOptions;
+            sheetSelector.innerHTML = '<option value="">Seleziona Scheda</option>';
+            document.getElementById('admin-log-week-input').value = 1;
+            
+            // Default Date/Time
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('admin-log-date-input').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+
+            // Event Listeners for selectors
+            const updateSheetOptions = async () => {
+                const mesoId = mesoSelector.value;
+                if (mesoId) {
+                    const sheetsSnapshot = await getDocs(query(collection(db, 'users', userId, 'mesocycles', mesoId, 'trainingSheets'), orderBy("dataCreazione", "desc")));
+                    let sheetOptions = '<option value="">Seleziona Scheda</option>';
+                    sheetsSnapshot.forEach(doc => {
+                        sheetOptions += `<option value="${doc.id}" data-sheet-name="${doc.data().nomeScheda}" data-weeks="${doc.data().numeroSettimane || 1}">${doc.data().nomeScheda}</option>`;
+                    });
+                    sheetSelector.innerHTML = sheetOptions;
+                } else {
+                    sheetSelector.innerHTML = '<option value="">Seleziona Scheda</option>';
+                }
+                updateSubmitButtonState();
+            };
+
+            const updateSubmitButtonState = () => {
+                const mesoId = mesoSelector.value;
+                const sheetId = sheetSelector.value;
+                const date = document.getElementById('admin-log-date-input').value;
+                const week = parseInt(document.getElementById('admin-log-week-input').value, 10);
+                
+                const selectedSheet = sheetSelector.options[sheetSelector.selectedIndex];
+                const totalWeeks = parseInt(selectedSheet?.dataset?.weeks, 10) || 1;
+
+                submitBtn.disabled = !(mesoId && sheetId && date && week >= 1 && week <= totalWeeks);
+            };
+
+            mesoSelector.onchange = updateSheetOptions;
+            sheetSelector.onchange = updateSubmitButtonState;
+            document.getElementById('admin-log-week-input').oninput = updateSubmitButtonState;
+            document.getElementById('admin-log-date-input').onchange = updateSubmitButtonState;
+
+            // Submit handler
+            submitBtn.onclick = async () => {
+                const mesoId = mesoSelector.value;
+                const sheetId = sheetSelector.value;
+                const sheetName = sheetSelector.options[sheetSelector.selectedIndex]?.dataset?.sheetName;
+                const week = parseInt(document.getElementById('admin-log-week-input').value, 10);
+                const date = document.getElementById('admin-log-date-input').value;
+                
+                if (mesoId && sheetId && sheetName && week && date) {
+                    const confirmed = await showConfirmModal(`Confermi di registrare l'allenamento: ${sheetName}, Sett. ${week} per il ${new Date(date).toLocaleString('it-IT')} per l'utente ${user.email}?`);
+                    
+                    if (confirmed) {
+                         submitBtn.disabled = true;
+                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Registrazione...';
+                         await logWorkoutSession(sheetId, week, sheetName, true, new Date(date).toISOString());
+                         closeModal(adminManualLogModal);
+                    }
+                }
+            };
+            
+            adminManualLogModal.classList.remove('hidden', 'opacity-0');
+        }
+
+        // NEW FUNCTION: Handle Edit Workout Date for old logs
+        async function openEditWorkoutDateModal(logId, currentSheetName, currentDate) {
+            if (currentUserRole !== 'admin') return;
+            
+            const inputDate = new Date(currentDate).toISOString().slice(0, 16);
+            
+            document.getElementById('edit-workout-date-info').textContent = `Modifica la data per il log: ${currentSheetName}`;
+            document.getElementById('new-workout-date').value = inputDate;
+            
+            const form = document.getElementById('edit-workout-date-form');
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const newDate = document.getElementById('new-workout-date').value;
+                if (!newDate) {
+                    showNotification("Seleziona una data valida.", "error");
+                    return;
+                }
+                
+                const logRef = doc(getWorkoutHistoryRef(selectedUserId), logId);
+                await updateDoc(logRef, { completedAt: new Date(newDate).toISOString() });
+                showNotification("Data log aggiornata!", "success");
+                
+                closeModal(editWorkoutDateModal);
+                renderWorkoutHistory(selectedUserId); // Refresh history list
+            };
+            
+            editWorkoutDateModal.classList.remove('hidden', 'opacity-0');
+        }
+        
+        async function renderWorkoutHistory(userId) {
+            const historyContainer = document.getElementById('user-details-history-container');
+            if (!historyContainer) return;
+            historyContainer.innerHTML = '<div class="loader"></div>';
+
+            try {
+                const historyQuery = query(getWorkoutHistoryRef(userId), orderBy('completedAt', 'desc'), limit(30));
+                const historySnapshot = await getDocs(historyQuery);
+                const history = historySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                if (history.length === 0) {
+                    historyContainer.innerHTML = '<p class="text-secondary text-center">Nessun allenamento registrato in automatico.</p>';
+                    return;
+                }
+
+                let historyHTML = `<div class="space-y-3 max-h-80 overflow-y-auto pr-2">`;
+                history.forEach(log => {
+                    const date = new Date(log.completedAt).toLocaleDateString('it-IT', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    
+                    historyHTML += `
+                        <div class="bg-slate-800/50 p-3 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                            <span class="font-semibold text-white">${log.sheetName} (Sett. ${log.week})</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-secondary mt-1 sm:mt-0"><i class="fas fa-calendar-alt mr-1"></i> ${date}</span>
+                                ${currentUserRole === 'admin' ? 
+                                    `<button class="btn btn-secondary !p-1 text-xs edit-date-btn" 
+                                             data-log-id="${log.id}" 
+                                             data-sheet-name="${log.sheetName}" 
+                                             data-date="${log.completedAt}"
+                                             title="Modifica Data">
+                                             <i class="fas fa-edit"></i>
+                                     </button>` 
+                                     : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                historyHTML += '</div>';
+                historyContainer.innerHTML = historyHTML;
+                
+                if (currentUserRole === 'admin') {
+                    historyContainer.querySelectorAll('.edit-date-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const { logId, sheetName, date } = e.currentTarget.dataset;
+                            openEditWorkoutDateModal(logId, sheetName, date);
+                        });
+                    });
+                }
+
+            } catch (error) {
+                console.error("Errore nel caricamento storico allenamenti:", error);
+                historyContainer.innerHTML = '<p class="text-red-400 text-center">Errore nel caricamento dello storico.</p>';
+            }
+        }
+        
+
+        // VOLUME ANALYSIS REFACTOR
+        async function calculateEffectiveVolume(selectedSheetIds, mesoId, userId) {
+            const historySnapshot = await getDocs(query(getWorkoutHistoryRef(userId), orderBy('completedAt', 'desc')));
+            const history = historySnapshot.docs.map(doc => doc.data()).filter(log => log.mesoId === mesoId); 
+            
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentHistory = history.filter(log => new Date(log.completedAt) >= thirtyDaysAgo);
+            
+            const sheetExercisesMap = {};
+            for (const sheetId of selectedSheetIds) {
+                if (!sheetExercisesMap[sheetId]) {
+                    const exercisesSnapshot = await getDocs(getExercisesRef(mesoId, sheetId));
+                    sheetExercisesMap[sheetId] = exercisesSnapshot.docs.map(doc => doc.data());
+                }
+            }
+
+            const effectiveVolumeMonthly = {};
+            for (const group in MACROCYCLE_RULES) {
+                effectiveVolumeMonthly[group] = 0;
+            }
+            
+            recentHistory.forEach(log => {
+                const exercises = sheetExercisesMap[log.sheetId] || [];
+                
+                exercises.forEach(ex => {
+                    const { categoria, serie } = ex;
+                    if (!categoria || !serie) return;
+
+                    for (const group in MACROCYCLE_RULES) {
+                        const rule = MACROCYCLE_RULES[group];
+                        let addedVolume = 0;
+                        
+                        if (rule.main === categoria) {
+                            addedVolume = serie;
+                        } else {
+                            const additionalRule = rule.additional.find(r => r.category === categoria);
+                            if (additionalRule) {
+                                addedVolume = serie * (additionalRule.percentage / 100);
+                            }
+                        }
+                        
+                        if (addedVolume > 0) {
+                            effectiveVolumeMonthly[group] += addedVolume;
+                        }
+                    }
+                });
+            });
+
+            const weeksInMonth = 4.33;
+            const effectiveVolumeWeekly = {};
+            for (const group in effectiveVolumeMonthly) {
+                effectiveVolumeWeekly[group] = (effectiveVolumeMonthly[group] / weeksInMonth);
+            }
+
+            return { monthly: effectiveVolumeMonthly, weekly: effectiveVolumeWeekly, numWorkouts: recentHistory.length };
+        }
+        
+        async function calculateVolumeAnalysis(sheets) {
+            const workoutsPerWeekInput = document.getElementById('workouts-per-week');
+            if (!workoutsPerWeekInput) return;
+
+            const workoutsPerWeek = parseInt(workoutsPerWeekInput.value, 10) || 0;
             const selectedSheetCheckboxes = document.querySelectorAll('#sheet-selection-container input[type="checkbox"]:checked');
             const selectedSheetIds = Array.from(selectedSheetCheckboxes).map(cb => cb.value);
             const resultsContainer = document.getElementById('volume-results-container');
             resultsContainer.innerHTML = '<div class="loader"></div>';
 
-            if (!workoutsPerWeek || workoutsPerWeek <= 0) {
-                resultsContainer.innerHTML = '<p class="text-center text-red-400">Inserisci un numero valido di allenamenti a settimana.</p>';
-                return;
-            }
             if (selectedSheetIds.length === 0) {
-                resultsContainer.innerHTML = '<p class="text-center text-red-400">Seleziona almeno una scheda da includere nel calcolo.</p>';
-                return;
+                 resultsContainer.innerHTML = '<p class="text-center text-red-400">Seleziona almeno una scheda da includere nel calcolo.</p>';
+                 return;
             }
 
             const multiplier = workoutsPerWeek / selectedSheetIds.length;
@@ -2056,89 +2900,181 @@
 
             const rotationVolumeData = {};
             for (const group in MACROCYCLE_RULES) {
-                rotationVolumeData[group] = { totalSets: 0, composition: {} };
+                 rotationVolumeData[group] = { totalSets: 0, composition: {} };
             }
 
             allExercises.forEach(ex => {
-                const { categoria, serie } = ex;
-                if (!categoria || !serie) return;
+                 const { categoria, serie } = ex;
+                 if (!categoria || !serie) return;
 
-                for (const group in MACROCYCLE_RULES) {
-                    const rule = MACROCYCLE_RULES[group];
-                    let addedVolume = 0;
-                    let contributingCategory = null;
-                    let percentage = 100;
+                 for (const group in MACROCYCLE_RULES) {
+                     const rule = MACROCYCLE_RULES[group];
+                     let addedVolume = 0;
+                     let contributingCategory = null;
+                     let percentage = 100;
 
-                    if (rule.main === categoria) {
-                        addedVolume = serie;
-                        contributingCategory = categoria;
-                    } else {
-                        const additionalRule = rule.additional.find(r => r.category === categoria);
-                        if (additionalRule) {
-                            addedVolume = serie * (additionalRule.percentage / 100);
-                            percentage = additionalRule.percentage;
-                            contributingCategory = categoria;
-                        }
-                    }
+                     if (rule.main === categoria) {
+                         addedVolume = serie;
+                         contributingCategory = categoria;
+                     } else {
+                         const additionalRule = rule.additional.find(r => r.category === categoria);
+                         if (additionalRule) {
+                             addedVolume = serie * (additionalRule.percentage / 100);
+                             percentage = additionalRule.percentage;
+                             contributingCategory = categoria;
+                         }
+                     }
 
-                    if (addedVolume > 0) {
-                        rotationVolumeData[group].totalSets += addedVolume;
-                        if (!rotationVolumeData[group].composition[contributingCategory]) {
-                            rotationVolumeData[group].composition[contributingCategory] = { sets: 0, percentage: 0 };
-                        }
-                        rotationVolumeData[group].composition[contributingCategory].sets += serie;
-                        rotationVolumeData[group].composition[contributingCategory].percentage = percentage;
-                    }
-                }
+                     if (addedVolume > 0) {
+                         rotationVolumeData[group].totalSets += addedVolume;
+                         if (!rotationVolumeData[group].composition[contributingCategory]) {
+                             rotationVolumeData[group].composition[contributingCategory] = { sets: 0, percentage: 0 };
+                         }
+                         rotationVolumeData[group].composition[contributingCategory].sets += serie;
+                         rotationVolumeData[group].composition[contributingCategory].percentage = percentage;
+                     }
+                 }
             });
 
             const weeksInMonth = 4.33;
-            let resultsHTML = `
-                <h3 class="text-lg font-bold text-white mb-4">Risultati Volume Mensile Stimato</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-stone-800/50">
-                            <tr>
-                                <th class="p-3">Gruppo Muscolare</th>
-                                <th class="p-3">Volume Totale Mensile</th>
-                                <th class="p-3">Dettaglio Volume (per rotazione di ${selectedSheetIds.length} schede)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-stone-800">
-                `;
-            const sortedGroups = Object.keys(rotationVolumeData).sort();
-            sortedGroups.forEach(group => {
-                const rotationSets = rotationVolumeData[group].totalSets;
-                if (rotationSets > 0) {
-                    const actualWeeklyVolume = rotationSets * multiplier;
-                    const monthlySets = (actualWeeklyVolume * weeksInMonth).toFixed(1);
-                    let compositionHTML = Object.entries(rotationVolumeData[group].composition).map(([cat, data]) => {
-                        const contribution = (data.sets * (data.percentage / 100)).toFixed(1);
-                        return `<div>${cat}: ${data.sets} serie (${data.percentage}%) = <b>${contribution}</b></div>`;
-                    }).join('');
+            const effectiveUserId = selectedUserId || currentUser.uid;
 
-                    resultsHTML += `
-                        <tr class="hover:bg-stone-800/30">
-                            <td class="p-3 font-bold text-red-400">${group}</td>
-                            <td class="p-3 font-semibold">${monthlySets} serie</td>
-                            <td class="p-3 text-xs text-secondary">Volume rotazione: <b>${rotationSets.toFixed(1)}</b><hr class="my-1 border-stone-700">${compositionHTML}</td>
-                        </tr>
-                    `;
+            // Phase 2: Effective Volume (using history)
+            let effectiveVolumeData = { monthly: {}, weekly: {}, numWorkouts: 0 };
+            if (effectiveUserId) {
+                effectiveVolumeData = await calculateEffectiveVolume(selectedSheetIds, currentMesoId, effectiveUserId);
+            }
+            
+            // Phase 3: Display Results
+            let projectedMonthlyHTML = '';
+            let projectedWeeklyHTML = '';
+            
+            if (workoutsPerWeek > 0) {
+                projectedMonthlyHTML = `
+                    <h4 class="font-bold text-white mb-3 flex items-center"><i class="fas fa-chart-line mr-2"></i> Proiezione Volume Teorico (Base ${workoutsPerWeek}x/sett)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-800/50">
+                                <tr>
+                                    <th class="p-3">Gruppo Muscolare</th>
+                                    <th class="p-3">Volume Rotazione</th>
+                                    <th class="p-3">Volume Settimanale (Teorico)</th>
+                                    <th class="p-3">Volume Mensile (Teorico)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                `;
+                
+                const sortedGroups = Object.keys(rotationVolumeData).sort();
+                sortedGroups.forEach(group => {
+                    const rotationSets = rotationVolumeData[group].totalSets;
+                    if (rotationSets > 0) {
+                        const actualWeeklyVolume = rotationSets * multiplier;
+                        const monthlySets = (actualWeeklyVolume * weeksInMonth).toFixed(1);
+                        
+                        projectedMonthlyHTML += `
+                            <tr class="hover:bg-slate-800/30">
+                                <td class="p-3 font-bold text-indigo-400">${group}</td>
+                                <td class="p-3 font-semibold">${rotationSets.toFixed(1)} serie</td>
+                                <td class="p-3 font-semibold">${actualWeeklyVolume.toFixed(1)} serie</td>
+                                <td class="p-3 font-semibold">${monthlySets} serie</td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                projectedMonthlyHTML += `</tbody></table></div>`;
+            } else {
+                projectedMonthlyHTML = `<p class="text-center text-secondary">Inserisci la Frequenza Settimanale per visualizzare la Proiezione Teorica.</p>`;
+            }
+
+
+            // Effective Volume HTML
+            let effectiveVolumeHTML = `
+                <h4 class="font-bold text-white mb-3 flex items-center"><i class="fas fa-history mr-2"></i> Volume Effettivo (Ultimi 30 giorni)</h4>
+                <p class="text-sm text-secondary mb-3">Basato su ${effectiveVolumeData.numWorkouts} allenamenti loggati in questo mesociclo.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            `;
+            
+            let effectiveMonthlyList = `<div class="bg-slate-900/50 p-3 rounded-lg"><h5 class="font-semibold text-indigo-400 mb-2">Volume Mensile Effettivo</h5><ul class="space-y-1">`;
+            let effectiveWeeklyList = `<div class="bg-slate-900/50 p-3 rounded-lg"><h5 class="font-semibold text-indigo-400 mb-2">Volume Settimanale Effettivo (Media)</h5><ul class="space-y-1">`;
+            
+            let hasEffectiveVolume = false;
+            Object.keys(effectiveVolumeData.monthly).sort().forEach(group => {
+                const monthlySets = effectiveVolumeData.monthly[group].toFixed(1);
+                const weeklySets = effectiveVolumeData.weekly[group].toFixed(1);
+                if (parseFloat(monthlySets) > 0) {
+                    hasEffectiveVolume = true;
+                    effectiveMonthlyList += `<li class="flex justify-between"><span class="text-white">${group}:</span> <span class="font-bold">${monthlySets} serie</span></li>`;
+                    effectiveWeeklyList += `<li class="flex justify-between"><span class="text-white">${group}:</span> <span class="font-bold">${weeklySets} serie</span></li>`;
                 }
             });
 
-            resultsHTML += `</tbody></table></div>`;
-            resultsContainer.innerHTML = resultsHTML;
+            effectiveMonthlyList += `</ul></div>`;
+            effectiveWeeklyList += `</ul></div>`;
+
+            if (hasEffectiveVolume) {
+                effectiveVolumeHTML += effectiveMonthlyList + effectiveWeeklyList;
+            } else {
+                effectiveVolumeHTML += `<p class="text-center text-secondary col-span-full">Nessun dato di volume effettivo negli ultimi 30 giorni.</p>`;
+            }
+            effectiveVolumeHTML += `</div>`;
+            
+            resultsContainer.innerHTML = `
+                <div class="bg-slate-900/50 p-4 rounded-lg mb-6">${projectedMonthlyHTML}</div>
+                <div class="bg-slate-900/50 p-4 rounded-lg">${effectiveVolumeHTML}</div>
+            `;
         }
 
-        document.getElementById('close-volume-modal').addEventListener('click', () => {
-            volumeAnalysisModal.classList.add('opacity-0');
-            setTimeout(() => volumeAnalysisModal.classList.add('hidden'), 250);
-        });
+
+        async function openVolumeAnalysisModal() {
+            if (!currentMesoId) {
+                showNotification("Seleziona prima un mesociclo.", "warning");
+                return;
+            }
+
+            const container = document.getElementById('volume-analysis-container');
+            container.innerHTML = '<div class="loader"></div>';
+            volumeAnalysisModal.classList.remove('hidden', 'opacity-0');
+            
+            const sheetsSnapshot = await getDocs(query(getSheetsRef(currentMesoId), orderBy("dataCreazione")));
+            const sheets = sheetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            let sheetSelectionHTML = '<p class="text-secondary">Nessuna scheda trovata in questo mesociclo.</p>';
+            if (sheets.length > 0) {
+                sheetSelectionHTML = sheets.map(sheet => `
+                    <label class="flex items-center space-x-3 bg-slate-800/50 p-3 rounded-lg cursor-pointer">
+                        <input type="checkbox" name="sheet" value="${sheet.id}" class="h-4 w-4 rounded bg-slate-700 border-slate-600 text-indigo-600 focus:ring-indigo-500">
+                        <span>${sheet.nomeScheda}</span>
+                    </label>
+                `).join('');
+            }
+
+            container.innerHTML = `
+                <div class="bg-slate-900/50 p-4 rounded-lg">
+                    <h4 class="font-bold text-white mb-3">1. Imposta Frequenza Settimanale (Per Proiezione Teorica)</h4>
+                    <p class="text-xs text-secondary mb-2">Quante volte a settimana si allena l'utente?</p>
+                    <input type="number" id="workouts-per-week" class="input-field w-full sm:w-1/3" placeholder="Es: 4" min="0">
+                </div>
+                <div class="bg-slate-900/50 p-4 rounded-lg">
+                     <h4 class="font-bold text-white mb-3">2. Seleziona le Schede della Rotazione</h4>
+                     <p class="text-xs text-secondary mb-2">Quali schede vengono eseguite nella rotazione? (Necessario per entrambi i calcoli)</p>
+                     <div id="sheet-selection-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">${sheetSelectionHTML}</div>
+                </div>
+                <div class="text-center">
+                    <button id="calculate-volume-btn" class="btn"><i class="fas fa-calculator mr-2"></i> Calcola Volumi</button>
+                </div>
+                <div id="volume-results-container" class="mt-6"></div>
+            `;
+            document.getElementById('calculate-volume-btn').addEventListener('click', () => calculateVolumeAnalysis(sheets));
+            
+            if (sheets.length > 0) {
+                document.querySelector('#sheet-selection-container input[type="checkbox"]').checked = true;
+            }
+        }
 
         // --- INIZIALIZZAZIONE APP ---
         window.addEventListener('load', setupAdminAccount);
-
     </script>
 </body>
 </html>
