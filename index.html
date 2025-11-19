@@ -48,7 +48,18 @@
         .input-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
         html.dark .input-field:focus { box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4); /* Indigo-600 glow */ }
         
-        .textarea-field { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 10px 12px; width: 100%; transition: all 0.2s; color: var(--text-primary); resize: vertical; min-height: 80px; }
+        .textarea-field { 
+            background-color: var(--bg-secondary); 
+            border: 1px solid var(--border-color); 
+            border-radius: 0.5rem; 
+            padding: 10px 12px; 
+            width: 100%; 
+            transition: all 0.2s; 
+            color: var(--text-primary); 
+            resize: vertical; 
+            min-height: 40px; /* Ridotto min-height */
+            height: auto; /* Permette l'adattamento al contenuto */
+        }
         .textarea-field:focus { outline: none; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent-dark); }
         html.dark .textarea-field:focus { box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4); }
 
@@ -1184,6 +1195,8 @@
 
             let imagesHTML = '';
             const imageUrls = [ex.imageUrl, ex.imageUrl2, ex.imageUrl3, ex.imageUrl4].filter(url => url);
+            
+            // FIX: Correzione bug duplicazione immagini (rimosso loop interno errato)
             if (imageUrls.length > 0) {
                 if (imageUrls.length > 2) { // Use grid for 3 or 4 images
                     imagesHTML += `<div class="image-grid">`;
@@ -1194,9 +1207,8 @@
                 } else { // Use flex for 1 or 2 images
                     imagesHTML += `<div class="flex gap-2 mt-2 justify-center">`;
                     imageUrls.forEach(url => {
-                        imageUrls.forEach(url => {
-                            imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
-                        });
+                        // FIX: Utilizzo corretto dell'HTML per le immagini senza duplicazione
+                        imagesHTML += `<div class="${imageUrls.length === 1 ? 'w-1/2 max-w-[200px]' : 'w-1/2'}"><img src="${url}" alt="${ex.nomeEsercizio}" class="exercise-image" onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/E5E7EB?text=NO_IMG';"></div>`;
                     });
                     imagesHTML += '</div>';
                 }
@@ -1845,12 +1857,18 @@
                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div>
                              <label class="text-sm text-secondary">Immagine 1</label>
-                             <input type="url" name="imageUrl" class="input-field mb-2" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
+                             <div class="flex items-center gap-2">
+                                <input type="url" name="imageUrl" class="input-field mb-2 flex-grow" value="${exercise.imageUrl || ''}" placeholder="URL Immagine 1">
+                                ${exercise.imageUrl ? `<button type="button" class="btn btn-danger !p-2 !w-8 !h-8 flex-shrink-0" data-clear-image="imageUrl" title="Rimuovi URL"><i class="fas fa-trash"></i></button>` : ''}
+                             </div>
                              <input type="file" name="imageFile1" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                          </div>
                          <div>
                              <label class="text-sm text-secondary">Immagine 2</label>
-                             <input type="url" name="imageUrl2" class="input-field mb-2" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
+                             <div class="flex items-center gap-2">
+                                 <input type="url" name="imageUrl2" class="input-field mb-2 flex-grow" value="${exercise.imageUrl2 || ''}" placeholder="URL Immagine 2">
+                                 ${exercise.imageUrl2 ? `<button type="button" class="btn btn-danger !p-2 !w-8 !h-8 flex-shrink-0" data-clear-image="imageUrl2" title="Rimuovi URL"><i class="fas fa-trash"></i></button>` : ''}
+                             </div>
                              <input type="file" name="imageFile2" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                          </div>
                      </div>
@@ -1869,12 +1887,18 @@
                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                              <div>
                                  <label class="text-sm text-secondary">Immagine 3</label>
-                                 <input type="url" name="imageUrl3" class="input-field mb-2" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
+                                 <div class="flex items-center gap-2">
+                                     <input type="url" name="imageUrl3" class="input-field mb-2 flex-grow" value="${exercise.imageUrl3 || ''}" placeholder="URL Immagine 3">
+                                     ${exercise.imageUrl3 ? `<button type="button" class="btn btn-danger !p-2 !w-8 !h-8 flex-shrink-0" data-clear-image="imageUrl3" title="Rimuovi URL"><i class="fas fa-trash"></i></button>` : ''}
+                                 </div>
                                  <input type="file" name="imageFile3" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                              </div>
                              <div>
                                  <label class="text-sm text-secondary">Immagine 4</label>
-                                 <input type="url" name="imageUrl4" class="input-field mb-2" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
+                                 <div class="flex items-center gap-2">
+                                     <input type="url" name="imageUrl4" class="input-field mb-2 flex-grow" value="${exercise.imageUrl4 || ''}" placeholder="URL Immagine 4">
+                                     ${exercise.imageUrl4 ? `<button type="button" class="btn btn-danger !p-2 !w-8 !h-8 flex-shrink-0" data-clear-image="imageUrl4" title="Rimuovi URL"><i class="fas fa-trash"></i></button>` : ''}
+                                 </div>
                                  <input type="file" name="imageFile4" class="text-sm w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600">
                              </div>
                          </div>
@@ -1888,6 +1912,22 @@
              const editForm = document.getElementById('edit-exercise-form');
              const seriesInput = editForm.elements.serie;
              const repsContainer = editForm.querySelector('#edit-ripetizioni-per-serie-container');
+
+             // Aggiungi listener per la rimozione dell'immagine
+             editForm.querySelectorAll('button[data-clear-image]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const fieldName = e.currentTarget.dataset.clearImage;
+                    const urlInput = editForm.querySelector(`input[name="${fieldName}"]`);
+                    if (urlInput) {
+                        urlInput.value = '';
+                        // Rimuovi il pulsante stesso e il file input associato se si tratta di un URL
+                        e.currentTarget.remove();
+                        const fileInput = editForm.querySelector(`input[name="imageFile${fieldName.slice(-1)}"]`);
+                        if (fileInput) fileInput.value = '';
+                        showNotification(`URL immagine per ${fieldName} rimosso. Salva le modifiche per confermare.`, "info");
+                    }
+                });
+            });
 
              generateRepInputs(repsContainer, exercise.serie, exercise.ripetizioniPerSerie);
 
@@ -1916,17 +1956,29 @@
 
              const exerciseInCache = exercisesCache.find(ex => ex.id === exId);
              
-             // Reuse existing URLs if no new file is uploaded
-             const imageUrl1 = form.elements.imageFile1.files[0] ? await uploadImage(form.elements.imageFile1.files[0]) : (form.elements.imageUrl.value || exerciseInCache.imageUrl);
-             const imageUrl2 = form.elements.imageFile2.files[0] ? await uploadImage(form.elements.imageFile2.files[0]) : (form.elements.imageUrl2.value || exerciseInCache.imageUrl2);
+             // Reuse existing URLs or use the URL input value, overriding with new file upload
+             const getFinalUrl = async (urlInputName, fileInputName) => {
+                 const urlInput = form.elements[urlInputName];
+                 const fileInput = form.elements[fileInputName];
+                 if (fileInput.files.length > 0) {
+                     return await uploadImage(fileInput.files[0]);
+                 }
+                 // Se non c'è un file nuovo, usa il valore dell'input URL (che può essere vuoto se l'utente ha cancellato l'URL con il tasto)
+                 return urlInput.value || '';
+             };
 
+             const imageUrl1 = await getFinalUrl('imageUrl', 'imageFile1');
+             const imageUrl2 = await getFinalUrl('imageUrl2', 'imageFile2');
+             
              const isCircuit = form.elements.isCircuit.checked;
-             let imageUrl3 = null, imageUrl4 = null;
-             let circuitWorkTime = null, circuitRestTime = null;
+             let imageUrl3 = '';
+             let imageUrl4 = '';
+             let circuitWorkTime = null;
+             let circuitRestTime = null;
 
              if (isCircuit) {
-                 imageUrl3 = form.elements.imageFile3?.files[0] ? await uploadImage(form.elements.imageFile3.files[0]) : (form.elements.imageUrl3.value || exerciseInCache.imageUrl3);
-                 imageUrl4 = form.elements.imageFile4?.files[0] ? await uploadImage(form.elements.imageFile4.files[0]) : (form.elements.imageUrl4.value || exerciseInCache.imageUrl4);
+                 imageUrl3 = await getFinalUrl('imageUrl3', 'imageFile3');
+                 imageUrl4 = await getFinalUrl('imageUrl4', 'imageFile4');
 
                  circuitWorkTime = parseInt(form.elements.circuitWorkTime.value, 10) || null;
                  circuitRestTime = parseInt(form.elements.circuitRestTime.value, 10) || null;
@@ -1949,8 +2001,8 @@
                  isCircuit: isCircuit,
                  circuitWorkTime: circuitWorkTime,
                  circuitRestTime: circuitRestTime,
-                 imageUrl3: isCircuit ? imageUrl3 : "",
-                 imageUrl4: isCircuit ? imageUrl4 : ""
+                 imageUrl3: imageUrl3,
+                 imageUrl4: imageUrl4
              };
 
              await updateDoc(doc(getExercisesRef(currentMesoId, currentSheetId), exId), updatedData);
